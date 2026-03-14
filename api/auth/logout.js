@@ -7,10 +7,11 @@ module.exports = async function handler(req, res) {
 
   const auth = req.headers.authorization;
   try {
-    const origin = req.headers.origin || req.headers.referer?.replace(/\/$/, '') || `https://${req.headers.host}`;
+    const baseUrl = `https://${req.headers.host}`;
     await fetch(`${process.env.NEON_AUTH_URL}/sign-out`, {
       method: 'POST',
-      headers: auth ? { 'Authorization': auth, 'Origin': origin } : { 'Origin': origin }
+      headers: auth ? { 'Authorization': auth, 'Content-Type': 'application/json' } : { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ callbackURL: baseUrl })
     });
   } catch (e) {}
   res.status(200).json({ ok: true });

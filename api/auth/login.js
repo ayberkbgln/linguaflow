@@ -11,18 +11,18 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    const origin = req.headers.origin || req.headers.referer?.replace(/\/$/, '') || `https://${req.headers.host}`;
+    const baseUrl = `https://${req.headers.host}`;
     const r = await fetch(`${process.env.NEON_AUTH_URL}/sign-in/email`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Origin': origin },
-      body: JSON.stringify({ email, password })
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password, callbackURL: baseUrl })
     });
     const data = await r.json();
     if (!r.ok) {
-      return res.status(r.status).json({ error: data.message || 'E-posta veya şifre hatalı' });
+      return res.status(r.status).json({ error: data.message || data.error || 'E-posta veya şifre hatalı' });
     }
     res.status(200).json(data);
   } catch (e) {
-    res.status(500).json({ error: 'Sunucu hatası' });
+    res.status(500).json({ error: 'Sunucu hatası: ' + e.message });
   }
 };
