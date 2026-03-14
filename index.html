@@ -4,182 +4,553 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LinguaFlow — İngilizce Öğren</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600&family=Outfit:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg-primary: #0a0f1c;
-  --bg-secondary: #111827;
-  --bg-card: #1a2236;
-  --bg-card-hover: #1f2942;
-  --bg-elevated: #243049;
-  --accent-primary: #f59e0b;
-  --accent-secondary: #fbbf24;
-  --accent-glow: rgba(245, 158, 11, 0.15);
-  --accent-green: #34d399;
-  --accent-green-glow: rgba(52, 211, 153, 0.15);
-  --accent-red: #f87171;
-  --accent-blue: #60a5fa;
-  --accent-purple: #a78bfa;
-  --text-primary: #f1f5f9;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
-  --border: rgba(148, 163, 184, 0.08);
-  --border-accent: rgba(245, 158, 11, 0.3);
-  --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
-  --shadow-md: 0 8px 32px rgba(0,0,0,0.4);
-  --shadow-lg: 0 16px 64px rgba(0,0,0,0.5);
-  --radius-sm: 8px;
-  --radius-md: 14px;
-  --radius-lg: 20px;
-  --radius-xl: 28px;
+  --bg-deep: #0c0a09;
+  --bg-primary: #1c1917;
+  --bg-card: #292524;
+  --bg-card-hover: #322f2d;
+  --bg-elevated: #3b3734;
+  --bg-input: #1c1917;
+  --amber: #e2a229;
+  --amber-light: #f0c45c;
+  --amber-glow: rgba(226, 162, 41, 0.12);
+  --amber-glow-strong: rgba(226, 162, 41, 0.22);
+  --emerald: #4ade80;
+  --emerald-glow: rgba(74, 222, 128, 0.12);
+  --rose: #fb7185;
+  --rose-glow: rgba(251, 113, 133, 0.12);
+  --sky: #7dd3fc;
+  --sky-glow: rgba(125, 211, 252, 0.12);
+  --violet: #c4b5fd;
+  --violet-glow: rgba(196, 181, 253, 0.12);
+  --text-1: #fafaf9;
+  --text-2: #d6d3d1;
+  --text-3: #a8a29e;
+  --text-4: #78716c;
+  --border-1: rgba(255,255,255,0.06);
+  --border-2: rgba(255,255,255,0.10);
+  --border-amber: rgba(226, 162, 41, 0.25);
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-body: 'Outfit', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
 }
-* { margin: 0; padding: 0; box-sizing: border-box; }
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
 body {
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  background: var(--bg-primary);
-  color: var(--text-primary);
+  font-family: var(--font-body);
+  background: var(--bg-deep);
+  color: var(--text-1);
   min-height: 100vh;
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
 }
-/* Ambient background */
-.ambient-bg {
+/* Noise texture overlay */
+body::before {
+  content: '';
   position: fixed;
   inset: 0;
-  z-index: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px;
+}
+::selection { background: var(--amber); color: var(--bg-deep); }
+.screen { display: none; }
+.screen.active { display: block; }
+
+/* ===== AUTH SCREENS ===== */
+.auth-page {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  position: relative;
+}
+.auth-brand {
+  background: var(--bg-primary);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 60px 56px;
+  position: relative;
   overflow: hidden;
+  border-right: 1px solid var(--border-1);
+}
+.auth-brand::before {
+  content: '';
+  position: absolute;
+  top: -30%;
+  right: -40%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(226,162,41,0.08) 0%, transparent 70%);
+  border-radius: 50%;
+}
+.auth-brand::after {
+  content: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  position: absolute;
+  bottom: -20px;
+  left: -10px;
+  font-family: var(--font-display);
+  font-size: 140px;
+  font-weight: 800;
+  color: rgba(255,255,255,0.015);
+  letter-spacing: -4px;
+  line-height: 1;
+  white-space: nowrap;
   pointer-events: none;
 }
-.ambient-bg .orb {
+.brand-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 48px;
+}
+.brand-mark {
+  width: 44px;
+  height: 44px;
+  background: var(--amber);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 22px;
+  color: var(--bg-deep);
+  transform: rotate(-3deg);
+  box-shadow: 0 4px 24px rgba(226,162,41,0.25);
+}
+.brand-wordmark {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+}
+.brand-wordmark em { color: var(--amber); font-style: normal; }
+.brand-headline {
+  font-family: var(--font-display);
+  font-size: 52px;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -1.5px;
+  margin-bottom: 20px;
+}
+.brand-headline em {
+  font-style: italic;
+  color: var(--amber);
+  position: relative;
+}
+.brand-headline em::after {
+  content: '';
   position: absolute;
-  border-radius: 50%;
-  filter: blur(120px);
-  opacity: 0.4;
-  animation: float 20s ease-in-out infinite;
+  bottom: 4px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--amber);
+  opacity: 0.3;
+  border-radius: 2px;
 }
-.ambient-bg .orb:nth-child(1) {
-  width: 500px; height: 500px;
-  background: radial-gradient(circle, rgba(245,158,11,0.12), transparent);
-  top: -10%; left: -5%;
-  animation-delay: 0s;
+.brand-sub {
+  font-size: 16px;
+  color: var(--text-3);
+  line-height: 1.7;
+  max-width: 380px;
+  margin-bottom: 40px;
 }
-.ambient-bg .orb:nth-child(2) {
-  width: 400px; height: 400px;
-  background: radial-gradient(circle, rgba(52,211,153,0.08), transparent);
-  bottom: -10%; right: -5%;
-  animation-delay: -7s;
+.brand-stats {
+  display: flex;
+  gap: 32px;
 }
-.ambient-bg .orb:nth-child(3) {
-  width: 300px; height: 300px;
-  background: radial-gradient(circle, rgba(96,165,250,0.06), transparent);
-  top: 40%; left: 50%;
-  animation-delay: -14s;
+.brand-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
-@keyframes float {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(30px, -30px) scale(1.05); }
-  66% { transform: translate(-20px, 20px) scale(0.95); }
+.brand-stat-val {
+  font-family: var(--font-mono);
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--amber-light);
 }
-/* Layout */
+.brand-stat-lbl {
+  font-size: 12px;
+  color: var(--text-4);
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  font-weight: 500;
+}
+
+.auth-form-side {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  background: var(--bg-deep);
+}
+.auth-form-box {
+  width: 100%;
+  max-width: 380px;
+  animation: authIn 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes authIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.auth-form-box h2 {
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  letter-spacing: -0.5px;
+}
+.auth-form-box .auth-subtitle {
+  font-size: 14px;
+  color: var(--text-4);
+  margin-bottom: 32px;
+}
+.form-group { margin-bottom: 20px; }
+.form-group label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-4);
+  margin-bottom: 8px;
+}
+.form-input {
+  width: 100%;
+  background: var(--bg-card);
+  border: 1px solid var(--border-2);
+  border-radius: 8px;
+  padding: 14px 16px;
+  color: var(--text-1);
+  font-family: var(--font-body);
+  font-size: 15px;
+  outline: none;
+  transition: all 0.2s;
+}
+.form-input:focus {
+  border-color: var(--amber);
+  box-shadow: 0 0 0 3px var(--amber-glow);
+}
+.form-input::placeholder { color: var(--text-4); }
+.form-error { font-size: 12px; color: var(--rose); margin-top: 8px; display: none; }
+.form-error.show { display: block; }
+.auth-switch {
+  text-align: center;
+  margin-top: 24px;
+  font-size: 13px;
+  color: var(--text-4);
+}
+.auth-switch a {
+  color: var(--amber);
+  cursor: pointer;
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s;
+}
+.auth-switch a:hover { border-bottom-color: var(--amber); }
+
+/* ===== BUTTONS ===== */
+.btn {
+  padding: 14px 28px;
+  border: none;
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  position: relative;
+  overflow: hidden;
+}
+.btn-primary {
+  background: var(--amber);
+  color: var(--bg-deep);
+  box-shadow: 0 2px 12px rgba(226,162,41,0.2);
+}
+.btn-primary:hover {
+  background: var(--amber-light);
+  box-shadow: 0 4px 20px rgba(226,162,41,0.3);
+  transform: translateY(-1px);
+}
+.btn-primary:active { transform: translateY(0); }
+.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+.btn-secondary {
+  background: var(--bg-elevated);
+  color: var(--text-2);
+  border: 1px solid var(--border-2);
+}
+.btn-secondary:hover { background: var(--bg-card-hover); color: var(--text-1); }
+.btn-ghost {
+  background: transparent;
+  color: var(--text-4);
+  padding: 14px 16px;
+}
+.btn-ghost:hover { color: var(--text-2); }
+.btn-full { width: 100%; }
+
+/* ===== ONBOARDING ===== */
+.onboarding-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  position: relative;
+}
+.onboarding-page::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 800px;
+  height: 400px;
+  background: radial-gradient(ellipse, rgba(226,162,41,0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+.onboarding-wrap {
+  width: 100%;
+  max-width: 560px;
+  animation: authIn 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.ob-progress {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 36px;
+}
+.ob-progress .dot {
+  flex: 1;
+  height: 3px;
+  border-radius: 3px;
+  background: var(--bg-elevated);
+  transition: all 0.4s;
+}
+.ob-progress .dot.active {
+  background: var(--amber);
+  box-shadow: 0 0 8px var(--amber-glow-strong);
+}
+.ob-progress .dot.done { background: var(--emerald); }
+.ob-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-1);
+  border-radius: 16px;
+  padding: 44px;
+  position: relative;
+}
+.ob-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 32px;
+  right: 32px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--amber-glow-strong), transparent);
+}
+.ob-card .step-icon {
+  font-size: 40px;
+  margin-bottom: 20px;
+  display: block;
+}
+.ob-card h2 {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  margin-bottom: 8px;
+}
+.ob-card .step-desc {
+  font-size: 14px;
+  color: var(--text-3);
+  line-height: 1.7;
+  margin-bottom: 28px;
+}
+.option-grid {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 28px;
+}
+.option-grid.cols-2 { grid-template-columns: 1fr 1fr; }
+.option-card {
+  padding: 18px 20px;
+  background: var(--bg-primary);
+  border: 1.5px solid var(--border-2);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+.option-card:hover {
+  border-color: var(--border-amber);
+  background: var(--bg-card-hover);
+}
+.option-card.selected {
+  border-color: var(--amber);
+  background: var(--amber-glow);
+  box-shadow: 0 0 0 3px var(--amber-glow);
+}
+.option-card.multi.selected {
+  border-color: var(--emerald);
+  background: var(--emerald-glow);
+  box-shadow: 0 0 0 3px var(--emerald-glow);
+}
+.option-card .option-emoji { font-size: 24px; display: block; margin-bottom: 8px; }
+.option-card .option-title { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+.option-card .option-desc { font-size: 11px; color: var(--text-4); }
+.ob-nav { display: flex; justify-content: space-between; margin-top: 8px; }
+
+/* ===== APP LAYOUT ===== */
 .app-container {
   position: relative;
   z-index: 1;
-  max-width: 1100px;
+  max-width: 1080px;
   margin: 0 auto;
-  padding: 24px 20px 40px;
+  padding: 24px 24px 48px;
 }
-/* Header */
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 32px;
-  padding-bottom: 24px;
-  border-bottom: 1px solid var(--border);
+  margin-bottom: 36px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border-1);
 }
 .logo {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
 }
-.logo-icon {
-  width: 48px; height: 48px;
-  background: linear-gradient(135deg, var(--accent-primary), #d97706);
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  box-shadow: 0 4px 20px rgba(245,158,11,0.3);
+.logo .brand-mark {
+  width: 40px;
+  height: 40px;
+  font-size: 18px;
 }
 .logo h1 {
-  font-family: 'DM Serif Display', serif;
-  font-size: 28px;
-  font-weight: 400;
-  color: var(--text-primary);
-  letter-spacing: -0.5px;
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
 }
-.logo h1 span { color: var(--accent-primary); }
-.streak-badge {
+.logo h1 em { color: var(--amber); font-style: normal; }
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.streak-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--amber-glow);
+  border: 1px solid var(--border-amber);
+  border-radius: 100px;
+  padding: 6px 16px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--amber-light);
+}
+.user-pill {
   display: flex;
   align-items: center;
   gap: 8px;
   background: var(--bg-card);
-  border: 1px solid var(--border-accent);
-  border-radius: 50px;
-  padding: 8px 18px;
-  font-weight: 600;
-  font-size: 14px;
-  color: var(--accent-secondary);
+  border: 1px solid var(--border-1);
+  border-radius: 100px;
+  padding: 5px 14px 5px 5px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-3);
 }
-.streak-badge .fire { font-size: 18px; }
-/* Navigation */
-.nav-tabs {
-  display: flex;
-  gap: 6px;
-  background: var(--bg-secondary);
-  border-radius: var(--radius-md);
-  padding: 5px;
-  margin-bottom: 28px;
-  border: 1px solid var(--border);
-}
-.nav-tab {
-  flex: 1;
-  padding: 12px 16px;
-  border: none;
-  background: transparent;
-  color: var(--text-muted);
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  border-radius: var(--radius-sm);
-  transition: all 0.25s ease;
+.user-av {
+  width: 26px;
+  height: 26px;
+  background: linear-gradient(135deg, var(--violet), var(--sky));
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 11px;
+  color: var(--bg-deep);
+  font-weight: 700;
+}
+.btn-logout {
+  background: none;
+  border: 1px solid var(--border-1);
+  color: var(--text-4);
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-logout:hover { color: var(--rose); border-color: rgba(251,113,133,0.3); background: var(--rose-glow); }
+
+/* ===== NAV ===== */
+.nav-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 32px;
+  border-bottom: 1px solid var(--border-1);
+  padding-bottom: 0;
+}
+.nav-tab {
+  padding: 12px 20px;
+  border: none;
+  background: transparent;
+  color: var(--text-4);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
   gap: 8px;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
-.nav-tab:hover { color: var(--text-secondary); background: var(--bg-card); }
+.nav-tab:hover { color: var(--text-2); }
 .nav-tab.active {
-  background: var(--bg-card);
-  color: var(--accent-primary);
-  box-shadow: var(--shadow-sm);
+  color: var(--amber);
+  border-bottom-color: var(--amber);
 }
-.nav-tab .icon { font-size: 18px; }
-/* Page sections */
-.page { display: none; animation: fadeIn 0.3s ease; }
+.nav-tab .icon { font-size: 16px; }
+
+/* ===== PAGES ===== */
+.page { display: none; animation: pageIn 0.35s cubic-bezier(0.22, 1, 0.36, 1); }
 .page.active { display: block; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-/* Cards */
+@keyframes pageIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== CARDS ===== */
 .card {
   background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-1);
+  border-radius: 14px;
   padding: 28px;
   margin-bottom: 20px;
-  transition: all 0.3s ease;
+  transition: border-color 0.2s;
 }
-.card:hover { border-color: rgba(148,163,184,0.15); }
+.card:hover { border-color: var(--border-2); }
 .card-header {
   display: flex;
   align-items: center;
@@ -187,785 +558,679 @@ body {
   margin-bottom: 20px;
 }
 .card-title {
+  font-family: var(--font-display);
   font-size: 18px;
-  font-weight: 700;
-  color: var(--text-primary);
+  font-weight: 600;
 }
 .card-badge {
-  font-size: 12px;
-  font-weight: 600;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
   padding: 4px 12px;
-  border-radius: 50px;
-  background: var(--accent-glow);
-  color: var(--accent-primary);
+  border-radius: 100px;
+  background: var(--amber-glow);
+  color: var(--amber);
+  border: 1px solid var(--border-amber);
 }
-.card-badge.green { background: var(--accent-green-glow); color: var(--accent-green); }
-/* Dashboard Grid */
+.card-badge.green {
+  background: var(--emerald-glow);
+  color: var(--emerald);
+  border-color: rgba(74,222,128,0.2);
+}
+
+/* ===== DASHBOARD ===== */
 .dashboard-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 16px;
-  margin-bottom: 28px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 24px;
 }
 .stat-card {
   background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: 22px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.stat-card .stat-icon {
-  width: 40px; height: 40px;
+  border: 1px solid var(--border-1);
   border-radius: 12px;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.25s;
+}
+.stat-card:hover { border-color: var(--border-2); transform: translateY(-2px); }
+.stat-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+}
+.stat-card:nth-child(1)::after { background: var(--amber); }
+.stat-card:nth-child(2)::after { background: var(--emerald); }
+.stat-card:nth-child(3)::after { background: var(--sky); }
+.stat-card:nth-child(4)::after { background: var(--violet); }
+.stat-card .stat-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-4);
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+.stat-card .stat-value {
+  font-family: var(--font-mono);
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 1;
+}
+.stat-card:nth-child(1) .stat-value { color: var(--amber-light); }
+.stat-card:nth-child(2) .stat-value { color: var(--emerald); }
+.stat-card:nth-child(3) .stat-value { color: var(--sky); }
+.stat-card:nth-child(4) .stat-value { color: var(--violet); }
+
+/* Plan overview */
+.plan-overview {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.plan-item {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-1);
+  border-radius: 10px;
+  padding: 14px 16px;
   display: flex;
   align-items: center;
-  justify-content: center;
-  font-size: 20px;
-  margin-bottom: 4px;
+  gap: 12px;
 }
-.stat-card .stat-icon.amber { background: var(--accent-glow); }
-.stat-card .stat-icon.green { background: var(--accent-green-glow); }
-.stat-card .stat-icon.blue { background: rgba(96,165,250,0.15); }
-.stat-card .stat-icon.purple { background: rgba(167,139,250,0.15); }
-.stat-card .stat-value {
-  font-size: 28px;
-  font-weight: 800;
-  line-height: 1;
-  font-family: 'JetBrains Mono', monospace;
-}
-.stat-card .stat-label {
-  font-size: 13px;
-  color: var(--text-muted);
-  font-weight: 500;
-}
-/* Lesson list */
-.lesson-list { display: flex; flex-direction: column; gap: 12px; }
+.plan-item .plan-icon { font-size: 18px; }
+.plan-item .plan-label { font-size: 11px; color: var(--text-4); text-transform: uppercase; letter-spacing: 0.5px; }
+.plan-item .plan-value { font-size: 14px; font-weight: 600; }
+
+/* Progress ring */
+.progress-ring-container { display: flex; align-items: center; justify-content: center; gap: 32px; padding: 20px; }
+.progress-ring { position: relative; width: 120px; height: 120px; }
+.progress-ring svg { transform: rotate(-90deg); }
+.progress-ring circle { fill: none; stroke-width: 6; stroke-linecap: round; }
+.progress-ring .bg { stroke: var(--bg-elevated); }
+.progress-ring .fill { stroke: var(--amber); transition: stroke-dashoffset 1s cubic-bezier(0.22, 1, 0.36, 1); }
+.progress-ring .center-text { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.progress-ring .center-text .pct { font-family: var(--font-mono); font-size: 28px; font-weight: 600; color: var(--amber-light); }
+.progress-ring .center-text .lbl { font-size: 10px; color: var(--text-4); font-weight: 500; text-transform: uppercase; letter-spacing: 1px; }
+
+/* ===== LESSONS ===== */
+.lesson-list { display: flex; flex-direction: column; gap: 8px; }
 .lesson-item {
   display: flex;
   align-items: center;
   gap: 16px;
-  padding: 18px 22px;
+  padding: 16px 20px;
   background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
+  border: 1px solid var(--border-1);
+  border-radius: 10px;
   cursor: pointer;
-  transition: all 0.25s ease;
+  transition: all 0.2s;
 }
 .lesson-item:hover {
+  border-color: var(--border-amber);
   background: var(--bg-card-hover);
-  border-color: var(--border-accent);
   transform: translateX(4px);
 }
-.lesson-item.completed { opacity: 0.6; }
-.lesson-item.locked { opacity: 0.4; cursor: not-allowed; }
+.lesson-item.completed { opacity: 0.5; }
+.lesson-item.locked { opacity: 0.35; cursor: not-allowed; }
+.lesson-item.locked:hover { transform: none; border-color: var(--border-1); background: var(--bg-card); }
 .lesson-num {
-  width: 42px; height: 42px;
-  border-radius: 12px;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 800;
-  font-size: 16px;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 14px;
   flex-shrink: 0;
 }
-.lesson-num.active-lesson { background: var(--accent-glow); color: var(--accent-primary); }
-.lesson-num.done { background: var(--accent-green-glow); color: var(--accent-green); }
-.lesson-num.lock { background: var(--bg-elevated); color: var(--text-muted); }
+.lesson-num.active-lesson { background: var(--amber-glow); color: var(--amber); border: 1px solid var(--border-amber); }
+.lesson-num.done { background: var(--emerald-glow); color: var(--emerald); border: 1px solid rgba(74,222,128,0.2); }
+.lesson-num.lock { background: var(--bg-elevated); color: var(--text-4); }
 .lesson-info { flex: 1; }
-.lesson-title { font-weight: 600; font-size: 15px; margin-bottom: 3px; }
-.lesson-desc { font-size: 13px; color: var(--text-muted); }
-.lesson-arrow { color: var(--text-muted); font-size: 18px; }
-/* Lesson Content */
+.lesson-title { font-weight: 600; font-size: 14px; margin-bottom: 2px; }
+.lesson-desc { font-size: 12px; color: var(--text-4); }
+.lesson-arrow { color: var(--text-4); font-size: 14px; font-family: var(--font-mono); }
+
 .lesson-content { display: none; }
 .lesson-content.active { display: block; }
-.lesson-section {
-  margin-bottom: 24px;
-}
+.lesson-section { margin-bottom: 28px; }
 .lesson-section h3 {
+  font-family: var(--font-display);
   font-size: 16px;
-  font-weight: 700;
+  font-weight: 600;
   margin-bottom: 14px;
-  color: var(--accent-secondary);
+  color: var(--amber-light);
   display: flex;
   align-items: center;
   gap: 8px;
 }
-.vocab-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 10px;
-}
+.vocab-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 8px; }
 .vocab-card {
-  background: var(--bg-elevated);
-  border-radius: var(--radius-sm);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-1);
+  border-radius: 10px;
   padding: 16px;
   cursor: pointer;
   transition: all 0.2s;
-  border: 1px solid transparent;
   position: relative;
-  overflow: hidden;
 }
-.vocab-card:hover { border-color: var(--border-accent); transform: translateY(-2px); }
-.vocab-card .en {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--accent-secondary);
-  margin-bottom: 4px;
-  font-family: 'JetBrains Mono', monospace;
-}
-.vocab-card .tr {
-  font-size: 13px;
-  color: var(--text-secondary);
-}
-.vocab-card .phonetic {
-  font-size: 11px;
-  color: var(--text-muted);
-  margin-top: 4px;
-  font-style: italic;
-}
+.vocab-card:hover { border-color: var(--border-amber); transform: translateY(-2px); }
+.vocab-card .en { font-family: var(--font-mono); font-size: 16px; font-weight: 600; color: var(--amber-light); margin-bottom: 4px; }
+.vocab-card .tr { font-size: 13px; color: var(--text-3); }
+.vocab-card .phonetic { font-size: 11px; color: var(--text-4); margin-top: 4px; font-style: italic; }
 .vocab-card .speak-btn {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: none;
-  border: none;
-  color: var(--text-muted);
-  cursor: pointer;
-  font-size: 16px;
-  transition: color 0.2s;
+  position: absolute; top: 10px; right: 10px;
+  background: none; border: none; color: var(--text-4);
+  cursor: pointer; font-size: 14px; transition: color 0.2s;
 }
-.vocab-card .speak-btn:hover { color: var(--accent-primary); }
+.vocab-card .speak-btn:hover { color: var(--amber); }
 .grammar-box {
-  background: var(--bg-elevated);
-  border-radius: var(--radius-md);
-  padding: 22px;
-  border-left: 3px solid var(--accent-primary);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-1);
+  border-radius: 12px;
+  padding: 24px;
+  border-left: 3px solid var(--amber);
 }
-.grammar-box p {
-  font-size: 14px;
-  line-height: 1.8;
-  color: var(--text-secondary);
-}
+.grammar-box p { font-size: 14px; line-height: 1.8; color: var(--text-3); }
 .grammar-box .example {
   background: var(--bg-card);
-  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-1);
+  border-radius: 8px;
   padding: 12px 16px;
   margin-top: 12px;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-mono);
   font-size: 14px;
 }
-.grammar-box .example .highlight {
-  color: var(--accent-primary);
-  font-weight: 600;
-}
-.dialogue-box {
-  background: var(--bg-elevated);
-  border-radius: var(--radius-md);
-  padding: 22px;
-}
-.dialogue-line {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 14px;
-  align-items: flex-start;
-}
+.grammar-box .example .highlight { color: var(--amber); font-weight: 600; }
+.dialogue-box { background: var(--bg-primary); border: 1px solid var(--border-1); border-radius: 12px; padding: 24px; }
+.dialogue-line { display: flex; gap: 12px; margin-bottom: 14px; align-items: flex-start; }
 .dialogue-line:last-child { margin-bottom: 0; }
-.dialogue-speaker {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--accent-blue);
-  min-width: 28px;
-  padding-top: 2px;
+.dialogue-speaker { font-family: var(--font-mono); font-size: 12px; font-weight: 600; color: var(--sky); min-width: 24px; padding-top: 2px; }
+.dialogue-speaker.b { color: var(--emerald); }
+.dialogue-text { font-size: 14px; line-height: 1.6; color: var(--text-2); }
+.dialogue-text .translation { display: block; font-size: 12px; color: var(--text-4); font-style: italic; margin-top: 2px; }
+.back-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: none; border: none; color: var(--text-4);
+  font-family: var(--font-body); font-size: 13px; font-weight: 500;
+  cursor: pointer; margin-bottom: 16px; transition: color 0.2s;
 }
-.dialogue-speaker.b { color: var(--accent-green); }
-.dialogue-text {
-  font-size: 14px;
-  line-height: 1.6;
-  color: var(--text-secondary);
-}
-.dialogue-text .translation {
-  display: block;
-  font-size: 12px;
-  color: var(--text-muted);
-  font-style: italic;
-  margin-top: 2px;
-}
-/* Quiz */
-.quiz-container { max-width: 640px; margin: 0 auto; }
-.quiz-progress {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-bottom: 24px;
-}
-.quiz-progress-bar {
-  flex: 1;
-  height: 8px;
-  background: var(--bg-elevated);
-  border-radius: 50px;
-  overflow: hidden;
-}
-.quiz-progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
-  border-radius: 50px;
-  transition: width 0.5s ease;
-}
-.quiz-progress-text {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-muted);
-  font-family: 'JetBrains Mono', monospace;
-}
-.quiz-question {
-  text-align: center;
-  margin-bottom: 28px;
-}
-.quiz-question .q-label {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--accent-primary);
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-  margin-bottom: 12px;
-}
-.quiz-question .q-text {
-  font-size: 22px;
-  font-weight: 700;
-  line-height: 1.4;
-}
-.quiz-question .q-hint {
-  font-size: 13px;
-  color: var(--text-muted);
-  margin-top: 8px;
-}
-.quiz-options {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-bottom: 20px;
-}
+.back-btn:hover { color: var(--amber); }
+
+/* ===== QUIZ ===== */
+.quiz-container { max-width: 600px; margin: 0 auto; }
+.quiz-progress { display: flex; align-items: center; gap: 14px; margin-bottom: 28px; }
+.quiz-progress-bar { flex: 1; height: 4px; background: var(--bg-elevated); border-radius: 4px; overflow: hidden; }
+.quiz-progress-fill { height: 100%; background: var(--amber); border-radius: 4px; transition: width 0.5s cubic-bezier(0.22, 1, 0.36, 1); }
+.quiz-progress-text { font-family: var(--font-mono); font-size: 12px; font-weight: 500; color: var(--text-4); }
+.quiz-question { text-align: center; margin-bottom: 32px; }
+.quiz-question .q-label { font-family: var(--font-mono); font-size: 11px; font-weight: 500; color: var(--amber); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 14px; }
+.quiz-question .q-text { font-family: var(--font-display); font-size: 24px; font-weight: 600; line-height: 1.4; letter-spacing: -0.3px; }
+.quiz-options { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
 .quiz-option {
   padding: 16px 20px;
-  background: var(--bg-elevated);
-  border: 2px solid transparent;
-  border-radius: var(--radius-md);
+  background: var(--bg-card);
+  border: 1.5px solid var(--border-2);
+  border-radius: 10px;
   cursor: pointer;
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--font-body);
   font-size: 15px;
   font-weight: 500;
-  color: var(--text-primary);
-  transition: all 0.2s ease;
+  color: var(--text-1);
+  transition: all 0.15s;
   text-align: left;
 }
-.quiz-option:hover { border-color: var(--border-accent); background: var(--bg-card-hover); }
-.quiz-option.correct {
-  border-color: var(--accent-green);
-  background: var(--accent-green-glow);
-  color: var(--accent-green);
-}
-.quiz-option.wrong {
-  border-color: var(--accent-red);
-  background: rgba(248,113,113,0.1);
-  color: var(--accent-red);
-}
+.quiz-option:hover { border-color: var(--border-amber); background: var(--bg-card-hover); }
+.quiz-option.correct { border-color: var(--emerald); background: var(--emerald-glow); color: var(--emerald); }
+.quiz-option.wrong { border-color: var(--rose); background: var(--rose-glow); color: var(--rose); }
 .quiz-option:disabled { cursor: default; }
-.quiz-feedback {
-  text-align: center;
-  padding: 16px;
-  border-radius: var(--radius-md);
-  font-weight: 600;
-  font-size: 14px;
-  margin-bottom: 16px;
-  display: none;
-}
+.quiz-feedback { text-align: center; padding: 14px; border-radius: 10px; font-weight: 600; font-size: 14px; margin-bottom: 16px; display: none; }
 .quiz-feedback.show { display: block; }
-.quiz-feedback.correct-fb { background: var(--accent-green-glow); color: var(--accent-green); }
-.quiz-feedback.wrong-fb { background: rgba(248,113,113,0.1); color: var(--accent-red); }
-.quiz-result {
-  text-align: center;
-  padding: 40px 20px;
-}
-.quiz-result .score {
-  font-size: 64px;
-  font-weight: 800;
-  font-family: 'JetBrains Mono', monospace;
-  margin-bottom: 8px;
-}
-.quiz-result .score.good { color: var(--accent-green); }
-.quiz-result .score.mid { color: var(--accent-primary); }
-.quiz-result .score.low { color: var(--accent-red); }
-.quiz-result .message {
-  font-size: 16px;
-  color: var(--text-secondary);
-  margin-bottom: 24px;
-}
-/* Chat / Conversation */
+.quiz-feedback.correct-fb { background: var(--emerald-glow); color: var(--emerald); }
+.quiz-feedback.wrong-fb { background: var(--rose-glow); color: var(--rose); }
+.quiz-result { text-align: center; padding: 48px 20px; }
+.quiz-result .score { font-family: var(--font-mono); font-size: 64px; font-weight: 600; margin-bottom: 8px; }
+.quiz-result .score.good { color: var(--emerald); }
+.quiz-result .score.mid { color: var(--amber); }
+.quiz-result .score.low { color: var(--rose); }
+.quiz-result .message { font-size: 16px; color: var(--text-3); margin-bottom: 28px; }
+
+/* ===== CHAT ===== */
 .chat-container {
   display: flex;
   flex-direction: column;
-  height: 520px;
+  height: 540px;
   background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-1);
+  border-radius: 14px;
   overflow: hidden;
 }
 .chat-header {
   padding: 16px 22px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--border-1);
   display: flex;
   align-items: center;
   gap: 12px;
 }
 .chat-avatar {
-  width: 36px; height: 36px;
-  background: linear-gradient(135deg, var(--accent-primary), #d97706);
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
+  width: 34px; height: 34px;
+  background: var(--amber);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  transform: rotate(-3deg);
 }
-.chat-info .chat-name { font-weight: 700; font-size: 14px; }
-.chat-info .chat-status { font-size: 12px; color: var(--accent-green); }
+.chat-info .chat-name { font-weight: 600; font-size: 14px; }
+.chat-info .chat-status { font-size: 11px; color: var(--emerald); font-family: var(--font-mono); }
 .chat-scenario-btn {
   margin-left: auto;
-  background: var(--bg-elevated);
-  border: 1px solid var(--border);
-  color: var(--text-secondary);
-  padding: 6px 14px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-2);
+  color: var(--text-3);
+  padding: 7px 14px;
   border-radius: 8px;
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--font-body);
   transition: all 0.2s;
 }
-.chat-scenario-btn:hover { background: var(--bg-card-hover); color: var(--text-primary); }
+.chat-scenario-btn:hover { border-color: var(--border-amber); color: var(--amber); }
 .chat-messages {
-  flex: 1;
-  overflow-y: auto;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
+  flex: 1; overflow-y: auto; padding: 20px;
+  display: flex; flex-direction: column; gap: 12px;
 }
-.chat-messages::-webkit-scrollbar { width: 4px; }
+.chat-messages::-webkit-scrollbar { width: 3px; }
 .chat-messages::-webkit-scrollbar-track { background: transparent; }
-.chat-messages::-webkit-scrollbar-thumb { background: var(--bg-elevated); border-radius: 4px; }
+.chat-messages::-webkit-scrollbar-thumb { background: var(--bg-elevated); border-radius: 3px; }
 .msg {
-  max-width: 80%;
+  max-width: 78%;
   padding: 12px 16px;
-  border-radius: 16px;
+  border-radius: 14px;
   font-size: 14px;
   line-height: 1.6;
-  animation: msgIn 0.3s ease;
+  animation: msgIn 0.25s cubic-bezier(0.22, 1, 0.36, 1);
 }
-@keyframes msgIn { from { opacity: 0; transform: translateY(8px); } }
+@keyframes msgIn { from { opacity: 0; transform: translateY(6px); } }
 .msg.ai {
   align-self: flex-start;
-  background: var(--bg-elevated);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-1);
   border-bottom-left-radius: 4px;
-  color: var(--text-secondary);
+  color: var(--text-2);
 }
 .msg.user {
   align-self: flex-end;
-  background: linear-gradient(135deg, #d97706, var(--accent-primary));
+  background: var(--amber);
   border-bottom-right-radius: 4px;
-  color: #fff;
-}
-.msg .correction {
-  display: block;
-  margin-top: 8px;
-  padding-top: 8px;
-  border-top: 1px solid rgba(255,255,255,0.1);
-  font-size: 12px;
-  color: var(--accent-green);
+  color: var(--bg-deep);
+  font-weight: 500;
 }
 .msg .turkish-help {
-  display: block;
-  margin-top: 6px;
-  font-size: 12px;
-  color: var(--text-muted);
-  font-style: italic;
+  display: block; margin-top: 6px; font-size: 12px; color: var(--text-4); font-style: italic;
 }
-.chat-input-area {
-  padding: 16px;
-  border-top: 1px solid var(--border);
-  display: flex;
-  gap: 10px;
-}
+.chat-input-area { padding: 16px; border-top: 1px solid var(--border-1); display: flex; gap: 10px; }
 .chat-input {
   flex: 1;
-  background: var(--bg-elevated);
-  border: 1px solid var(--border);
-  border-radius: 12px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-2);
+  border-radius: 10px;
   padding: 12px 16px;
-  color: var(--text-primary);
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  color: var(--text-1);
+  font-family: var(--font-body);
   font-size: 14px;
   outline: none;
-  transition: border-color 0.2s;
+  transition: all 0.2s;
 }
-.chat-input:focus { border-color: var(--border-accent); }
-.chat-input::placeholder { color: var(--text-muted); }
+.chat-input:focus { border-color: var(--amber); box-shadow: 0 0 0 3px var(--amber-glow); }
+.chat-input::placeholder { color: var(--text-4); }
 .chat-send {
-  width: 46px; height: 46px;
-  background: linear-gradient(135deg, var(--accent-primary), #d97706);
-  border: none;
-  border-radius: 12px;
-  color: #fff;
-  font-size: 18px;
+  width: 44px; height: 44px;
+  background: var(--amber);
+  border: none; border-radius: 10px;
+  color: var(--bg-deep); font-size: 16px;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.2s, box-shadow 0.2s;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
   flex-shrink: 0;
+  font-weight: 700;
 }
-.chat-send:hover { transform: scale(1.05); box-shadow: 0 4px 16px rgba(245,158,11,0.3); }
-.chat-send:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-/* Scenario selector modal */
+.chat-send:hover { background: var(--amber-light); transform: scale(1.04); }
+.chat-send:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+.typing-indicator { display: flex; gap: 5px; padding: 8px 0; }
+.typing-indicator span { width: 7px; height: 7px; background: var(--text-4); border-radius: 50%; animation: bounce 1.2s ease-in-out infinite; }
+.typing-indicator span:nth-child(2) { animation-delay: 0.15s; }
+.typing-indicator span:nth-child(3) { animation-delay: 0.3s; }
+@keyframes bounce { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-5px); } }
+
+/* Scenario modal */
 .scenario-modal {
-  display: none;
-  position: fixed;
-  inset: 0;
-  z-index: 100;
-  background: rgba(0,0,0,0.7);
-  backdrop-filter: blur(8px);
-  align-items: center;
-  justify-content: center;
+  display: none; position: fixed; inset: 0; z-index: 100;
+  background: rgba(12,10,9,0.85); backdrop-filter: blur(12px);
+  align-items: center; justify-content: center;
 }
 .scenario-modal.show { display: flex; }
 .scenario-modal-content {
   background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 32px;
-  max-width: 480px;
-  width: 90%;
+  border: 1px solid var(--border-2);
+  border-radius: 16px;
+  padding: 36px;
+  max-width: 460px;
+  width: 92%;
+  animation: authIn 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
-.scenario-modal-content h3 {
-  font-size: 18px;
-  font-weight: 700;
-  margin-bottom: 6px;
-}
-.scenario-modal-content p {
-  font-size: 13px;
-  color: var(--text-muted);
-  margin-bottom: 20px;
-}
-.scenario-list { display: flex; flex-direction: column; gap: 8px; }
+.scenario-modal-content h3 { font-family: var(--font-display); font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+.scenario-modal-content p { font-size: 13px; color: var(--text-4); margin-bottom: 20px; }
+.scenario-list { display: flex; flex-direction: column; gap: 6px; }
 .scenario-item {
   padding: 14px 18px;
-  background: var(--bg-elevated);
-  border: 1px solid transparent;
-  border-radius: var(--radius-sm);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-1);
+  border-radius: 10px;
   cursor: pointer;
   transition: all 0.2s;
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--font-body);
   font-size: 14px;
-  color: var(--text-primary);
+  color: var(--text-1);
 }
-.scenario-item:hover { border-color: var(--border-accent); background: var(--bg-card-hover); }
+.scenario-item:hover { border-color: var(--border-amber); background: var(--bg-card-hover); }
 .scenario-item .scenario-emoji { margin-right: 10px; }
-.scenario-item .scenario-desc { display: block; font-size: 12px; color: var(--text-muted); margin-top: 3px; }
-/* Buttons */
-.btn {
-  padding: 12px 24px;
-  border: none;
-  border-radius: var(--radius-sm);
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.btn-primary {
-  background: linear-gradient(135deg, var(--accent-primary), #d97706);
-  color: #fff;
-  box-shadow: 0 4px 16px rgba(245,158,11,0.2);
-}
-.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(245,158,11,0.3); }
-.btn-secondary {
-  background: var(--bg-elevated);
-  color: var(--text-primary);
-  border: 1px solid var(--border);
-}
-.btn-secondary:hover { background: var(--bg-card-hover); }
-/* Progress ring */
-.progress-ring-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 28px;
-  padding: 20px;
-}
-.progress-ring {
-  position: relative;
-  width: 120px;
-  height: 120px;
-}
-.progress-ring svg { transform: rotate(-90deg); }
-.progress-ring circle {
-  fill: none;
-  stroke-width: 8;
-  stroke-linecap: round;
-}
-.progress-ring .bg { stroke: var(--bg-elevated); }
-.progress-ring .fill {
-  stroke: var(--accent-primary);
-  transition: stroke-dashoffset 1s ease;
-}
-.progress-ring .center-text {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-.progress-ring .center-text .pct {
-  font-size: 28px;
-  font-weight: 800;
-  font-family: 'JetBrains Mono', monospace;
-  color: var(--accent-primary);
-}
-.progress-ring .center-text .lbl {
-  font-size: 11px;
-  color: var(--text-muted);
-  font-weight: 600;
-}
-/* Typing indicator */
-.typing-indicator {
-  display: flex;
-  gap: 4px;
-  padding: 8px 0;
-}
-.typing-indicator span {
-  width: 8px; height: 8px;
-  background: var(--text-muted);
-  border-radius: 50%;
-  animation: typingBounce 1.2s ease-in-out infinite;
-}
-.typing-indicator span:nth-child(2) { animation-delay: 0.15s; }
-.typing-indicator span:nth-child(3) { animation-delay: 0.3s; }
-@keyframes typingBounce {
-  0%, 60%, 100% { transform: translateY(0); }
-  30% { transform: translateY(-6px); }
-}
-/* Responsive */
-@media (max-width: 640px) {
-  .header { flex-direction: column; gap: 12px; align-items: flex-start; }
+.scenario-item .scenario-desc { display: block; font-size: 11px; color: var(--text-4); margin-top: 3px; }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .auth-page { grid-template-columns: 1fr; }
+  .auth-brand { display: none; }
+  .header { flex-direction: column; gap: 14px; align-items: flex-start; }
+  .header-right { width: 100%; justify-content: flex-start; flex-wrap: wrap; gap: 8px; }
   .nav-tab .label { display: none; }
-  .nav-tab .icon { font-size: 22px; }
+  .nav-tab .icon { font-size: 18px; }
+  .nav-tab { padding: 12px 16px; }
   .dashboard-grid { grid-template-columns: repeat(2, 1fr); }
   .vocab-grid { grid-template-columns: 1fr; }
-  .msg { max-width: 90%; }
+  .msg { max-width: 88%; }
+  .option-grid.cols-2 { grid-template-columns: 1fr; }
+  .plan-overview { grid-template-columns: 1fr; }
+  .ob-card { padding: 28px; }
+  .brand-headline { font-size: 36px; }
 }
-/* Back button */
-.back-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: none;
-  border: none;
-  color: var(--text-muted);
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  margin-bottom: 16px;
-  transition: color 0.2s;
-}
-.back-btn:hover { color: var(--text-primary); }
-/* Loading spinner */
-.loading-spinner {
-  display: inline-block;
-  width: 18px;
-  height: 18px;
-  border: 2px solid var(--text-muted);
-  border-top-color: var(--accent-primary);
-  border-radius: 50%;
-  animation: spin 0.7s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-/* Write exercise */
-.write-input {
-  width: 100%;
-  background: var(--bg-elevated);
-  border: 2px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 14px 18px;
-  color: var(--text-primary);
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 16px;
-  outline: none;
-  transition: border-color 0.2s;
-  margin-bottom: 12px;
-}
-.write-input:focus { border-color: var(--border-accent); }
-.write-input::placeholder { color: var(--text-muted); }
 </style>
 </head>
 <body>
-<div class="ambient-bg">
-  <div class="orb"></div>
-  <div class="orb"></div>
-  <div class="orb"></div>
+
+<!-- ===== LOGIN ===== -->
+<div class="screen active" id="screen-login">
+  <div class="auth-page">
+    <div class="auth-brand">
+      <div class="brand-top">
+        <div class="brand-mark">Lf</div>
+        <div class="brand-wordmark">Lingua<em>Flow</em></div>
+      </div>
+      <h2 class="brand-headline">
+        İngilizceyi<br><em>akıcı</em> bir şekilde<br>öğren.
+      </h2>
+      <p class="brand-sub">
+        Kişiselleştirilmiş dersler, IELTS hazırlık programı ve AI destekli konuşma pratiği ile İngilizce yolculuğuna başla.
+      </p>
+      <div class="brand-stats">
+        <div class="brand-stat">
+          <div class="brand-stat-val">5+</div>
+          <div class="brand-stat-lbl">Ders</div>
+        </div>
+        <div class="brand-stat">
+          <div class="brand-stat-val">50+</div>
+          <div class="brand-stat-lbl">Kelime</div>
+        </div>
+        <div class="brand-stat">
+          <div class="brand-stat-val">6</div>
+          <div class="brand-stat-lbl">Senaryo</div>
+        </div>
+      </div>
+    </div>
+    <div class="auth-form-side">
+      <div class="auth-form-box">
+        <h2>Giriş Yap</h2>
+        <p class="auth-subtitle">Hesabınla giriş yap ve kaldığın yerden devam et</p>
+        <div class="form-group">
+          <label>E-posta</label>
+          <input class="form-input" type="email" id="loginEmail" placeholder="ornek@email.com">
+        </div>
+        <div class="form-group">
+          <label>Şifre</label>
+          <input class="form-input" type="password" id="loginPassword" placeholder="••••••••">
+        </div>
+        <div class="form-error" id="loginError"></div>
+        <button class="btn btn-primary btn-full" style="margin-top:8px;" onclick="handleLogin()">Giriş Yap</button>
+        <div class="auth-switch">
+          Hesabın yok mu? <a onclick="showScreen('screen-register')">Kayıt Ol</a>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
-<div class="app-container">
-  <!-- Header -->
-  <div class="header">
-    <div class="logo">
-      <div class="logo-icon">🔥</div>
-      <h1>Lingua<span>Flow</span></h1>
-    </div>
-    <div class="streak-badge">
-      <span class="fire">🔥</span>
-      <span id="streakCount">0</span> gün seri
-    </div>
-  </div>
-  <!-- Navigation -->
-  <div class="nav-tabs">
-    <button class="nav-tab active" data-page="dashboard">
-      <span class="icon">📊</span>
-      <span class="label">Panel</span>
-    </button>
-    <button class="nav-tab" data-page="lessons">
-      <span class="icon">📚</span>
-      <span class="label">Dersler</span>
-    </button>
-    <button class="nav-tab" data-page="quiz">
-      <span class="icon">🧠</span>
-      <span class="label">Quiz</span>
-    </button>
-    <button class="nav-tab" data-page="chat">
-      <span class="icon">💬</span>
-      <span class="label">Konuşma</span>
-    </button>
-  </div>
-  <!-- Dashboard Page -->
-  <div class="page active" id="page-dashboard">
-    <div class="dashboard-grid">
-      <div class="stat-card">
-        <div class="stat-icon amber">📚</div>
-        <div class="stat-value" id="lessonsCompleted">0</div>
-        <div class="stat-label">Tamamlanan Ders</div>
+
+<!-- ===== REGISTER ===== -->
+<div class="screen" id="screen-register">
+  <div class="auth-page">
+    <div class="auth-brand">
+      <div class="brand-top">
+        <div class="brand-mark">Lf</div>
+        <div class="brand-wordmark">Lingua<em>Flow</em></div>
       </div>
-      <div class="stat-card">
-        <div class="stat-icon green">🔤</div>
-        <div class="stat-value" id="wordsLearned">0</div>
-        <div class="stat-label">Öğrenilen Kelime</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon blue">🎯</div>
-        <div class="stat-value" id="quizScore">—</div>
-        <div class="stat-label">Quiz Ortalaması</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon purple">💬</div>
-        <div class="stat-value" id="chatCount">0</div>
-        <div class="stat-label">Konuşma Pratiği</div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title">📈 Genel İlerleme</div>
-        <div class="card-badge">Seviye A1</div>
-      </div>
-      <div class="progress-ring-container">
-        <div class="progress-ring">
-          <svg width="120" height="120">
-            <circle class="bg" cx="60" cy="60" r="52"/>
-            <circle class="fill" id="progressRing" cx="60" cy="60" r="52"
-              stroke-dasharray="326.73" stroke-dashoffset="326.73"/>
-          </svg>
-          <div class="center-text">
-            <span class="pct" id="progressPct">0%</span>
-            <span class="lbl">tamamlandı</span>
-          </div>
+      <h2 class="brand-headline">
+        Yeni bir<br><em>dil</em>, yeni<br>bir dünya.
+      </h2>
+      <p class="brand-sub">
+        Ücretsiz hesap oluştur ve IELTS hedefine doğru ilk adımını at. Kişisel planınla sistematik ilerle.
+      </p>
+      <div class="brand-stats">
+        <div class="brand-stat">
+          <div class="brand-stat-val">A1→C1</div>
+          <div class="brand-stat-lbl">Seviye</div>
         </div>
-        <div>
-          <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 12px;">
-            Bugünkü görevlerin:
-          </p>
-          <div id="dailyTasks" style="display: flex; flex-direction: column; gap: 8px;"></div>
+        <div class="brand-stat">
+          <div class="brand-stat-val">IELTS</div>
+          <div class="brand-stat-lbl">Hazırlık</div>
         </div>
       </div>
     </div>
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title">🕐 Son Aktiviteler</div>
-      </div>
-      <div id="activityLog" style="font-size: 13px; color: var(--text-muted);">
-        Henüz bir aktivite yok. Derslerden başlayarak öğrenmeye başla!
+    <div class="auth-form-side">
+      <div class="auth-form-box">
+        <h2>Kayıt Ol</h2>
+        <p class="auth-subtitle">Ücretsiz hesap oluştur ve öğrenmeye başla</p>
+        <div class="form-group">
+          <label>Ad Soyad</label>
+          <input class="form-input" type="text" id="regName" placeholder="Ayberk">
+        </div>
+        <div class="form-group">
+          <label>E-posta</label>
+          <input class="form-input" type="email" id="regEmail" placeholder="ornek@email.com">
+        </div>
+        <div class="form-group">
+          <label>Şifre</label>
+          <input class="form-input" type="password" id="regPassword" placeholder="En az 6 karakter">
+        </div>
+        <div class="form-error" id="regError"></div>
+        <button class="btn btn-primary btn-full" style="margin-top:8px;" onclick="handleRegister()">Kayıt Ol</button>
+        <div class="auth-switch">
+          Zaten hesabın var mı? <a onclick="showScreen('screen-login')">Giriş Yap</a>
+        </div>
       </div>
     </div>
   </div>
-  <!-- Lessons Page -->
-  <div class="page" id="page-lessons">
-    <div id="lessonListView">
+</div>
+
+<!-- ===== ONBOARDING ===== -->
+<div class="screen" id="screen-onboarding">
+  <div class="onboarding-page">
+    <div class="onboarding-wrap">
+      <div class="ob-progress" id="onboardingProgress"></div>
+      <div class="ob-card" id="onboardingCard"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MAIN APP ===== -->
+<div class="screen" id="screen-app">
+  <div class="app-container">
+    <div class="header">
+      <div class="logo">
+        <div class="brand-mark">Lf</div>
+        <h1>Lingua<em>Flow</em></h1>
+      </div>
+      <div class="header-right">
+        <div class="streak-pill">
+          <span>&#9632;</span>
+          <span id="streakCount">0</span> gün seri
+        </div>
+        <div class="user-pill">
+          <div class="user-av" id="userAvatar"></div>
+          <span id="userName"></span>
+        </div>
+        <button class="btn-logout" onclick="handleLogout()">Çıkış</button>
+      </div>
+    </div>
+
+    <div class="nav-tabs">
+      <button class="nav-tab active" data-page="dashboard">
+        <span class="icon">&#9638;</span><span class="label">Panel</span>
+      </button>
+      <button class="nav-tab" data-page="lessons">
+        <span class="icon">&#9776;</span><span class="label">Dersler</span>
+      </button>
+      <button class="nav-tab" data-page="quiz">
+        <span class="icon">&#10022;</span><span class="label">Quiz</span>
+      </button>
+      <button class="nav-tab" data-page="chat">
+        <span class="icon">&#9998;</span><span class="label">Konuşma</span>
+      </button>
+    </div>
+
+    <!-- Dashboard -->
+    <div class="page active" id="page-dashboard">
+      <div class="dashboard-grid">
+        <div class="stat-card">
+          <div class="stat-label">Tamamlanan Ders</div>
+          <div class="stat-value" id="lessonsCompleted">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Öğrenilen Kelime</div>
+          <div class="stat-value" id="wordsLearned">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Quiz Ortalaması</div>
+          <div class="stat-value" id="quizScore">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Konuşma Pratiği</div>
+          <div class="stat-value" id="chatCount">0</div>
+        </div>
+      </div>
+
+      <div class="card" id="studyPlanCard">
+        <div class="card-header">
+          <div class="card-title">Kişisel Çalışma Planın</div>
+          <div class="card-badge" id="planLevelBadge">—</div>
+        </div>
+        <div class="plan-overview" id="planOverview"></div>
+        <div id="planDetails" style="font-size:13px;color:var(--text-3);line-height:1.7;"></div>
+      </div>
+
       <div class="card">
         <div class="card-header">
-          <div class="card-title">📚 Ders Programı</div>
-          <div class="card-badge green">30 Günlük Plan</div>
+          <div class="card-title">Genel İlerleme</div>
         </div>
-        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">
-          Her ders yaklaşık 15-20 dakika sürer. Sırayla ilerle, her dersi tamamladıktan sonra quiz'e geç!
-        </p>
-        <div class="lesson-list" id="lessonList"></div>
+        <div class="progress-ring-container">
+          <div class="progress-ring">
+            <svg width="120" height="120">
+              <circle class="bg" cx="60" cy="60" r="52"/>
+              <circle class="fill" id="progressRing" cx="60" cy="60" r="52"
+                stroke-dasharray="326.73" stroke-dashoffset="326.73"/>
+            </svg>
+            <div class="center-text">
+              <span class="pct" id="progressPct">0%</span>
+              <span class="lbl">tamamlandı</span>
+            </div>
+          </div>
+          <div>
+            <p style="font-size:14px;color:var(--text-3);margin-bottom:12px;">Bugünkü görevlerin:</p>
+            <div id="dailyTasks" style="display:flex;flex-direction:column;gap:8px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><div class="card-title">Son Aktiviteler</div></div>
+        <div id="activityLog" style="font-size:13px;color:var(--text-4);">
+          Henüz bir aktivite yok. Derslerden başlayarak öğrenmeye başla!
+        </div>
       </div>
     </div>
-    <div id="lessonDetailView" class="lesson-content"></div>
-  </div>
-  <!-- Quiz Page -->
-  <div class="page" id="page-quiz">
-    <div class="quiz-container" id="quizArea"></div>
-  </div>
-  <!-- Chat Page -->
-  <div class="page" id="page-chat">
-    <div class="chat-container">
-      <div class="chat-header">
-        <div class="chat-avatar">🤖</div>
-        <div class="chat-info">
-          <div class="chat-name">AI English Tutor</div>
-          <div class="chat-status">● Çevrimiçi</div>
-        </div>
-        <button class="chat-scenario-btn" id="scenarioBtn">🎭 Senaryo Seç</button>
-      </div>
-      <div class="chat-messages" id="chatMessages">
-        <div class="msg ai">
-          Merhaba Ayberk! 👋 Ben senin İngilizce konuşma partnerinrim. Benimle İngilizce pratik yapabilirsin.
-          Yanlış yaparsan düzeltirim, anlamadığın yerleri Türkçe açıklarım.
-          <span class="turkish-help">Bir senaryo seçebilir veya doğrudan İngilizce yazmaya başlayabilirsin!</span>
+
+    <!-- Lessons -->
+    <div class="page" id="page-lessons">
+      <div id="lessonListView">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Ders Programı</div>
+            <div class="card-badge green" id="lessonPlanBadge">Plan</div>
+          </div>
+          <p style="font-size:13px;color:var(--text-4);margin-bottom:20px;">
+            Her ders yaklaşık 15-20 dakika sürer. Sırayla ilerle, her dersi tamamladıktan sonra quiz'e geç!
+          </p>
+          <div class="lesson-list" id="lessonList"></div>
         </div>
       </div>
-      <div class="chat-input-area">
-        <input class="chat-input" id="chatInput" placeholder="İngilizce yaz... (Türkçe de sorabilirsin)" />
-        <button class="chat-send" id="chatSendBtn">➤</button>
-      </div>
+      <div id="lessonDetailView" class="lesson-content"></div>
     </div>
-  </div>
-  <!-- Scenario Modal -->
-  <div class="scenario-modal" id="scenarioModal">
-    <div class="scenario-modal-content">
-      <h3>🎭 Senaryo Seç</h3>
-      <p>Bir konuşma senaryosu seçerek pratik yap</p>
-      <div class="scenario-list" id="scenarioList"></div>
+
+    <!-- Quiz -->
+    <div class="page" id="page-quiz">
+      <div class="quiz-container" id="quizArea"></div>
+    </div>
+
+    <!-- Chat -->
+    <div class="page" id="page-chat">
+      <div class="chat-container">
+        <div class="chat-header">
+          <div class="chat-avatar">Lf</div>
+          <div class="chat-info">
+            <div class="chat-name">AI English Tutor</div>
+            <div class="chat-status">online</div>
+          </div>
+          <button class="chat-scenario-btn" id="scenarioBtn">Senaryo Seç</button>
+        </div>
+        <div class="chat-messages" id="chatMessages"></div>
+        <div class="chat-input-area">
+          <input class="chat-input" id="chatInput" placeholder="İngilizce yaz... (Türkçe de sorabilirsin)" />
+          <button class="chat-send" id="chatSendBtn">&#8594;</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
+
+<!-- Scenario Modal -->
+<div class="scenario-modal" id="scenarioModal">
+  <div class="scenario-modal-content">
+    <h3>Senaryo Seç</h3>
+    <p>Bir konuşma senaryosu seçerek pratik yap</p>
+    <div class="scenario-list" id="scenarioList"></div>
+  </div>
+</div>
+
 <script>
 // ==================== DATA ====================
 const LESSONS = [
   {
-    id: 1,
-    title: "Selamlaşma & Tanışma",
-    desc: "Hello, goodbye, temel selamlaşma",
+    id: 1, title: "Selamlaşma & Tanışma", desc: "Hello, goodbye, temel selamlaşma", level: "A1",
     vocab: [
       { en: "Hello", tr: "Merhaba", phonetic: "/həˈloʊ/" },
       { en: "Goodbye", tr: "Hoşça kal", phonetic: "/ɡʊdˈbaɪ/" },
@@ -978,624 +1243,203 @@ const LESSONS = [
       { en: "No", tr: "Hayır", phonetic: "/noʊ/" },
       { en: "Sorry", tr: "Özür dilerim", phonetic: "/ˈsɒri/" },
     ],
-    grammar: {
-      title: "\"To be\" fiili — am / is / are",
-      explanation: "İngilizcede kendinizi tanıtırken \"I am\" (Ben ...ım) kullanırsınız. Kısaltması \"I'm\" şeklindedir.",
-      examples: [
-        { en: "I <hl>am</hl> Ayberk.", tr: "Ben Ayberk." },
-        { en: "She <hl>is</hl> my friend.", tr: "O benim arkadaşım." },
-        { en: "We <hl>are</hl> from Turkey.", tr: "Biz Türkiye'denliyiz." },
-      ]
-    },
-    dialogue: [
-      { speaker: "A", text: "Hello! My name is John. What is your name?", tr: "Merhaba! Benim adım John. Senin adın ne?" },
-      { speaker: "B", text: "Hi John! I'm Ayberk. Nice to meet you!", tr: "Merhaba John! Ben Ayberk. Tanıştığımıza memnun oldum!" },
-      { speaker: "A", text: "Nice to meet you too! Where are you from?", tr: "Ben de memnun oldum! Nerelisin?" },
-      { speaker: "B", text: "I'm from Turkey. I'm from Istanbul.", tr: "Türkiye'denliyim. İstanbul'danım." },
-    ],
-    quiz: [
-      { q: "\"Merhaba\" İngilizcede ne demek?", opts: ["Goodbye", "Hello", "Sorry", "Please"], correct: 1 },
-      { q: "\"I ___ from Turkey\" boşluğa ne gelir?", opts: ["is", "are", "am", "be"], correct: 2 },
-      { q: "\"Teşekkür ederim\" İngilizcede ne demek?", opts: ["Sorry", "Please", "Thank you", "Goodbye"], correct: 2 },
-      { q: "\"Good morning\" ne demek?", opts: ["İyi geceler", "İyi akşamlar", "Günaydın", "Hoşça kal"], correct: 2 },
-      { q: "\"She ___ my friend\" boşluğa ne gelir?", opts: ["am", "are", "is", "be"], correct: 2 },
-      { q: "\"Nice to meet you\" ne anlama gelir?", opts: ["Güle güle", "Nasılsın?", "Tanıştığıma memnun oldum", "Lütfen"], correct: 2 },
-      { q: "\"Hayır\" İngilizcede ne demek?", opts: ["Yes", "No", "Not", "None"], correct: 1 },
-      { q: "Hangisi bir selamlaşma ifadesi DEĞİLDİR?", opts: ["Hello", "Good morning", "Thank you", "Good evening"], correct: 2 },
-    ]
+    grammar: { title: "\"To be\" fiili — am / is / are", explanation: "İngilizcede kendinizi tanıtırken \"I am\" (Ben ...ım) kullanırsınız. Kısaltması \"I'm\" şeklindedir.", examples: [{ en: "I <hl>am</hl> Ayberk.", tr: "Ben Ayberk." },{ en: "She <hl>is</hl> my friend.", tr: "O benim arkadaşım." },{ en: "We <hl>are</hl> from Turkey.", tr: "Biz Türkiye'denliyiz." }]},
+    dialogue: [{ speaker: "A", text: "Hello! My name is John. What is your name?", tr: "Merhaba! Benim adım John. Senin adın ne?" },{ speaker: "B", text: "Hi John! I'm Ayberk. Nice to meet you!", tr: "Merhaba John! Ben Ayberk. Tanıştığımıza memnun oldum!" },{ speaker: "A", text: "Nice to meet you too! Where are you from?", tr: "Ben de memnun oldum! Nerelisin?" },{ speaker: "B", text: "I'm from Turkey. I'm from Istanbul.", tr: "Türkiye'denliyim. İstanbul'danım." }],
+    quiz: [{ q: "\"Merhaba\" İngilizcede ne demek?", opts: ["Goodbye","Hello","Sorry","Please"], correct: 1 },{ q: "\"I ___ from Turkey\" boşluğa ne gelir?", opts: ["is","are","am","be"], correct: 2 },{ q: "\"Teşekkür ederim\" İngilizcede ne demek?", opts: ["Sorry","Please","Thank you","Goodbye"], correct: 2 },{ q: "\"Good morning\" ne demek?", opts: ["İyi geceler","İyi akşamlar","Günaydın","Hoşça kal"], correct: 2 },{ q: "\"She ___ my friend\" boşluğa ne gelir?", opts: ["am","are","is","be"], correct: 2 },{ q: "\"Hayır\" İngilizcede ne demek?", opts: ["Yes","No","Not","None"], correct: 1 }]
   },
   {
-    id: 2,
-    title: "Sayılar & Renkler",
-    desc: "1-100 sayılar, temel renkler",
-    vocab: [
-      { en: "One", tr: "Bir", phonetic: "/wʌn/" },
-      { en: "Two", tr: "İki", phonetic: "/tuː/" },
-      { en: "Three", tr: "Üç", phonetic: "/θriː/" },
-      { en: "Ten", tr: "On", phonetic: "/tɛn/" },
-      { en: "Twenty", tr: "Yirmi", phonetic: "/ˈtwɛnti/" },
-      { en: "Red", tr: "Kırmızı", phonetic: "/rɛd/" },
-      { en: "Blue", tr: "Mavi", phonetic: "/bluː/" },
-      { en: "Green", tr: "Yeşil", phonetic: "/ɡriːn/" },
-      { en: "Black", tr: "Siyah", phonetic: "/blæk/" },
-      { en: "White", tr: "Beyaz", phonetic: "/waɪt/" },
-    ],
-    grammar: {
-      title: "Çoğul yapı — \"s\" eki",
-      explanation: "İngilizcede isimleri çoğul yapmak için genellikle sonuna \"-s\" veya \"-es\" eklenir.",
-      examples: [
-        { en: "One cat → Two <hl>cats</hl>", tr: "Bir kedi → İki kedi" },
-        { en: "One box → Three <hl>boxes</hl>", tr: "Bir kutu → Üç kutu" },
-        { en: "I have five <hl>books</hl>.", tr: "Beş kitabım var." },
-      ]
-    },
-    dialogue: [
-      { speaker: "A", text: "How many books do you have?", tr: "Kaç tane kitabın var?" },
-      { speaker: "B", text: "I have ten books.", tr: "On tane kitabım var." },
-      { speaker: "A", text: "What color is your car?", tr: "Arabanın rengi ne?" },
-      { speaker: "B", text: "My car is blue.", tr: "Arabam mavi." },
-    ],
-    quiz: [
-      { q: "\"Three\" ne demek?", opts: ["İki", "Üç", "Dört", "Beş"], correct: 1 },
-      { q: "\"Mavi\" İngilizcede ne demek?", opts: ["Red", "Green", "Blue", "Black"], correct: 2 },
-      { q: "\"cat\" kelimesinin çoğulu nedir?", opts: ["cates", "cats", "caties", "cat"], correct: 1 },
-      { q: "\"Twenty\" kaç demek?", opts: ["12", "22", "20", "2"], correct: 2 },
-      { q: "\"What color is your car?\" ne demek?", opts: ["Araban nerede?", "Araban kaç lira?", "Arabanın rengi ne?", "Araban var mı?"], correct: 2 },
-      { q: "Hangisi bir renk DEĞİLDİR?", opts: ["Green", "White", "Ten", "Red"], correct: 2 },
-    ]
+    id: 2, title: "Sayılar & Renkler", desc: "1-100 sayılar, temel renkler", level: "A1",
+    vocab: [{ en: "One", tr: "Bir", phonetic: "/wʌn/" },{ en: "Two", tr: "İki", phonetic: "/tuː/" },{ en: "Three", tr: "Üç", phonetic: "/θriː/" },{ en: "Ten", tr: "On", phonetic: "/tɛn/" },{ en: "Twenty", tr: "Yirmi", phonetic: "/ˈtwɛnti/" },{ en: "Red", tr: "Kırmızı", phonetic: "/rɛd/" },{ en: "Blue", tr: "Mavi", phonetic: "/bluː/" },{ en: "Green", tr: "Yeşil", phonetic: "/ɡriːn/" },{ en: "Black", tr: "Siyah", phonetic: "/blæk/" },{ en: "White", tr: "Beyaz", phonetic: "/waɪt/" }],
+    grammar: { title: "Çoğul yapı — \"s\" eki", explanation: "İngilizcede isimleri çoğul yapmak için genellikle sonuna \"-s\" veya \"-es\" eklenir.", examples: [{ en: "One cat → Two <hl>cats</hl>", tr: "Bir kedi → İki kedi" },{ en: "One box → Three <hl>boxes</hl>", tr: "Bir kutu → Üç kutu" },{ en: "I have five <hl>books</hl>.", tr: "Beş kitabım var." }]},
+    dialogue: [{ speaker: "A", text: "How many books do you have?", tr: "Kaç tane kitabın var?" },{ speaker: "B", text: "I have ten books.", tr: "On tane kitabım var." },{ speaker: "A", text: "What color is your car?", tr: "Arabanın rengi ne?" },{ speaker: "B", text: "My car is blue.", tr: "Arabam mavi." }],
+    quiz: [{ q: "\"Three\" ne demek?", opts: ["İki","Üç","Dört","Beş"], correct: 1 },{ q: "\"Mavi\" İngilizcede ne demek?", opts: ["Red","Green","Blue","Black"], correct: 2 },{ q: "\"cat\" kelimesinin çoğulu nedir?", opts: ["cates","cats","caties","cat"], correct: 1 },{ q: "\"Twenty\" kaç demek?", opts: ["12","22","20","2"], correct: 2 },{ q: "Hangisi bir renk DEĞİLDİR?", opts: ["Green","White","Ten","Red"], correct: 2 }]
   },
   {
-    id: 3,
-    title: "Aile & İnsanlar",
-    desc: "Aile üyeleri, kişi tanımları",
-    vocab: [
-      { en: "Mother", tr: "Anne", phonetic: "/ˈmʌðər/" },
-      { en: "Father", tr: "Baba", phonetic: "/ˈfɑːðər/" },
-      { en: "Sister", tr: "Kız kardeş", phonetic: "/ˈsɪstər/" },
-      { en: "Brother", tr: "Erkek kardeş", phonetic: "/ˈbrʌðər/" },
-      { en: "Friend", tr: "Arkadaş", phonetic: "/frɛnd/" },
-      { en: "Family", tr: "Aile", phonetic: "/ˈfæməli/" },
-      { en: "Child", tr: "Çocuk", phonetic: "/tʃaɪld/" },
-      { en: "Husband", tr: "Koca", phonetic: "/ˈhʌzbənd/" },
-      { en: "Wife", tr: "Karı/Eş", phonetic: "/waɪf/" },
-      { en: "Baby", tr: "Bebek", phonetic: "/ˈbeɪbi/" },
-    ],
-    grammar: {
-      title: "İyelik — my, your, his, her",
-      explanation: "Sahiplik bildirmek için 'my (benim)', 'your (senin)', 'his (onun-erkek)', 'her (onun-kadın)' kullanılır.",
-      examples: [
-        { en: "<hl>My</hl> mother is a teacher.", tr: "Annem bir öğretmen." },
-        { en: "<hl>His</hl> brother is tall.", tr: "Onun erkek kardeşi uzun." },
-        { en: "I love <hl>my</hl> family.", tr: "Ailemi seviyorum." },
-      ]
-    },
-    dialogue: [
-      { speaker: "A", text: "Do you have brothers or sisters?", tr: "Kardeşin var mı?" },
-      { speaker: "B", text: "Yes, I have one sister.", tr: "Evet, bir kız kardeşim var." },
-      { speaker: "A", text: "What does your father do?", tr: "Baban ne iş yapıyor?" },
-      { speaker: "B", text: "My father is an engineer.", tr: "Babam mühendis." },
-    ],
-    quiz: [
-      { q: "\"Mother\" ne demek?", opts: ["Baba", "Anne", "Kardeş", "Koca"], correct: 1 },
-      { q: "\"___ brother is tall\" (Onun erkek kardeşi)", opts: ["My", "Her", "His", "Your"], correct: 2 },
-      { q: "\"Aile\" İngilizcede ne demek?", opts: ["Friend", "Family", "Father", "Child"], correct: 1 },
-      { q: "\"Wife\" ne demek?", opts: ["Koca", "Anne", "Kız kardeş", "Eş (kadın)"], correct: 3 },
-      { q: "\"I have one sister\" ne anlama gelir?", opts: ["İki kız kardeşim var", "Bir kız kardeşim var", "Kardeşim yok", "Bir erkek kardeşim var"], correct: 1 },
-    ]
+    id: 3, title: "Aile & İnsanlar", desc: "Aile üyeleri, kişi tanımları", level: "A1",
+    vocab: [{ en: "Mother", tr: "Anne", phonetic: "/ˈmʌðər/" },{ en: "Father", tr: "Baba", phonetic: "/ˈfɑːðər/" },{ en: "Sister", tr: "Kız kardeş", phonetic: "/ˈsɪstər/" },{ en: "Brother", tr: "Erkek kardeş", phonetic: "/ˈbrʌðər/" },{ en: "Friend", tr: "Arkadaş", phonetic: "/frɛnd/" },{ en: "Family", tr: "Aile", phonetic: "/ˈfæməli/" },{ en: "Child", tr: "Çocuk", phonetic: "/tʃaɪld/" },{ en: "Husband", tr: "Koca", phonetic: "/ˈhʌzbənd/" },{ en: "Wife", tr: "Karı/Eş", phonetic: "/waɪf/" },{ en: "Baby", tr: "Bebek", phonetic: "/ˈbeɪbi/" }],
+    grammar: { title: "İyelik — my, your, his, her", explanation: "Sahiplik bildirmek için 'my (benim)', 'your (senin)', 'his (onun-erkek)', 'her (onun-kadın)' kullanılır.", examples: [{ en: "<hl>My</hl> mother is a teacher.", tr: "Annem bir öğretmen." },{ en: "<hl>His</hl> brother is tall.", tr: "Onun erkek kardeşi uzun." },{ en: "I love <hl>my</hl> family.", tr: "Ailemi seviyorum." }]},
+    dialogue: [{ speaker: "A", text: "Do you have brothers or sisters?", tr: "Kardeşin var mı?" },{ speaker: "B", text: "Yes, I have one sister.", tr: "Evet, bir kız kardeşim var." },{ speaker: "A", text: "What does your father do?", tr: "Baban ne iş yapıyor?" },{ speaker: "B", text: "My father is an engineer.", tr: "Babam mühendis." }],
+    quiz: [{ q: "\"Mother\" ne demek?", opts: ["Baba","Anne","Kardeş","Koca"], correct: 1 },{ q: "\"___ brother is tall\" (Onun erkek kardeşi)", opts: ["My","Her","His","Your"], correct: 2 },{ q: "\"Aile\" İngilizcede ne demek?", opts: ["Friend","Family","Father","Child"], correct: 1 },{ q: "\"Wife\" ne demek?", opts: ["Koca","Anne","Kız kardeş","Eş (kadın)"], correct: 3 }]
   },
   {
-    id: 4,
-    title: "Günlük Rutinler",
-    desc: "wake up, eat, go to work...",
-    vocab: [
-      { en: "Wake up", tr: "Uyanmak", phonetic: "/weɪk ʌp/" },
-      { en: "Eat", tr: "Yemek", phonetic: "/iːt/" },
-      { en: "Drink", tr: "İçmek", phonetic: "/drɪŋk/" },
-      { en: "Go", tr: "Gitmek", phonetic: "/ɡoʊ/" },
-      { en: "Work", tr: "Çalışmak / İş", phonetic: "/wɜːrk/" },
-      { en: "Sleep", tr: "Uyumak", phonetic: "/sliːp/" },
-      { en: "Breakfast", tr: "Kahvaltı", phonetic: "/ˈbrɛkfəst/" },
-      { en: "Lunch", tr: "Öğle yemeği", phonetic: "/lʌntʃ/" },
-      { en: "Dinner", tr: "Akşam yemeği", phonetic: "/ˈdɪnər/" },
-      { en: "Coffee", tr: "Kahve", phonetic: "/ˈkɒfi/" },
-    ],
-    grammar: {
-      title: "Simple Present Tense — Geniş Zaman",
-      explanation: "Her gün yaptığımız şeyleri anlatırız. 'I/you/we/they' ile fiil olduğu gibi kalır. 'He/she/it' ile fiile '-s' eklenir.",
-      examples: [
-        { en: "I <hl>wake up</hl> at 7.", tr: "7'de uyanırım." },
-        { en: "She <hl>drinks</hl> coffee.", tr: "O kahve içer." },
-        { en: "We <hl>go</hl> to work.", tr: "İşe gideriz." },
-      ]
-    },
-    dialogue: [
-      { speaker: "A", text: "What time do you wake up?", tr: "Saat kaçta uyanırsın?" },
-      { speaker: "B", text: "I wake up at seven o'clock.", tr: "Saat yedide uyanırım." },
-      { speaker: "A", text: "Do you eat breakfast every day?", tr: "Her gün kahvaltı yapar mısın?" },
-      { speaker: "B", text: "Yes, I eat breakfast and drink coffee.", tr: "Evet, kahvaltı yapar ve kahve içerim." },
-    ],
-    quiz: [
-      { q: "\"Wake up\" ne demek?", opts: ["Uyumak", "Uyanmak", "Yemek", "Gitmek"], correct: 1 },
-      { q: "\"She ___ coffee\" (O kahve içer)", opts: ["drink", "drinks", "drinking", "drinkes"], correct: 1 },
-      { q: "\"Kahvaltı\" İngilizcede ne demek?", opts: ["Lunch", "Dinner", "Breakfast", "Coffee"], correct: 2 },
-      { q: "\"I go to work\" ne demek?", opts: ["Eve giderim", "İşe giderim", "Okula giderim", "Markete giderim"], correct: 1 },
-      { q: "\"What time do you wake up?\" ne soruyor?", opts: ["Nereye gidiyorsun?", "Ne yiyorsun?", "Saat kaçta uyanıyorsun?", "Ne içiyorsun?"], correct: 2 },
-    ]
+    id: 4, title: "Günlük Rutinler", desc: "wake up, eat, go to work...", level: "A1",
+    vocab: [{ en: "Wake up", tr: "Uyanmak", phonetic: "/weɪk ʌp/" },{ en: "Eat", tr: "Yemek", phonetic: "/iːt/" },{ en: "Drink", tr: "İçmek", phonetic: "/drɪŋk/" },{ en: "Go", tr: "Gitmek", phonetic: "/ɡoʊ/" },{ en: "Work", tr: "Çalışmak / İş", phonetic: "/wɜːrk/" },{ en: "Sleep", tr: "Uyumak", phonetic: "/sliːp/" },{ en: "Breakfast", tr: "Kahvaltı", phonetic: "/ˈbrɛkfəst/" },{ en: "Lunch", tr: "Öğle yemeği", phonetic: "/lʌntʃ/" },{ en: "Dinner", tr: "Akşam yemeği", phonetic: "/ˈdɪnər/" },{ en: "Coffee", tr: "Kahve", phonetic: "/ˈkɒfi/" }],
+    grammar: { title: "Simple Present Tense — Geniş Zaman", explanation: "Her gün yaptığımız şeyleri anlatırız. 'I/you/we/they' ile fiil olduğu gibi kalır. 'He/she/it' ile fiile '-s' eklenir.", examples: [{ en: "I <hl>wake up</hl> at 7.", tr: "7'de uyanırım." },{ en: "She <hl>drinks</hl> coffee.", tr: "O kahve içer." },{ en: "We <hl>go</hl> to work.", tr: "İşe gideriz." }]},
+    dialogue: [{ speaker: "A", text: "What time do you wake up?", tr: "Saat kaçta uyanırsın?" },{ speaker: "B", text: "I wake up at seven o'clock.", tr: "Saat yedide uyanırım." },{ speaker: "A", text: "Do you eat breakfast every day?", tr: "Her gün kahvaltı yapar mısın?" },{ speaker: "B", text: "Yes, I eat breakfast and drink coffee.", tr: "Evet, kahvaltı yapar ve kahve içerim." }],
+    quiz: [{ q: "\"Wake up\" ne demek?", opts: ["Uyumak","Uyanmak","Yemek","Gitmek"], correct: 1 },{ q: "\"She ___ coffee\" (O kahve içer)", opts: ["drink","drinks","drinking","drinkes"], correct: 1 },{ q: "\"Kahvaltı\" İngilizcede ne demek?", opts: ["Lunch","Dinner","Breakfast","Coffee"], correct: 2 },{ q: "\"I go to work\" ne demek?", opts: ["Eve giderim","İşe giderim","Okula giderim","Markete giderim"], correct: 1 }]
   },
   {
-    id: 5,
-    title: "Yiyecek & İçecekler",
-    desc: "Yemek isimleri, sipariş verme",
-    vocab: [
-      { en: "Water", tr: "Su", phonetic: "/ˈwɔːtər/" },
-      { en: "Bread", tr: "Ekmek", phonetic: "/brɛd/" },
-      { en: "Chicken", tr: "Tavuk", phonetic: "/ˈtʃɪkɪn/" },
-      { en: "Rice", tr: "Pirinç/Pilav", phonetic: "/raɪs/" },
-      { en: "Salad", tr: "Salata", phonetic: "/ˈsæləd/" },
-      { en: "Tea", tr: "Çay", phonetic: "/tiː/" },
-      { en: "Milk", tr: "Süt", phonetic: "/mɪlk/" },
-      { en: "Fruit", tr: "Meyve", phonetic: "/fruːt/" },
-      { en: "Cheese", tr: "Peynir", phonetic: "/tʃiːz/" },
-      { en: "Egg", tr: "Yumurta", phonetic: "/ɛɡ/" },
-    ],
-    grammar: {
-      title: "\"I would like\" — Kibarca İsteme",
-      explanation: "Restoranda veya bir şey isterken 'I would like...' (İstiyorum / ... alabilir miyim) kullanılır. Kısaca 'I'd like' denir.",
-      examples: [
-        { en: "I<hl>'d like</hl> some water, please.", tr: "Su alabilir miyim lütfen?" },
-        { en: "<hl>I would like</hl> chicken and rice.", tr: "Tavuk ve pilav istiyorum." },
-        { en: "<hl>Can I have</hl> a tea?", tr: "Bir çay alabilir miyim?" },
-      ]
-    },
-    dialogue: [
-      { speaker: "A", text: "What would you like to eat?", tr: "Ne yemek istersiniz?" },
-      { speaker: "B", text: "I'd like chicken and salad, please.", tr: "Tavuk ve salata istiyorum lütfen." },
-      { speaker: "A", text: "And to drink?", tr: "İçecek olarak?" },
-      { speaker: "B", text: "Can I have a glass of water?", tr: "Bir bardak su alabilir miyim?" },
-    ],
-    quiz: [
-      { q: "\"Water\" ne demek?", opts: ["Çay", "Süt", "Su", "Kahve"], correct: 2 },
-      { q: "\"I'd like\" ne anlama gelir?", opts: ["Seviyorum", "İstiyorum", "Var", "Yiyorum"], correct: 1 },
-      { q: "\"Peynir\" İngilizcede ne demek?", opts: ["Chicken", "Cheese", "Bread", "Egg"], correct: 1 },
-      { q: "\"Can I have a tea?\" ne demek?", opts: ["Çayı seviyorum", "Çay var mı?", "Bir çay alabilir miyim?", "Bu çay mı?"], correct: 2 },
-      { q: "Hangisi bir içecek DEĞİLDİR?", opts: ["Water", "Tea", "Bread", "Milk"], correct: 2 },
-    ]
+    id: 5, title: "Yiyecek & İçecekler", desc: "Yemek isimleri, sipariş verme", level: "A1",
+    vocab: [{ en: "Water", tr: "Su", phonetic: "/ˈwɔːtər/" },{ en: "Bread", tr: "Ekmek", phonetic: "/brɛd/" },{ en: "Chicken", tr: "Tavuk", phonetic: "/ˈtʃɪkɪn/" },{ en: "Rice", tr: "Pirinç/Pilav", phonetic: "/raɪs/" },{ en: "Salad", tr: "Salata", phonetic: "/ˈsæləd/" },{ en: "Tea", tr: "Çay", phonetic: "/tiː/" },{ en: "Milk", tr: "Süt", phonetic: "/mɪlk/" },{ en: "Fruit", tr: "Meyve", phonetic: "/fruːt/" },{ en: "Cheese", tr: "Peynir", phonetic: "/tʃiːz/" },{ en: "Egg", tr: "Yumurta", phonetic: "/ɛɡ/" }],
+    grammar: { title: "\"I would like\" — Kibarca İsteme", explanation: "Restoranda veya bir şey isterken 'I would like...' kullanılır. Kısaca 'I'd like' denir.", examples: [{ en: "I<hl>'d like</hl> some water, please.", tr: "Su alabilir miyim lütfen?" },{ en: "<hl>I would like</hl> chicken and rice.", tr: "Tavuk ve pilav istiyorum." },{ en: "<hl>Can I have</hl> a tea?", tr: "Bir çay alabilir miyim?" }]},
+    dialogue: [{ speaker: "A", text: "What would you like to eat?", tr: "Ne yemek istersiniz?" },{ speaker: "B", text: "I'd like chicken and salad, please.", tr: "Tavuk ve salata istiyorum lütfen." },{ speaker: "A", text: "And to drink?", tr: "İçecek olarak?" },{ speaker: "B", text: "Can I have a glass of water?", tr: "Bir bardak su alabilir miyim?" }],
+    quiz: [{ q: "\"Water\" ne demek?", opts: ["Çay","Süt","Su","Kahve"], correct: 2 },{ q: "\"I'd like\" ne anlama gelir?", opts: ["Seviyorum","İstiyorum","Var","Yiyorum"], correct: 1 },{ q: "\"Peynir\" İngilizcede ne demek?", opts: ["Chicken","Cheese","Bread","Egg"], correct: 1 },{ q: "Hangisi bir içecek DEĞİLDİR?", opts: ["Water","Tea","Bread","Milk"], correct: 2 }]
   },
 ];
 const SCENARIOS = [
-  { emoji: "☕", name: "Kahve Siparişi", desc: "Bir kafede sipariş ver", prompt: "You are a friendly barista at a coffee shop. The student (Ayberk, beginner A1 level) is ordering coffee. Start the conversation by greeting them and asking what they'd like. Keep your English very simple. If they make grammar mistakes, gently correct them. Always provide a Turkish translation of your messages in parentheses." },
-  { emoji: "🏨", name: "Otel Check-in", desc: "Otelde giriş yapma", prompt: "You are a hotel receptionist. The student (Ayberk, beginner A1 level) is checking into a hotel. Start by greeting them and asking for their name/reservation. Keep English very simple. Correct grammar mistakes gently. Provide Turkish translations in parentheses." },
-  { emoji: "🛒", name: "Market Alışverişi", desc: "Markette alışveriş yap", prompt: "You are a friendly shopkeeper at a grocery store. The student (Ayberk, beginner A1 level) is shopping for food. Greet them and ask how you can help. Keep English very simple. Correct mistakes gently. Provide Turkish translations in parentheses." },
-  { emoji: "🚕", name: "Taksi", desc: "Taksiciye yol tarif et", prompt: "You are a taxi driver. The student (Ayberk, beginner A1 level) needs a ride. Ask them where they want to go. Keep English very simple. Correct mistakes gently. Provide Turkish translations in parentheses." },
-  { emoji: "🤝", name: "Yeni Arkadaş", desc: "Biriyle tanış ve sohbet et", prompt: "You are a new person the student meets at a park. The student (Ayberk, beginner A1 level) will try to introduce themselves and have a simple conversation. Start by saying hi and introducing yourself. Keep English very simple. Correct mistakes gently. Provide Turkish translations in parentheses." },
-  { emoji: "💼", name: "İş Görüşmesi", desc: "Basit bir iş görüşmesi", prompt: "You are an interviewer conducting a simple job interview. The student (Ayberk, beginner A1 level) is applying for a basic position. Start by greeting them and asking their name. Keep questions very simple. Correct mistakes gently. Provide Turkish translations in parentheses." },
+  { emoji: "☕", name: "Kahve Siparişi", desc: "Bir kafede sipariş ver", prompt: "You are a friendly barista at a coffee shop. The student is ordering coffee. Start by greeting them and asking what they'd like. Keep English very simple. Correct grammar mistakes gently. Provide Turkish translations in parentheses." },
+  { emoji: "🏨", name: "Otel Check-in", desc: "Otelde giriş yapma", prompt: "You are a hotel receptionist. The student is checking in. Start by greeting them. Keep English very simple. Correct mistakes gently. Provide Turkish translations in parentheses." },
+  { emoji: "🛒", name: "Market Alışverişi", desc: "Markette alışveriş yap", prompt: "You are a shopkeeper. The student is shopping for food. Greet them and ask how you can help. Keep English very simple. Correct mistakes gently. Provide Turkish translations in parentheses." },
+  { emoji: "🚕", name: "Taksi", desc: "Taksiciye yol tarif et", prompt: "You are a taxi driver. The student needs a ride. Ask where they want to go. Keep English very simple. Correct mistakes gently. Provide Turkish translations in parentheses." },
+  { emoji: "🤝", name: "Yeni Arkadaş", desc: "Biriyle tanış ve sohbet et", prompt: "You meet the student at a park. Introduce yourself and have a simple conversation. Keep English very simple. Correct mistakes gently. Provide Turkish translations in parentheses." },
+  { emoji: "💼", name: "İş Görüşmesi", desc: "Basit bir iş görüşmesi", prompt: "You are an interviewer. The student is applying for a job. Start by greeting them. Keep questions very simple. Correct mistakes gently. Provide Turkish translations in parentheses." },
 ];
-// ==================== STATE ====================
-let state = JSON.parse(localStorage.getItem('linguaflow_state') || 'null') || {
-  streak: 0,
-  lastActiveDate: null,
-  lessonsCompleted: [],
-  wordsLearned: 0,
-  quizScores: [],
-  chatCount: 0,
-  activities: [],
-};
-function saveState() {
-  // Update streak
-  const today = new Date().toDateString();
-  if (state.lastActiveDate !== today) {
-    const yesterday = new Date(Date.now() - 86400000).toDateString();
-    if (state.lastActiveDate === yesterday) {
-      state.streak++;
-    } else if (state.lastActiveDate !== today) {
-      state.streak = 1;
-    }
-    state.lastActiveDate = today;
-  }
-  localStorage.setItem('linguaflow_state', JSON.stringify(state));
-  updateDashboard();
-}
-function addActivity(text) {
-  state.activities.unshift({ text, time: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }) });
-  if (state.activities.length > 10) state.activities.pop();
-  saveState();
-}
-// ==================== NAVIGATION ====================
-document.querySelectorAll('.nav-tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    tab.classList.add('active');
-    document.getElementById(`page-${tab.dataset.page}`).classList.add('active');
+const ONBOARDING_STEPS = [
+  { icon: "👋", title: "Hoş geldin!", desc: "Seni daha iyi tanımak ve kişisel bir plan oluşturmak istiyoruz. Birkaç kısa soruya cevap ver.", type: "info" },
+  { icon: "📊", title: "İngilizce seviyen ne?", desc: "Şu anki İngilizce bilgin hakkında en uygun seçeneği seç.", type: "single", key: "level", options: [{ value: "zero", emoji: "🌱", title: "Sıfır", desc: "Hiç bilmiyorum" },{ value: "beginner", emoji: "🌿", title: "Başlangıç", desc: "Biraz anlıyorum, konuşamıyorum" },{ value: "elementary", emoji: "🌳", title: "Temel", desc: "Basit cümleler kurabilirim" },{ value: "intermediate", emoji: "🌲", title: "Orta", desc: "Günlük konuşma yapabilrim" },{ value: "upper", emoji: "🏔️", title: "İleri Orta", desc: "Akıcı ama hatalı konuşurum" }] },
+  { icon: "🎯", title: "IELTS hedefin ne?", desc: "IELTS sınavında hangi band skorunu hedefliyorsun?", type: "single", key: "targetBand", options: [{ value: "5.5", emoji: "🥉", title: "Band 5.5", desc: "Temel yeterlilik" },{ value: "6.0", emoji: "🥈", title: "Band 6.0", desc: "Lisans başvuruları" },{ value: "6.5", emoji: "🥇", title: "Band 6.5", desc: "Çoğu üniversite" },{ value: "7.0", emoji: "🏆", title: "Band 7.0", desc: "Rekabetçi programlar" },{ value: "7.5+", emoji: "💎", title: "Band 7.5+", desc: "En üst seviye" }] },
+  { icon: "📅", title: "IELTS'e ne zaman gireceksin?", desc: "Sınav tarihin planlamanı şekillendirecek.", type: "single", key: "examDate", options: [{ value: "3months", emoji: "⚡", title: "3 Ay İçinde", desc: "Yoğun program" },{ value: "6months", emoji: "📆", title: "6 Ay İçinde", desc: "Dengeli program" },{ value: "1year", emoji: "🗓️", title: "1 Yıl İçinde", desc: "Rahat tempo" },{ value: "nodate", emoji: "🤷", title: "Tarih Yok", desc: "Sadece öğrenmek istiyorum" }] },
+  { icon: "⏰", title: "Günde ne kadar vakit ayırabilirsin?", desc: "Günlük çalışma süren planının yoğunluğunu belirler.", type: "single", key: "dailyTime", options: [{ value: "15min", emoji: "☕", title: "15 Dakika", desc: "Kısa ve öz" },{ value: "30min", emoji: "📖", title: "30 Dakika", desc: "Etkili öğrenme" },{ value: "1hour", emoji: "💪", title: "1 Saat", desc: "Ciddi çalışma" },{ value: "2hours", emoji: "🔥", title: "2+ Saat", desc: "Yoğun hazırlık" }] },
+  { icon: "😰", title: "En çok hangi alanlarda zorlanıyorsun?", desc: "Birden fazla seçebilirsin. Planın bu alanlara daha çok odaklanacak.", type: "multi", key: "weakAreas", options: [{ value: "listening", emoji: "👂", title: "Listening", desc: "Dinleme & anlama" },{ value: "reading", emoji: "📖", title: "Reading", desc: "Okuma & kavrama" },{ value: "writing", emoji: "✍️", title: "Writing", desc: "Yazma & kompozisyon" },{ value: "speaking", emoji: "🗣️", title: "Speaking", desc: "Konuşma & telaffuz" },{ value: "vocabulary", emoji: "🔤", title: "Kelime", desc: "Kelime bilgisi" },{ value: "grammar", emoji: "📝", title: "Gramer", desc: "Dilbilgisi kuralları" }] },
+  { icon: "🚀", title: "Planın hazır!", desc: "Cevaplarına göre kişisel çalışma planın oluşturuldu. Hadi başlayalım!", type: "summary" }
+];
 
-    if (tab.dataset.page === 'quiz') initQuizPage();
-    if (tab.dataset.page === 'lessons') showLessonList();
-  });
-});
+// ==================== STATE ====================
+function getUsers() { return JSON.parse(localStorage.getItem('lf_users') || '{}'); }
+function saveUsers(u) { localStorage.setItem('lf_users', JSON.stringify(u)); }
+function getCurrentUser() { const e = localStorage.getItem('lf_current_user'); if (!e) return null; return getUsers()[e] || null; }
+function saveCurrentUser(data) { const e = localStorage.getItem('lf_current_user'); if (!e) return; const u = getUsers(); u[e] = data; saveUsers(u); }
+let state = null;
+function loadState() { const u = getCurrentUser(); if (!u) return null; state = u.progress || { streak:0, lastActiveDate:null, lessonsCompleted:[], wordsLearned:0, quizScores:[], chatCount:0, activities:[] }; return state; }
+function saveState() { if (!state) return; const t = new Date().toDateString(); if (state.lastActiveDate !== t) { const y = new Date(Date.now()-86400000).toDateString(); state.streak = (state.lastActiveDate === y) ? state.streak+1 : 1; state.lastActiveDate = t; } const u = getCurrentUser(); if (u) { u.progress = state; saveCurrentUser(u); } updateDashboard(); }
+function addActivity(text) { state.activities.unshift({ text, time: new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}) }); if (state.activities.length > 10) state.activities.pop(); saveState(); }
+
+// ==================== SCREENS ====================
+function showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+
+// ==================== AUTH ====================
+function handleLogin() {
+  const email = document.getElementById('loginEmail').value.trim(), pw = document.getElementById('loginPassword').value, err = document.getElementById('loginError');
+  if (!email || !pw) { err.textContent = 'Lütfen tüm alanları doldurun.'; err.classList.add('show'); return; }
+  const users = getUsers();
+  if (!users[email]) { err.textContent = 'Bu e-posta ile kayıtlı hesap bulunamadı.'; err.classList.add('show'); return; }
+  if (users[email].password !== pw) { err.textContent = 'Şifre hatalı.'; err.classList.add('show'); return; }
+  err.classList.remove('show'); localStorage.setItem('lf_current_user', email); loadState();
+  users[email].onboarding ? enterApp() : startOnboarding();
+}
+function handleRegister() {
+  const name = document.getElementById('regName').value.trim(), email = document.getElementById('regEmail').value.trim(), pw = document.getElementById('regPassword').value, err = document.getElementById('regError');
+  if (!name || !email || !pw) { err.textContent = 'Lütfen tüm alanları doldurun.'; err.classList.add('show'); return; }
+  if (pw.length < 6) { err.textContent = 'Şifre en az 6 karakter olmalı.'; err.classList.add('show'); return; }
+  if (!email.includes('@')) { err.textContent = 'Geçerli bir e-posta girin.'; err.classList.add('show'); return; }
+  const users = getUsers();
+  if (users[email]) { err.textContent = 'Bu e-posta ile zaten bir hesap var.'; err.classList.add('show'); return; }
+  err.classList.remove('show'); users[email] = { name, email, password: pw, onboarding: null, progress: null }; saveUsers(users);
+  localStorage.setItem('lf_current_user', email); loadState(); startOnboarding();
+}
+function handleLogout() { localStorage.removeItem('lf_current_user'); state = null; showScreen('screen-login'); }
+
+// ==================== ONBOARDING ====================
+let obStep = 0, obData = {};
+function startOnboarding() { obStep = 0; obData = {}; showScreen('screen-onboarding'); renderOb(); }
+function renderOb() {
+  const s = ONBOARDING_STEPS[obStep];
+  document.getElementById('onboardingProgress').innerHTML = ONBOARDING_STEPS.map((_,i) => `<div class="dot ${i < obStep ? 'done' : i === obStep ? 'active' : ''}"></div>`).join('');
+  const card = document.getElementById('onboardingCard');
+  if (s.type === 'info') { const u = getCurrentUser(); card.innerHTML = `<span class="step-icon">${s.icon}</span><h2>${s.title.replace('!',`, ${u?.name||''}!`)}</h2><p class="step-desc">${s.desc}</p><button class="btn btn-primary btn-full" onclick="nextOb()">Başlayalım →</button>`; }
+  else if (s.type === 'single') { const cols = s.options.length > 4 ? '' : 'cols-2'; card.innerHTML = `<span class="step-icon">${s.icon}</span><h2>${s.title}</h2><p class="step-desc">${s.desc}</p><div class="option-grid ${cols}" id="optionGrid">${s.options.map(o => `<div class="option-card" data-value="${o.value}" onclick="selOpt(this,'${s.key}','${o.value}')"><span class="option-emoji">${o.emoji}</span><div class="option-title">${o.title}</div><div class="option-desc">${o.desc}</div></div>`).join('')}</div><div class="ob-nav">${obStep>0?'<button class="btn btn-ghost" onclick="prevOb()">← Geri</button>':'<div></div>'}<button class="btn btn-primary" id="nextStepBtn" disabled onclick="nextOb()">Devam →</button></div>`; if (obData[s.key]) { const c = document.querySelector(`[data-value="${obData[s.key]}"]`); if(c){c.classList.add('selected');document.getElementById('nextStepBtn').disabled=false;} } }
+  else if (s.type === 'multi') { card.innerHTML = `<span class="step-icon">${s.icon}</span><h2>${s.title}</h2><p class="step-desc">${s.desc}</p><div class="option-grid cols-2" id="optionGrid">${s.options.map(o => `<div class="option-card multi" data-value="${o.value}" onclick="togOpt(this,'${s.key}','${o.value}')"><span class="option-emoji">${o.emoji}</span><div class="option-title">${o.title}</div><div class="option-desc">${o.desc}</div></div>`).join('')}</div><div class="ob-nav"><button class="btn btn-ghost" onclick="prevOb()">← Geri</button><button class="btn btn-primary" id="nextStepBtn" disabled onclick="nextOb()">Devam →</button></div>`; if(obData[s.key]?.length>0){obData[s.key].forEach(v=>{const c=document.querySelector(`[data-value="${v}"]`);if(c)c.classList.add('selected');});document.getElementById('nextStepBtn').disabled=false;} }
+  else if (s.type === 'summary') { const p = genPlan(obData); card.innerHTML = `<span class="step-icon">${s.icon}</span><h2>${s.title}</h2><p class="step-desc">${s.desc}</p><div style="background:var(--bg-primary);border:1px solid var(--border-1);border-radius:12px;padding:24px;margin-bottom:24px;"><div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;"><div style="text-align:center;"><div style="font-size:22px;margin-bottom:4px;">${p.levelEmoji}</div><div style="font-size:11px;color:var(--text-4);text-transform:uppercase;letter-spacing:1px;">Seviye</div><div style="font-size:14px;font-weight:600;margin-top:2px;">${p.levelLabel}</div></div><div style="text-align:center;"><div style="font-size:22px;margin-bottom:4px;">🎯</div><div style="font-size:11px;color:var(--text-4);text-transform:uppercase;letter-spacing:1px;">IELTS Hedef</div><div style="font-size:14px;font-weight:600;margin-top:2px;">Band ${p.targetBand}</div></div><div style="text-align:center;"><div style="font-size:22px;margin-bottom:4px;">📅</div><div style="font-size:11px;color:var(--text-4);text-transform:uppercase;letter-spacing:1px;">Süre</div><div style="font-size:14px;font-weight:600;margin-top:2px;">${p.durationLabel}</div></div><div style="text-align:center;"><div style="font-size:22px;margin-bottom:4px;">⏰</div><div style="font-size:11px;color:var(--text-4);text-transform:uppercase;letter-spacing:1px;">Günlük</div><div style="font-size:14px;font-weight:600;margin-top:2px;">${p.dailyLabel}</div></div></div><div style="font-size:13px;color:var(--text-3);line-height:1.7;"><strong style="color:var(--amber);">Odak alanların:</strong> ${p.focusAreas}</div></div><div class="ob-nav"><button class="btn btn-ghost" onclick="prevOb()">← Geri</button><button class="btn btn-primary" onclick="completeOb()">Öğrenmeye Başla →</button></div>`; }
+}
+function selOpt(el,key,val) { document.querySelectorAll('#optionGrid .option-card').forEach(c=>c.classList.remove('selected')); el.classList.add('selected'); obData[key]=val; document.getElementById('nextStepBtn').disabled=false; }
+function togOpt(el,key,val) { el.classList.toggle('selected'); if(!obData[key])obData[key]=[]; const i=obData[key].indexOf(val); i>=0?obData[key].splice(i,1):obData[key].push(val); document.getElementById('nextStepBtn').disabled=obData[key].length===0; }
+function nextOb() { if(obStep<ONBOARDING_STEPS.length-1){obStep++;renderOb();} }
+function prevOb() { if(obStep>0){obStep--;renderOb();} }
+function genPlan(d) {
+  const lm = {zero:{emoji:"🌱",label:"Sıfır (A0)"},beginner:{emoji:"🌿",label:"Başlangıç (A1)"},elementary:{emoji:"🌳",label:"Temel (A2)"},intermediate:{emoji:"🌲",label:"Orta (B1)"},upper:{emoji:"🏔️",label:"İleri Orta (B2)"}};
+  const dm = {"3months":"3 Ay","6months":"6 Ay","1year":"1 Yıl","nodate":"Esnek"};
+  const tm = {"15min":"15 dk/gün","30min":"30 dk/gün","1hour":"1 saat/gün","2hours":"2+ saat/gün"};
+  const al = {listening:"Dinleme",reading:"Okuma",writing:"Yazma",speaking:"Konuşma",vocabulary:"Kelime",grammar:"Gramer"};
+  const lv = lm[d.level]||lm.zero; const wa = (d.weakAreas||[]).map(a=>al[a]||a);
+  return { levelEmoji:lv.emoji, levelLabel:lv.label, targetBand:d.targetBand||"6.0", durationLabel:dm[d.examDate]||"Esnek", dailyLabel:tm[d.dailyTime]||"30 dk", focusAreas:wa.length>0?wa.join(', '):'Genel', weakAreas:d.weakAreas||[], examDate:d.examDate, dailyTime:d.dailyTime, level:d.level };
+}
+function completeOb() { const u=getCurrentUser(); if(u){u.onboarding=obData;u.plan=genPlan(obData);u.progress={streak:0,lastActiveDate:null,lessonsCompleted:[],wordsLearned:0,quizScores:[],chatCount:0,activities:[]};saveCurrentUser(u);} loadState(); enterApp(); }
+
+// ==================== APP ====================
+function enterApp() {
+  const u = getCurrentUser(); if(!u){showScreen('screen-login');return;}
+  document.getElementById('userName').textContent = u.name;
+  document.getElementById('userAvatar').textContent = u.name.charAt(0).toUpperCase();
+  if (u.plan) {
+    document.getElementById('planLevelBadge').textContent = u.plan.levelLabel;
+    document.getElementById('planOverview').innerHTML = `<div class="plan-item"><span class="plan-icon">🎯</span><div><div class="plan-label">IELTS Hedef</div><div class="plan-value">Band ${u.plan.targetBand}</div></div></div><div class="plan-item"><span class="plan-icon">📅</span><div><div class="plan-label">Süre</div><div class="plan-value">${u.plan.durationLabel}</div></div></div><div class="plan-item"><span class="plan-icon">⏰</span><div><div class="plan-label">Günlük Çalışma</div><div class="plan-value">${u.plan.dailyLabel}</div></div></div><div class="plan-item"><span class="plan-icon">🔥</span><div><div class="plan-label">Odak Alanlar</div><div class="plan-value">${u.plan.focusAreas}</div></div></div>`;
+    const int = {"15min":"hafif","30min":"orta","1hour":"yoğun","2hours":"çok yoğun"}; const iv = int[u.plan.dailyTime]||"orta";
+    let adv = `<strong style="color:var(--amber);">Haftalık Önerilen Program (${iv}):</strong><br>`;
+    if(u.plan.dailyTime==="15min") adv+=`• Pazartesi-Cuma: 1 ders + 5 kelime<br>• Cumartesi: Quiz tekrarı<br>• Pazar: Konuşma pratiği`;
+    else if(u.plan.dailyTime==="30min") adv+=`• Pazartesi-Cuma: 1 ders + 10 kelime + mini quiz<br>• Cumartesi: Konuşma pratiği + tekrar<br>• Pazar: Dinleme/okuma pratiği`;
+    else if(u.plan.dailyTime==="1hour") adv+=`• Pazartesi-Cuma: 1 ders + 15 kelime + gramer + quiz<br>• Cumartesi: IELTS pratik testi + konuşma<br>• Pazar: Yazma pratiği + genel tekrar`;
+    else adv+=`• Pazartesi-Cuma: 2 ders + 20 kelime + gramer + quiz + konuşma<br>• Cumartesi: IELTS tam pratik testi<br>• Pazar: Yazma Task 1&2 + genel tekrar`;
+    document.getElementById('planDetails').innerHTML = adv;
+    document.getElementById('lessonPlanBadge').textContent = `${u.plan.durationLabel} Plan`;
+  }
+  document.getElementById('chatMessages').innerHTML = `<div class="msg ai">Merhaba ${u.name}! Ben senin İngilizce konuşma partnerin. Benimle İngilizce pratik yapabilirsin. Yanlış yaparsan düzeltirim, anlamadığın yerleri Türkçe açıklarım.<span class="turkish-help">Bir senaryo seçebilir veya doğrudan İngilizce yazmaya başlayabilirsin!</span></div>`;
+  showScreen('screen-app'); updateDashboard(); showLessonList(); saveState();
+}
+
+// ==================== NAV ====================
+document.querySelectorAll('.nav-tab').forEach(tab => { tab.addEventListener('click', () => { document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active')); document.querySelectorAll('.page').forEach(p=>p.classList.remove('active')); tab.classList.add('active'); document.getElementById(`page-${tab.dataset.page}`).classList.add('active'); if(tab.dataset.page==='quiz')initQuizPage(); if(tab.dataset.page==='lessons')showLessonList(); }); });
+
 // ==================== DASHBOARD ====================
 function updateDashboard() {
+  if(!state) return;
   document.getElementById('streakCount').textContent = state.streak;
   document.getElementById('lessonsCompleted').textContent = state.lessonsCompleted.length;
   document.getElementById('wordsLearned').textContent = state.wordsLearned;
   document.getElementById('chatCount').textContent = state.chatCount;
-
-  const avgScore = state.quizScores.length > 0
-    ? Math.round(state.quizScores.reduce((a,b) => a+b, 0) / state.quizScores.length)
-    : null;
-  document.getElementById('quizScore').textContent = avgScore !== null ? `%${avgScore}` : '—';
-  // Progress ring
-  const totalLessons = LESSONS.length;
-  const pct = Math.round((state.lessonsCompleted.length / totalLessons) * 100);
-  const circumference = 326.73;
-  document.getElementById('progressRing').style.strokeDashoffset = circumference - (circumference * pct / 100);
+  const avg = state.quizScores.length>0 ? Math.round(state.quizScores.reduce((a,b)=>a+b,0)/state.quizScores.length) : null;
+  document.getElementById('quizScore').textContent = avg!==null ? `%${avg}` : '—';
+  const pct = Math.round((state.lessonsCompleted.length/LESSONS.length)*100);
+  document.getElementById('progressRing').style.strokeDashoffset = 326.73-(326.73*pct/100);
   document.getElementById('progressPct').textContent = `${pct}%`;
-  // Daily tasks
-  const tasksEl = document.getElementById('dailyTasks');
-  const nextLesson = LESSONS.find(l => !state.lessonsCompleted.includes(l.id));
-  const todayDone = state.lastActiveDate === new Date().toDateString();
-  tasksEl.innerHTML = `
-    <div style="display:flex;align-items:center;gap:8px;">
-      <span style="font-size:16px;">${nextLesson ? '📖' : '✅'}</span>
-      <span style="font-size:13px;color:${nextLesson ? 'var(--text-secondary)' : 'var(--accent-green)'};">
-        ${nextLesson ? `Ders ${nextLesson.id}: ${nextLesson.title}` : 'Tüm dersler tamamlandı!'}
-      </span>
-    </div>
-    <div style="display:flex;align-items:center;gap:8px;">
-      <span style="font-size:16px;">🧠</span>
-      <span style="font-size:13px;color:var(--text-secondary);">Günlük quiz'i çöz</span>
-    </div>
-    <div style="display:flex;align-items:center;gap:8px;">
-      <span style="font-size:16px;">💬</span>
-      <span style="font-size:13px;color:var(--text-secondary);">Konuşma pratiği yap</span>
-    </div>
-  `;
-  // Activity log
+  const nl = LESSONS.find(l=>!state.lessonsCompleted.includes(l.id));
+  document.getElementById('dailyTasks').innerHTML = `<div style="display:flex;align-items:center;gap:8px;"><span style="font-size:14px;">&#9654;</span><span style="font-size:13px;color:${nl?'var(--text-2)':'var(--emerald)'};">${nl?`Ders ${nl.id}: ${nl.title}`:'Tüm dersler tamamlandı!'}</span></div><div style="display:flex;align-items:center;gap:8px;"><span style="font-size:14px;">&#10022;</span><span style="font-size:13px;color:var(--text-3);">Günlük quiz'i çöz</span></div><div style="display:flex;align-items:center;gap:8px;"><span style="font-size:14px;">&#9998;</span><span style="font-size:13px;color:var(--text-3);">Konuşma pratiği yap</span></div>`;
   const logEl = document.getElementById('activityLog');
-  if (state.activities.length > 0) {
-    logEl.innerHTML = state.activities.map(a => `
-      <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">
-        <span>${a.text}</span>
-        <span style="color:var(--text-muted);font-size:12px;">${a.time}</span>
-      </div>
-    `).join('');
-  }
+  if(state.activities.length>0) logEl.innerHTML = state.activities.map(a=>`<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border-1);"><span style="font-size:13px;">${a.text}</span><span style="color:var(--text-4);font-size:11px;font-family:var(--font-mono);">${a.time}</span></div>`).join('');
 }
+
 // ==================== LESSONS ====================
-function showLessonList() {
-  document.getElementById('lessonListView').style.display = 'block';
-  document.getElementById('lessonDetailView').style.display = 'none';
-  document.getElementById('lessonDetailView').classList.remove('active');
-  const list = document.getElementById('lessonList');
-  list.innerHTML = LESSONS.map((lesson, i) => {
-    const completed = state.lessonsCompleted.includes(lesson.id);
-    const prevCompleted = i === 0 || state.lessonsCompleted.includes(LESSONS[i-1].id);
-    const locked = !prevCompleted && !completed;
-    const statusClass = completed ? 'completed' : locked ? 'locked' : '';
-    const numClass = completed ? 'done' : locked ? 'lock' : 'active-lesson';
-    const icon = completed ? '✓' : locked ? '🔒' : lesson.id;
-    return `
-      <div class="lesson-item ${statusClass}" ${!locked ? `onclick="openLesson(${lesson.id})"` : ''}>
-        <div class="lesson-num ${numClass}">${icon}</div>
-        <div class="lesson-info">
-          <div class="lesson-title">${lesson.title}</div>
-          <div class="lesson-desc">${lesson.desc}</div>
-        </div>
-        <div class="lesson-arrow">${locked ? '' : '→'}</div>
-      </div>
-    `;
-  }).join('');
+function showLessonList() { document.getElementById('lessonListView').style.display='block'; document.getElementById('lessonDetailView').style.display='none'; document.getElementById('lessonDetailView').classList.remove('active');
+  document.getElementById('lessonList').innerHTML = LESSONS.map((l,i)=>{ const done=state?.lessonsCompleted.includes(l.id); const prev=i===0||state?.lessonsCompleted.includes(LESSONS[i-1].id); const locked=!prev&&!done; const sc=done?'completed':locked?'locked':''; const nc=done?'done':locked?'lock':'active-lesson'; const ic=done?'✓':locked?'—':l.id;
+    return `<div class="lesson-item ${sc}" ${!locked?`onclick="openLesson(${l.id})"`:''}><div class="lesson-num ${nc}">${ic}</div><div class="lesson-info"><div class="lesson-title">${l.title}</div><div class="lesson-desc">${l.desc}</div></div><div class="lesson-arrow">${locked?'':'→'}</div></div>`; }).join('');
 }
-function openLesson(id) {
-  const lesson = LESSONS.find(l => l.id === id);
-  if (!lesson) return;
-  document.getElementById('lessonListView').style.display = 'none';
-  const detail = document.getElementById('lessonDetailView');
-  detail.style.display = 'block';
-  detail.classList.add('active');
-  detail.innerHTML = `
-    <button class="back-btn" onclick="showLessonList()">← Ders Listesine Dön</button>
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title">Ders ${lesson.id}: ${lesson.title}</div>
-        <div class="card-badge">${lesson.vocab.length} kelime</div>
-      </div>
-      <div class="lesson-section">
-        <h3>🔤 Yeni Kelimeler</h3>
-        <div class="vocab-grid">
-          ${lesson.vocab.map(v => `
-            <div class="vocab-card" onclick="speakWord('${v.en}')">
-              <button class="speak-btn" title="Dinle">🔊</button>
-              <div class="en">${v.en}</div>
-              <div class="tr">${v.tr}</div>
-              <div class="phonetic">${v.phonetic}</div>
-            </div>
-          `).join('')}
-        </div>
-      </div>
-      <div class="lesson-section">
-        <h3>📝 Gramer: ${lesson.grammar.title}</h3>
-        <div class="grammar-box">
-          <p>${lesson.grammar.explanation}</p>
-          ${lesson.grammar.examples.map(ex => `
-            <div class="example">
-              <div>${ex.en.replace(/<hl>/g, '<span class="highlight">').replace(/<\/hl>/g, '</span>')}</div>
-              <div style="color:var(--text-muted);font-size:12px;margin-top:4px;">${ex.tr}</div>
-            </div>
-          `).join('')}
-        </div>
-      </div>
-      <div class="lesson-section">
-        <h3>🗣️ Diyalog</h3>
-        <div class="dialogue-box">
-          ${lesson.dialogue.map(d => `
-            <div class="dialogue-line">
-              <div class="dialogue-speaker ${d.speaker === 'B' ? 'b' : ''}">${d.speaker}:</div>
-              <div class="dialogue-text">
-                ${d.text}
-                <span class="translation">${d.tr}</span>
-              </div>
-            </div>
-          `).join('')}
-        </div>
-        <button class="btn btn-secondary" style="margin-top:12px;width:100%;" onclick="speakDialogue(${lesson.id})">
-          🔊 Diyaloğu Dinle
-        </button>
-      </div>
-      <button class="btn btn-primary" style="width:100%;margin-top:8px;" onclick="completeLesson(${lesson.id})">
-        ✅ Dersi Tamamla
-      </button>
-    </div>
-  `;
+function openLesson(id) { const l=LESSONS.find(x=>x.id===id); if(!l)return; document.getElementById('lessonListView').style.display='none'; const d=document.getElementById('lessonDetailView'); d.style.display='block'; d.classList.add('active');
+  d.innerHTML = `<button class="back-btn" onclick="showLessonList()">← Ders Listesine Dön</button><div class="card"><div class="card-header"><div class="card-title">Ders ${l.id}: ${l.title}</div><div class="card-badge">${l.vocab.length} kelime</div></div><div class="lesson-section"><h3>Yeni Kelimeler</h3><div class="vocab-grid">${l.vocab.map(v=>`<div class="vocab-card" onclick="speakWord('${v.en}')"><button class="speak-btn" title="Dinle">&#9834;</button><div class="en">${v.en}</div><div class="tr">${v.tr}</div><div class="phonetic">${v.phonetic}</div></div>`).join('')}</div></div><div class="lesson-section"><h3>Gramer: ${l.grammar.title}</h3><div class="grammar-box"><p>${l.grammar.explanation}</p>${l.grammar.examples.map(ex=>`<div class="example"><div>${ex.en.replace(/<hl>/g,'<span class="highlight">').replace(/<\/hl>/g,'</span>')}</div><div style="color:var(--text-4);font-size:12px;margin-top:4px;">${ex.tr}</div></div>`).join('')}</div></div><div class="lesson-section"><h3>Diyalog</h3><div class="dialogue-box">${l.dialogue.map(x=>`<div class="dialogue-line"><div class="dialogue-speaker ${x.speaker==='B'?'b':''}">${x.speaker}:</div><div class="dialogue-text">${x.text}<span class="translation">${x.tr}</span></div></div>`).join('')}</div><button class="btn btn-secondary" style="margin-top:12px;width:100%;" onclick="speakDialogue(${l.id})">Diyaloğu Dinle</button></div><button class="btn btn-primary" style="width:100%;margin-top:8px;" onclick="completeLesson(${l.id})">Dersi Tamamla</button></div>`;
 }
-function completeLesson(id) {
-  const lesson = LESSONS.find(l => l.id === id);
-  if (!state.lessonsCompleted.includes(id)) {
-    state.lessonsCompleted.push(id);
-    state.wordsLearned += lesson.vocab.length;
-    addActivity(`📚 Ders ${id}: "${lesson.title}" tamamlandı`);
-  }
-  showLessonList();
-}
+function completeLesson(id) { const l=LESSONS.find(x=>x.id===id); if(!state.lessonsCompleted.includes(id)){state.lessonsCompleted.push(id);state.wordsLearned+=l.vocab.length;addActivity(`Ders ${id}: "${l.title}" tamamlandı`);} showLessonList(); }
+
 // ==================== SPEECH ====================
-function speakWord(text) {
-  if ('speechSynthesis' in window) {
-    const utter = new SpeechSynthesisUtterance(text);
-    utter.lang = 'en-US';
-    utter.rate = 0.85;
-    speechSynthesis.speak(utter);
-  }
-}
-function speakDialogue(lessonId) {
-  const lesson = LESSONS.find(l => l.id === lessonId);
-  if (!lesson || !('speechSynthesis' in window)) return;
-  let delay = 0;
-  lesson.dialogue.forEach(d => {
-    setTimeout(() => {
-      const utter = new SpeechSynthesisUtterance(d.text);
-      utter.lang = 'en-US';
-      utter.rate = 0.8;
-      speechSynthesis.speak(utter);
-    }, delay);
-    delay += 3000;
-  });
-}
+function speakWord(t) { if('speechSynthesis' in window){const u=new SpeechSynthesisUtterance(t);u.lang='en-US';u.rate=0.85;speechSynthesis.speak(u);} }
+function speakDialogue(id) { const l=LESSONS.find(x=>x.id===id); if(!l||!('speechSynthesis' in window))return; let d=0; l.dialogue.forEach(x=>{setTimeout(()=>{const u=new SpeechSynthesisUtterance(x.text);u.lang='en-US';u.rate=0.8;speechSynthesis.speak(u);},d);d+=3000;}); }
+
 // ==================== QUIZ ====================
-let currentQuiz = [];
-let quizIndex = 0;
-let quizCorrectCount = 0;
-function initQuizPage() {
-  const area = document.getElementById('quizArea');
-
-  // Gather questions from completed lessons (or lesson 1 if none completed)
-  const availableLessons = state.lessonsCompleted.length > 0
-    ? LESSONS.filter(l => state.lessonsCompleted.includes(l.id))
-    : [LESSONS[0]];
-  if (availableLessons.length === 0) {
-    area.innerHTML = `
-      <div style="text-align:center;padding:60px 20px;">
-        <div style="font-size:48px;margin-bottom:16px;">🔒</div>
-        <p style="font-size:16px;color:var(--text-secondary);">Quiz'e başlamak için önce en az bir ders tamamla!</p>
-        <button class="btn btn-primary" style="margin-top:20px;" onclick="document.querySelector('[data-page=lessons]').click()">
-          Derslere Git
-        </button>
-      </div>
-    `;
-    return;
-  }
-  // Gather and shuffle questions
-  currentQuiz = [];
-  availableLessons.forEach(l => {
-    l.quiz.forEach(q => currentQuiz.push({...q, lessonId: l.id}));
-  });
-  currentQuiz = currentQuiz.sort(() => Math.random() - 0.5).slice(0, 10);
-  quizIndex = 0;
-  quizCorrectCount = 0;
-  showQuizQuestion();
+let cQuiz=[],qIdx=0,qOk=0;
+function initQuizPage() { const a=document.getElementById('quizArea'); const al=state.lessonsCompleted.length>0?LESSONS.filter(l=>state.lessonsCompleted.includes(l.id)):[LESSONS[0]]; cQuiz=[]; al.forEach(l=>l.quiz.forEach(q=>cQuiz.push({...q,lessonId:l.id}))); cQuiz=cQuiz.sort(()=>Math.random()-0.5).slice(0,10); qIdx=0; qOk=0; showQ(); }
+function showQ() { const a=document.getElementById('quizArea');
+  if(qIdx>=cQuiz.length){const p=Math.round((qOk/cQuiz.length)*100);const sc=p>=80?'good':p>=50?'mid':'low';const msg=p>=80?'Harika!':p>=50?'Fena değil, gelişiyorsun!':'Biraz daha pratik gerekiyor';state.quizScores.push(p);addActivity(`Quiz tamamlandı: %${p}`);a.innerHTML=`<div class="quiz-result"><div class="score ${sc}">%${p}</div><div class="message">${msg}</div><p style="font-size:14px;color:var(--text-4);margin-bottom:28px;">${qOk}/${cQuiz.length} doğru</p><button class="btn btn-primary" onclick="initQuizPage()">Tekrar Dene</button></div>`;return;}
+  const q=cQuiz[qIdx];const p=Math.round((qIdx/cQuiz.length)*100);
+  a.innerHTML=`<div class="quiz-progress"><div class="quiz-progress-bar"><div class="quiz-progress-fill" style="width:${p}%"></div></div><div class="quiz-progress-text">${qIdx+1}/${cQuiz.length}</div></div><div class="quiz-question"><div class="q-label">Soru ${qIdx+1}</div><div class="q-text">${q.q}</div></div><div class="quiz-options">${q.opts.map((o,i)=>`<button class="quiz-option" onclick="ansQ(${i},${q.correct})">${o}</button>`).join('')}</div><div class="quiz-feedback" id="quizFeedback"></div>`;
 }
-function showQuizQuestion() {
-  const area = document.getElementById('quizArea');
+function ansQ(s,c) { const opts=document.querySelectorAll('.quiz-option'),fb=document.getElementById('quizFeedback'); opts.forEach((o,i)=>{o.disabled=true;if(i===c)o.classList.add('correct');if(i===s&&s!==c)o.classList.add('wrong');}); if(s===c){qOk++;fb.textContent='Doğru!';fb.className='quiz-feedback show correct-fb';}else{fb.textContent=`Yanlış! Doğru cevap: ${cQuiz[qIdx].opts[c]}`;fb.className='quiz-feedback show wrong-fb';} setTimeout(()=>{qIdx++;showQ();},1500); }
 
-  if (quizIndex >= currentQuiz.length) {
-    const pct = Math.round((quizCorrectCount / currentQuiz.length) * 100);
-    const scoreClass = pct >= 80 ? 'good' : pct >= 50 ? 'mid' : 'low';
-    const message = pct >= 80 ? 'Harika iş! 🎉' : pct >= 50 ? 'Fena değil, gelişiyorsun! 💪' : 'Biraz daha pratik gerekiyor 📖';
-
-    state.quizScores.push(pct);
-    addActivity(`🧠 Quiz tamamlandı: %${pct}`);
-    area.innerHTML = `
-      <div class="quiz-result">
-        <div style="font-size:48px;margin-bottom:16px;">${pct >= 80 ? '🏆' : pct >= 50 ? '⭐' : '📖'}</div>
-        <div class="score ${scoreClass}">%${pct}</div>
-        <div class="message">${message}</div>
-        <p style="font-size:14px;color:var(--text-muted);margin-bottom:24px;">
-          ${quizCorrectCount}/${currentQuiz.length} doğru cevap
-        </p>
-        <button class="btn btn-primary" onclick="initQuizPage()">Tekrar Dene</button>
-      </div>
-    `;
-    return;
-  }
-  const q = currentQuiz[quizIndex];
-  const pct = Math.round((quizIndex / currentQuiz.length) * 100);
-  area.innerHTML = `
-    <div class="quiz-progress">
-      <div class="quiz-progress-bar">
-        <div class="quiz-progress-fill" style="width: ${pct}%"></div>
-      </div>
-      <div class="quiz-progress-text">${quizIndex + 1}/${currentQuiz.length}</div>
-    </div>
-    <div class="quiz-question">
-      <div class="q-label">Soru ${quizIndex + 1}</div>
-      <div class="q-text">${q.q}</div>
-    </div>
-    <div class="quiz-options">
-      ${q.opts.map((opt, i) => `
-        <button class="quiz-option" onclick="answerQuiz(${i}, ${q.correct})">${opt}</button>
-      `).join('')}
-    </div>
-    <div class="quiz-feedback" id="quizFeedback"></div>
-  `;
-}
-function answerQuiz(selected, correct) {
-  const options = document.querySelectorAll('.quiz-option');
-  const feedback = document.getElementById('quizFeedback');
-
-  options.forEach((opt, i) => {
-    opt.disabled = true;
-    if (i === correct) opt.classList.add('correct');
-    if (i === selected && selected !== correct) opt.classList.add('wrong');
-  });
-  if (selected === correct) {
-    quizCorrectCount++;
-    feedback.textContent = '✅ Doğru!';
-    feedback.className = 'quiz-feedback show correct-fb';
-  } else {
-    feedback.textContent = `❌ Yanlış! Doğru cevap: ${currentQuiz[quizIndex].opts[correct]}`;
-    feedback.className = 'quiz-feedback show wrong-fb';
-  }
-  setTimeout(() => {
-    quizIndex++;
-    showQuizQuestion();
-  }, 1500);
-}
 // ==================== CHAT ====================
-let chatHistory = [];
-let currentScenario = null;
-document.getElementById('scenarioBtn').addEventListener('click', () => {
-  const modal = document.getElementById('scenarioModal');
-  const list = document.getElementById('scenarioList');
-  list.innerHTML = SCENARIOS.map((s, i) => `
-    <div class="scenario-item" onclick="selectScenario(${i})">
-      <span class="scenario-emoji">${s.emoji}</span>${s.name}
-      <span class="scenario-desc">${s.desc}</span>
-    </div>
-  `).join('');
-  modal.classList.add('show');
-});
-document.getElementById('scenarioModal').addEventListener('click', (e) => {
-  if (e.target === e.currentTarget) e.currentTarget.classList.remove('show');
-});
-function selectScenario(index) {
-  currentScenario = SCENARIOS[index];
-  document.getElementById('scenarioModal').classList.remove('show');
+let chatH=[],curScen=null;
+document.getElementById('scenarioBtn').addEventListener('click',()=>{const m=document.getElementById('scenarioModal');document.getElementById('scenarioList').innerHTML=SCENARIOS.map((s,i)=>`<div class="scenario-item" onclick="selScen(${i})"><span class="scenario-emoji">${s.emoji}</span>${s.name}<span class="scenario-desc">${s.desc}</span></div>`).join('');m.classList.add('show');});
+document.getElementById('scenarioModal').addEventListener('click',(e)=>{if(e.target===e.currentTarget)e.currentTarget.classList.remove('show');});
+function selScen(i){curScen=SCENARIOS[i];document.getElementById('scenarioModal').classList.remove('show');chatH=[];document.getElementById('chatMessages').innerHTML='';addMsg('ai',`Senaryo: <strong>${curScen.name}</strong> — ${curScen.desc}<br><span class="turkish-help">Senaryoya başlıyorum, İngilizce cevap vermeye çalış!</span>`);sendAI(curScen.prompt+"\n\nStart the conversation now.",true);}
+function addMsg(role,html){const el=document.getElementById('chatMessages');const d=document.createElement('div');d.className=`msg ${role}`;d.innerHTML=html;el.appendChild(d);el.scrollTop=el.scrollHeight;}
+function addTyping(){const el=document.getElementById('chatMessages');const d=document.createElement('div');d.className='msg ai';d.id='typingIndicator';d.innerHTML='<div class="typing-indicator"><span></span><span></span><span></span></div>';el.appendChild(d);el.scrollTop=el.scrollHeight;}
+function rmTyping(){const el=document.getElementById('typingIndicator');if(el)el.remove();}
+async function sendAI(msg,isSys=false){addTyping();document.getElementById('chatSendBtn').disabled=true;const u=getCurrentUser();const sysP=`You are an English tutor for ${u?.name||'User'}, a Turkish speaker (${u?.plan?.levelLabel||'beginner'}) learning English for IELTS (target: Band ${u?.plan?.targetBand||'6.0'}).\nRules:\n- Keep English simple for their level\n- If they write in Turkish, respond in English with Turkish translation in parentheses\n- Gently correct grammar/spelling mistakes\n- Be encouraging and friendly\n- Add Turkish translations for difficult words\n- If they ask about grammar, explain in Turkish\n${curScen?'\nCurrent scenario: '+curScen.prompt:''}`;chatH.push({role:'user',content:msg});try{const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:sysP,messages:chatH.slice(-10)})});const d=await r.json();const t=d.content?.map(c=>c.text||'').join('')||'Sorry, I had an error.';chatH.push({role:'assistant',content:t});rmTyping();addMsg('ai',t.replace(/\n/g,'<br>'));state.chatCount++;saveState();}catch(e){rmTyping();addMsg('ai','Bağlantı hatası oluştu. Tekrar deneyelim!<br><span class="turkish-help">API bağlantısını kontrol et.</span>');}document.getElementById('chatSendBtn').disabled=false;}
+document.getElementById('chatSendBtn').addEventListener('click',sendUser);
+document.getElementById('chatInput').addEventListener('keydown',(e)=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendUser();}});
+function sendUser(){const inp=document.getElementById('chatInput');const t=inp.value.trim();if(!t)return;inp.value='';addMsg('user',t);addActivity('Konuşma pratiği yapıldı');sendAI(t);}
 
-  // Clear chat
-  chatHistory = [];
-  const messagesEl = document.getElementById('chatMessages');
-  messagesEl.innerHTML = '';
+// ==================== ENTER KEY ====================
+document.getElementById('loginPassword').addEventListener('keydown',(e)=>{if(e.key==='Enter')handleLogin();});
+document.getElementById('regPassword').addEventListener('keydown',(e)=>{if(e.key==='Enter')handleRegister();});
 
-  // Send initial scenario message
-  addChatMessage('ai', `🎭 Senaryo: <strong>${currentScenario.name}</strong> — ${currentScenario.desc}<br><span class="turkish-help">Senaryoya başlıyorum, İngilizce cevap vermeye çalış!</span>`);
-
-  sendToAI(currentScenario.prompt + "\n\nStart the conversation now. Remember to keep it very simple for a beginner.", true);
-}
-function addChatMessage(role, html) {
-  const messagesEl = document.getElementById('chatMessages');
-  const div = document.createElement('div');
-  div.className = `msg ${role}`;
-  div.innerHTML = html;
-  messagesEl.appendChild(div);
-  messagesEl.scrollTop = messagesEl.scrollHeight;
-}
-function addTypingIndicator() {
-  const messagesEl = document.getElementById('chatMessages');
-  const div = document.createElement('div');
-  div.className = 'msg ai';
-  div.id = 'typingIndicator';
-  div.innerHTML = '<div class="typing-indicator"><span></span><span></span><span></span></div>';
-  messagesEl.appendChild(div);
-  messagesEl.scrollTop = messagesEl.scrollHeight;
-}
-function removeTypingIndicator() {
-  const el = document.getElementById('typingIndicator');
-  if (el) el.remove();
-}
-async function sendToAI(message, isSystem = false) {
-  addTypingIndicator();
-  document.getElementById('chatSendBtn').disabled = true;
-  const systemPrompt = `You are an English tutor for Ayberk, a Turkish speaker who is an absolute beginner (A1 level) learning English.
-Rules:
-- Keep your English VERY simple — short sentences, basic vocabulary
-- If the user writes in Turkish, respond in English but add Turkish translation in parentheses
-- If the user makes a grammar or spelling mistake, gently correct it
-- Be encouraging and friendly
-- Add Turkish translations for difficult words in parentheses
-- If the user asks about grammar, explain in Turkish
-- Use emojis to make it fun
-${currentScenario ? '\nCurrent scenario: ' + currentScenario.prompt : ''}`;
-  if (!isSystem) {
-    chatHistory.push({ role: 'user', content: message });
-  } else {
-    chatHistory.push({ role: 'user', content: message });
-  }
-  try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        system: systemPrompt,
-        messages: chatHistory.slice(-10), // Keep last 10 messages for context
-      })
-    });
-    const data = await response.json();
-    const aiText = data.content?.map(c => c.text || '').join('') || 'Sorry, I had an error. Let\'s try again!';
-
-    chatHistory.push({ role: 'assistant', content: aiText });
-    removeTypingIndicator();
-    addChatMessage('ai', aiText.replace(/\n/g, '<br>'));
-
-    state.chatCount++;
-    saveState();
-  } catch (err) {
-    removeTypingIndicator();
-    addChatMessage('ai', '⚠️ Bağlantı hatası oluştu. Tekrar deneyelim!<br><span class="turkish-help">API bağlantısını kontrol et.</span>');
-    console.error('AI Error:', err);
-  }
-  document.getElementById('chatSendBtn').disabled = false;
-}
-document.getElementById('chatSendBtn').addEventListener('click', sendUserMessage);
-document.getElementById('chatInput').addEventListener('keydown', (e) => {
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault();
-    sendUserMessage();
-  }
-});
-function sendUserMessage() {
-  const input = document.getElementById('chatInput');
-  const text = input.value.trim();
-  if (!text) return;
-
-  input.value = '';
-  addChatMessage('user', text);
-  addActivity(`💬 Konuşma pratiği yapıldı`);
-  sendToAI(text);
-}
 // ==================== INIT ====================
-updateDashboard();
-showLessonList();
-saveState();
+(function(){const e=localStorage.getItem('lf_current_user');if(e){const u=getUsers();if(u[e]){loadState();u[e].onboarding?enterApp():startOnboarding();return;}}showScreen('screen-login');})();
 </script>
 </body>
 </html>
