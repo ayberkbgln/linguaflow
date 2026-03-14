@@ -764,6 +764,63 @@ body::before {
 }
 .back-btn:hover { color: var(--amber); }
 
+/* ===== MODULES ===== */
+.module-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+.module-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-1);
+  border-radius: 12px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+.module-card:hover { border-color: var(--border-amber); background: var(--bg-card-hover); transform: translateY(-2px); }
+.module-card .module-icon { font-size: 32px; margin-bottom: 12px; }
+.module-card .module-title { font-weight: 600; font-size: 15px; margin-bottom: 4px; }
+.module-card .module-cefr { font-family: var(--font-mono); font-size: 11px; color: var(--amber); margin-bottom: 8px; }
+.module-card .module-desc { font-size: 12px; color: var(--text-4); line-height: 1.5; margin-bottom: 12px; }
+.module-card .module-progress { font-family: var(--font-mono); font-size: 11px; color: var(--text-4); }
+.module-card .module-progress-bar { height: 3px; background: var(--bg-elevated); border-radius: 3px; margin-top: 6px; overflow: hidden; }
+.module-card .module-progress-fill { height: 100%; background: var(--emerald); border-radius: 3px; transition: width 0.3s; }
+
+.unit-item {
+  display: flex; align-items: center; gap: 16px;
+  padding: 16px 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-1);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.unit-item:hover { border-color: var(--border-amber); background: var(--bg-card-hover); transform: translateX(4px); }
+.unit-item.locked { opacity: 0.35; cursor: not-allowed; }
+.unit-item.locked:hover { transform: none; border-color: var(--border-1); background: var(--bg-card); }
+.unit-num {
+  width: 38px; height: 38px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-mono); font-weight: 600; font-size: 14px; flex-shrink: 0;
+  background: var(--amber-glow); color: var(--amber); border: 1px solid var(--border-amber);
+}
+.unit-info { flex: 1; }
+.unit-title { font-weight: 600; font-size: 14px; margin-bottom: 2px; }
+.unit-meta { font-size: 12px; color: var(--text-4); }
+.unit-arrow { color: var(--text-4); font-size: 14px; font-family: var(--font-mono); }
+
+.lesson-type-badge {
+  display: inline-block; font-size: 10px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 1px; padding: 2px 8px; border-radius: 4px;
+  font-family: var(--font-mono);
+}
+.lesson-type-badge.vocabulary { background: rgba(96,165,250,0.15); color: #60a5fa; }
+.lesson-type-badge.grammar { background: rgba(251,191,36,0.15); color: #fbbf24; }
+.lesson-type-badge.dialogue { background: rgba(74,222,128,0.15); color: #4ade80; }
+.lesson-type-badge.reading { background: rgba(192,132,252,0.15); color: #c084fc; }
+.lesson-type-badge.writing { background: rgba(251,146,60,0.15); color: #fb923c; }
+.lesson-type-badge.speaking { background: rgba(45,212,191,0.15); color: #2dd4bf; }
+.lesson-type-badge.strategy { background: rgba(244,114,182,0.15); color: #f472b6; }
+
 /* ===== QUIZ ===== */
 .quiz-container { max-width: 600px; margin: 0 auto; }
 .quiz-progress { display: flex; align-items: center; gap: 14px; margin-bottom: 28px; }
@@ -1202,18 +1259,20 @@ body::before {
 
     <!-- Lessons -->
     <div class="page" id="page-lessons">
-      <div id="lessonListView">
+      <div id="moduleListView">
         <div class="card">
           <div class="card-header">
-            <div class="card-title">Ders Programı</div>
-            <div class="card-badge green" id="lessonPlanBadge">Plan</div>
+            <div class="card-title">Müfredat</div>
+            <div class="card-badge" id="totalLessonsBadge"></div>
           </div>
           <p style="font-size:13px;color:var(--text-4);margin-bottom:20px;">
-            Her ders yaklaşık 15-20 dakika sürer. Sırayla ilerle, her dersi tamamladıktan sonra quiz'e geç!
+            Modül seç ve konulara göre ilerle. Her ders 10-20 dakika sürer.
           </p>
-          <div class="lesson-list" id="lessonList"></div>
+          <div class="module-grid" id="moduleGrid"></div>
         </div>
       </div>
+      <div id="unitListView" style="display:none;"></div>
+      <div id="lessonListView" style="display:none;"></div>
       <div id="lessonDetailView" class="lesson-content"></div>
     </div>
 
@@ -1255,54 +1314,6 @@ body::before {
 <script src="curriculum.js"></script>
 <script>
 // ==================== DATA ====================
-const LESSONS = [
-  {
-    id: 1, title: "Selamlaşma & Tanışma", desc: "Hello, goodbye, temel selamlaşma", level: "A1",
-    vocab: [
-      { en: "Hello", tr: "Merhaba", phonetic: "/həˈloʊ/" },
-      { en: "Goodbye", tr: "Hoşça kal", phonetic: "/ɡʊdˈbaɪ/" },
-      { en: "Good morning", tr: "Günaydın", phonetic: "/ɡʊd ˈmɔːrnɪŋ/" },
-      { en: "Good evening", tr: "İyi akşamlar", phonetic: "/ɡʊd ˈiːvnɪŋ/" },
-      { en: "Good night", tr: "İyi geceler", phonetic: "/ɡʊd naɪt/" },
-      { en: "Please", tr: "Lütfen", phonetic: "/pliːz/" },
-      { en: "Thank you", tr: "Teşekkür ederim", phonetic: "/θæŋk juː/" },
-      { en: "Yes", tr: "Evet", phonetic: "/jɛs/" },
-      { en: "No", tr: "Hayır", phonetic: "/noʊ/" },
-      { en: "Sorry", tr: "Özür dilerim", phonetic: "/ˈsɒri/" },
-    ],
-    grammar: { title: "\"To be\" fiili — am / is / are", explanation: "İngilizcede kendinizi tanıtırken \"I am\" (Ben ...ım) kullanırsınız. Kısaltması \"I'm\" şeklindedir.", examples: [{ en: "I <hl>am</hl> Ayberk.", tr: "Ben Ayberk." },{ en: "She <hl>is</hl> my friend.", tr: "O benim arkadaşım." },{ en: "We <hl>are</hl> from Turkey.", tr: "Biz Türkiye'denliyiz." }]},
-    dialogue: [{ speaker: "A", text: "Hello! My name is John. What is your name?", tr: "Merhaba! Benim adım John. Senin adın ne?" },{ speaker: "B", text: "Hi John! I'm Ayberk. Nice to meet you!", tr: "Merhaba John! Ben Ayberk. Tanıştığımıza memnun oldum!" },{ speaker: "A", text: "Nice to meet you too! Where are you from?", tr: "Ben de memnun oldum! Nerelisin?" },{ speaker: "B", text: "I'm from Turkey. I'm from Istanbul.", tr: "Türkiye'denliyim. İstanbul'danım." }],
-    quiz: [{ q: "\"Merhaba\" İngilizcede ne demek?", opts: ["Goodbye","Hello","Sorry","Please"], correct: 1 },{ q: "\"I ___ from Turkey\" boşluğa ne gelir?", opts: ["is","are","am","be"], correct: 2 },{ q: "\"Teşekkür ederim\" İngilizcede ne demek?", opts: ["Sorry","Please","Thank you","Goodbye"], correct: 2 },{ q: "\"Good morning\" ne demek?", opts: ["İyi geceler","İyi akşamlar","Günaydın","Hoşça kal"], correct: 2 },{ q: "\"She ___ my friend\" boşluğa ne gelir?", opts: ["am","are","is","be"], correct: 2 },{ q: "\"Hayır\" İngilizcede ne demek?", opts: ["Yes","No","Not","None"], correct: 1 }]
-  },
-  {
-    id: 2, title: "Sayılar & Renkler", desc: "1-100 sayılar, temel renkler", level: "A1",
-    vocab: [{ en: "One", tr: "Bir", phonetic: "/wʌn/" },{ en: "Two", tr: "İki", phonetic: "/tuː/" },{ en: "Three", tr: "Üç", phonetic: "/θriː/" },{ en: "Ten", tr: "On", phonetic: "/tɛn/" },{ en: "Twenty", tr: "Yirmi", phonetic: "/ˈtwɛnti/" },{ en: "Red", tr: "Kırmızı", phonetic: "/rɛd/" },{ en: "Blue", tr: "Mavi", phonetic: "/bluː/" },{ en: "Green", tr: "Yeşil", phonetic: "/ɡriːn/" },{ en: "Black", tr: "Siyah", phonetic: "/blæk/" },{ en: "White", tr: "Beyaz", phonetic: "/waɪt/" }],
-    grammar: { title: "Çoğul yapı — \"s\" eki", explanation: "İngilizcede isimleri çoğul yapmak için genellikle sonuna \"-s\" veya \"-es\" eklenir.", examples: [{ en: "One cat → Two <hl>cats</hl>", tr: "Bir kedi → İki kedi" },{ en: "One box → Three <hl>boxes</hl>", tr: "Bir kutu → Üç kutu" },{ en: "I have five <hl>books</hl>.", tr: "Beş kitabım var." }]},
-    dialogue: [{ speaker: "A", text: "How many books do you have?", tr: "Kaç tane kitabın var?" },{ speaker: "B", text: "I have ten books.", tr: "On tane kitabım var." },{ speaker: "A", text: "What color is your car?", tr: "Arabanın rengi ne?" },{ speaker: "B", text: "My car is blue.", tr: "Arabam mavi." }],
-    quiz: [{ q: "\"Three\" ne demek?", opts: ["İki","Üç","Dört","Beş"], correct: 1 },{ q: "\"Mavi\" İngilizcede ne demek?", opts: ["Red","Green","Blue","Black"], correct: 2 },{ q: "\"cat\" kelimesinin çoğulu nedir?", opts: ["cates","cats","caties","cat"], correct: 1 },{ q: "\"Twenty\" kaç demek?", opts: ["12","22","20","2"], correct: 2 },{ q: "Hangisi bir renk DEĞİLDİR?", opts: ["Green","White","Ten","Red"], correct: 2 }]
-  },
-  {
-    id: 3, title: "Aile & İnsanlar", desc: "Aile üyeleri, kişi tanımları", level: "A1",
-    vocab: [{ en: "Mother", tr: "Anne", phonetic: "/ˈmʌðər/" },{ en: "Father", tr: "Baba", phonetic: "/ˈfɑːðər/" },{ en: "Sister", tr: "Kız kardeş", phonetic: "/ˈsɪstər/" },{ en: "Brother", tr: "Erkek kardeş", phonetic: "/ˈbrʌðər/" },{ en: "Friend", tr: "Arkadaş", phonetic: "/frɛnd/" },{ en: "Family", tr: "Aile", phonetic: "/ˈfæməli/" },{ en: "Child", tr: "Çocuk", phonetic: "/tʃaɪld/" },{ en: "Husband", tr: "Koca", phonetic: "/ˈhʌzbənd/" },{ en: "Wife", tr: "Karı/Eş", phonetic: "/waɪf/" },{ en: "Baby", tr: "Bebek", phonetic: "/ˈbeɪbi/" }],
-    grammar: { title: "İyelik — my, your, his, her", explanation: "Sahiplik bildirmek için 'my (benim)', 'your (senin)', 'his (onun-erkek)', 'her (onun-kadın)' kullanılır.", examples: [{ en: "<hl>My</hl> mother is a teacher.", tr: "Annem bir öğretmen." },{ en: "<hl>His</hl> brother is tall.", tr: "Onun erkek kardeşi uzun." },{ en: "I love <hl>my</hl> family.", tr: "Ailemi seviyorum." }]},
-    dialogue: [{ speaker: "A", text: "Do you have brothers or sisters?", tr: "Kardeşin var mı?" },{ speaker: "B", text: "Yes, I have one sister.", tr: "Evet, bir kız kardeşim var." },{ speaker: "A", text: "What does your father do?", tr: "Baban ne iş yapıyor?" },{ speaker: "B", text: "My father is an engineer.", tr: "Babam mühendis." }],
-    quiz: [{ q: "\"Mother\" ne demek?", opts: ["Baba","Anne","Kardeş","Koca"], correct: 1 },{ q: "\"___ brother is tall\" (Onun erkek kardeşi)", opts: ["My","Her","His","Your"], correct: 2 },{ q: "\"Aile\" İngilizcede ne demek?", opts: ["Friend","Family","Father","Child"], correct: 1 },{ q: "\"Wife\" ne demek?", opts: ["Koca","Anne","Kız kardeş","Eş (kadın)"], correct: 3 }]
-  },
-  {
-    id: 4, title: "Günlük Rutinler", desc: "wake up, eat, go to work...", level: "A1",
-    vocab: [{ en: "Wake up", tr: "Uyanmak", phonetic: "/weɪk ʌp/" },{ en: "Eat", tr: "Yemek", phonetic: "/iːt/" },{ en: "Drink", tr: "İçmek", phonetic: "/drɪŋk/" },{ en: "Go", tr: "Gitmek", phonetic: "/ɡoʊ/" },{ en: "Work", tr: "Çalışmak / İş", phonetic: "/wɜːrk/" },{ en: "Sleep", tr: "Uyumak", phonetic: "/sliːp/" },{ en: "Breakfast", tr: "Kahvaltı", phonetic: "/ˈbrɛkfəst/" },{ en: "Lunch", tr: "Öğle yemeği", phonetic: "/lʌntʃ/" },{ en: "Dinner", tr: "Akşam yemeği", phonetic: "/ˈdɪnər/" },{ en: "Coffee", tr: "Kahve", phonetic: "/ˈkɒfi/" }],
-    grammar: { title: "Simple Present Tense — Geniş Zaman", explanation: "Her gün yaptığımız şeyleri anlatırız. 'I/you/we/they' ile fiil olduğu gibi kalır. 'He/she/it' ile fiile '-s' eklenir.", examples: [{ en: "I <hl>wake up</hl> at 7.", tr: "7'de uyanırım." },{ en: "She <hl>drinks</hl> coffee.", tr: "O kahve içer." },{ en: "We <hl>go</hl> to work.", tr: "İşe gideriz." }]},
-    dialogue: [{ speaker: "A", text: "What time do you wake up?", tr: "Saat kaçta uyanırsın?" },{ speaker: "B", text: "I wake up at seven o'clock.", tr: "Saat yedide uyanırım." },{ speaker: "A", text: "Do you eat breakfast every day?", tr: "Her gün kahvaltı yapar mısın?" },{ speaker: "B", text: "Yes, I eat breakfast and drink coffee.", tr: "Evet, kahvaltı yapar ve kahve içerim." }],
-    quiz: [{ q: "\"Wake up\" ne demek?", opts: ["Uyumak","Uyanmak","Yemek","Gitmek"], correct: 1 },{ q: "\"She ___ coffee\" (O kahve içer)", opts: ["drink","drinks","drinking","drinkes"], correct: 1 },{ q: "\"Kahvaltı\" İngilizcede ne demek?", opts: ["Lunch","Dinner","Breakfast","Coffee"], correct: 2 },{ q: "\"I go to work\" ne demek?", opts: ["Eve giderim","İşe giderim","Okula giderim","Markete giderim"], correct: 1 }]
-  },
-  {
-    id: 5, title: "Yiyecek & İçecekler", desc: "Yemek isimleri, sipariş verme", level: "A1",
-    vocab: [{ en: "Water", tr: "Su", phonetic: "/ˈwɔːtər/" },{ en: "Bread", tr: "Ekmek", phonetic: "/brɛd/" },{ en: "Chicken", tr: "Tavuk", phonetic: "/ˈtʃɪkɪn/" },{ en: "Rice", tr: "Pirinç/Pilav", phonetic: "/raɪs/" },{ en: "Salad", tr: "Salata", phonetic: "/ˈsæləd/" },{ en: "Tea", tr: "Çay", phonetic: "/tiː/" },{ en: "Milk", tr: "Süt", phonetic: "/mɪlk/" },{ en: "Fruit", tr: "Meyve", phonetic: "/fruːt/" },{ en: "Cheese", tr: "Peynir", phonetic: "/tʃiːz/" },{ en: "Egg", tr: "Yumurta", phonetic: "/ɛɡ/" }],
-    grammar: { title: "\"I would like\" — Kibarca İsteme", explanation: "Restoranda veya bir şey isterken 'I would like...' kullanılır. Kısaca 'I'd like' denir.", examples: [{ en: "I<hl>'d like</hl> some water, please.", tr: "Su alabilir miyim lütfen?" },{ en: "<hl>I would like</hl> chicken and rice.", tr: "Tavuk ve pilav istiyorum." },{ en: "<hl>Can I have</hl> a tea?", tr: "Bir çay alabilir miyim?" }]},
-    dialogue: [{ speaker: "A", text: "What would you like to eat?", tr: "Ne yemek istersiniz?" },{ speaker: "B", text: "I'd like chicken and salad, please.", tr: "Tavuk ve salata istiyorum lütfen." },{ speaker: "A", text: "And to drink?", tr: "İçecek olarak?" },{ speaker: "B", text: "Can I have a glass of water?", tr: "Bir bardak su alabilir miyim?" }],
-    quiz: [{ q: "\"Water\" ne demek?", opts: ["Çay","Süt","Su","Kahve"], correct: 2 },{ q: "\"I'd like\" ne anlama gelir?", opts: ["Seviyorum","İstiyorum","Var","Yiyorum"], correct: 1 },{ q: "\"Peynir\" İngilizcede ne demek?", opts: ["Chicken","Cheese","Bread","Egg"], correct: 1 },{ q: "Hangisi bir içecek DEĞİLDİR?", opts: ["Water","Tea","Bread","Milk"], correct: 2 }]
-  },
-];
 const SCENARIOS = [
   { emoji: "☕", name: "Kahve Siparişi", desc: "Bir kafede sipariş ver", prompt: "You are a friendly barista at a coffee shop. The student is ordering coffee. Start by greeting them and asking what they'd like. Keep English very simple. Correct grammar mistakes gently. Provide Turkish translations in parentheses." },
   { emoji: "🏨", name: "Otel Check-in", desc: "Otelde giriş yapma", prompt: "You are a hotel receptionist. The student is checking in. Start by greeting them. Keep English very simple. Correct mistakes gently. Provide Turkish translations in parentheses." },
@@ -1480,14 +1491,14 @@ function enterApp() {
     else if(u.plan.dailyTime==="1hour") adv+=`• Pazartesi-Cuma: 1 ders + 15 kelime + gramer + quiz<br>• Cumartesi: IELTS pratik testi + konuşma<br>• Pazar: Yazma pratiği + genel tekrar`;
     else adv+=`• Pazartesi-Cuma: 2 ders + 20 kelime + gramer + quiz + konuşma<br>• Cumartesi: IELTS tam pratik testi<br>• Pazar: Yazma Task 1&2 + genel tekrar`;
     document.getElementById('planDetails').innerHTML = adv;
-    document.getElementById('lessonPlanBadge').textContent = `${u.plan.durationLabel} Plan`;
+    // lessonPlanBadge removed - curriculum uses module view now
   }
   document.getElementById('chatMessages').innerHTML = `<div class="msg ai">Merhaba ${u.name}! Ben senin İngilizce konuşma partnerin. Benimle İngilizce pratik yapabilirsin. Yanlış yaparsan düzeltirim, anlamadığın yerleri Türkçe açıklarım.<span class="turkish-help">Bir senaryo seçebilir veya doğrudan İngilizce yazmaya başlayabilirsin!</span></div>`;
-  showScreen('screen-app'); updateDashboard(); showLessonList(); saveState();
+  showScreen('screen-app'); updateDashboard(); showModules(); saveState();
 }
 
 // ==================== NAV ====================
-document.querySelectorAll('.nav-tab').forEach(tab => { tab.addEventListener('click', () => { document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active')); document.querySelectorAll('.page').forEach(p=>p.classList.remove('active')); tab.classList.add('active'); document.getElementById(`page-${tab.dataset.page}`).classList.add('active'); if(tab.dataset.page==='quiz')initQuizPage(); if(tab.dataset.page==='lessons')showLessonList(); }); });
+document.querySelectorAll('.nav-tab').forEach(tab => { tab.addEventListener('click', () => { document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active')); document.querySelectorAll('.page').forEach(p=>p.classList.remove('active')); tab.classList.add('active'); document.getElementById(`page-${tab.dataset.page}`).classList.add('active'); if(tab.dataset.page==='quiz')initQuizPage(); if(tab.dataset.page==='lessons')showModules(); }); });
 
 // ==================== DASHBOARD ====================
 function updateDashboard() {
@@ -1498,32 +1509,305 @@ function updateDashboard() {
   document.getElementById('chatCount').textContent = state.chatCount;
   const avg = state.quizScores.length>0 ? Math.round(state.quizScores.reduce((a,b)=>a+b,0)/state.quizScores.length) : null;
   document.getElementById('quizScore').textContent = avg!==null ? `%${avg}` : '—';
-  const pct = Math.round((state.lessonsCompleted.length/LESSONS.length)*100);
+  const totalL = countTotalLessons();
+  const pct = totalL > 0 ? Math.round((state.lessonsCompleted.length / totalL) * 100) : 0;
   document.getElementById('progressRing').style.strokeDashoffset = 326.73-(326.73*pct/100);
   document.getElementById('progressPct').textContent = `${pct}%`;
-  const nl = LESSONS.find(l=>!state.lessonsCompleted.includes(l.id));
-  document.getElementById('dailyTasks').innerHTML = `<div style="display:flex;align-items:center;gap:8px;"><span style="font-size:14px;">&#9654;</span><span style="font-size:13px;color:${nl?'var(--text-2)':'var(--emerald)'};">${nl?`Ders ${nl.id}: ${nl.title}`:'Tüm dersler tamamlandı!'}</span></div><div style="display:flex;align-items:center;gap:8px;"><span style="font-size:14px;">&#10022;</span><span style="font-size:13px;color:var(--text-3);">Günlük quiz'i çöz</span></div><div style="display:flex;align-items:center;gap:8px;"><span style="font-size:14px;">&#9998;</span><span style="font-size:13px;color:var(--text-3);">Konuşma pratiği yap</span></div>`;
+  const hasMore = state.lessonsCompleted.length < totalL;
+  document.getElementById('dailyTasks').innerHTML = `<div style="display:flex;align-items:center;gap:8px;"><span style="font-size:14px;">&#9654;</span><span style="font-size:13px;color:${hasMore?'var(--text-2)':'var(--emerald)'};">${hasMore?'M\u00fcfredattan bir ders se\u00e7':'T\u00fcm dersler tamamland\u0131!'}</span></div><div style="display:flex;align-items:center;gap:8px;"><span style="font-size:14px;">&#10022;</span><span style="font-size:13px;color:var(--text-3);">G\u00fcnl\u00fck quiz\'i \u00e7\u00f6z</span></div><div style="display:flex;align-items:center;gap:8px;"><span style="font-size:14px;">&#9998;</span><span style="font-size:13px;color:var(--text-3);">Konu\u015fma prati\u011fi yap</span></div>`;
   const logEl = document.getElementById('activityLog');
   if(state.activities.length>0) logEl.innerHTML = state.activities.map(a=>`<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border-1);"><span style="font-size:13px;">${a.text}</span><span style="color:var(--text-4);font-size:11px;font-family:var(--font-mono);">${a.time}</span></div>`).join('');
 }
 
-// ==================== LESSONS ====================
-function showLessonList() { document.getElementById('lessonListView').style.display='block'; document.getElementById('lessonDetailView').style.display='none'; document.getElementById('lessonDetailView').classList.remove('active');
-  document.getElementById('lessonList').innerHTML = LESSONS.map((l,i)=>{ const done=state?.lessonsCompleted.includes(l.id); const prev=i===0||state?.lessonsCompleted.includes(LESSONS[i-1].id); const locked=!prev&&!done; const sc=done?'completed':locked?'locked':''; const nc=done?'done':locked?'lock':'active-lesson'; const ic=done?'✓':locked?'—':l.id;
-    return `<div class="lesson-item ${sc}" ${!locked?`onclick="openLesson(${l.id})"`:''}><div class="lesson-num ${nc}">${ic}</div><div class="lesson-info"><div class="lesson-title">${l.title}</div><div class="lesson-desc">${l.desc}</div></div><div class="lesson-arrow">${locked?'':'→'}</div></div>`; }).join('');
+// ==================== CURRICULUM NAVIGATION ====================
+let currentModuleId = null;
+let currentUnitId = null;
+
+function showModules() {
+  document.getElementById('moduleListView').style.display = 'block';
+  document.getElementById('unitListView').style.display = 'none';
+  document.getElementById('lessonListView').style.display = 'none';
+  document.getElementById('lessonDetailView').style.display = 'none';
+  document.getElementById('lessonDetailView').classList.remove('active');
+  document.getElementById('totalLessonsBadge').textContent = countTotalLessons() + ' ders';
+  const grid = document.getElementById('moduleGrid');
+  grid.innerHTML = MODULES.map(mod => {
+    const units = UNITS[mod.id] || [];
+    let totalLessons = 0, completedLessons = 0;
+    units.forEach(u => {
+      const lessons = UNIT_LESSONS[u.id] || [];
+      totalLessons += lessons.length;
+      lessons.forEach(lid => { if (state?.lessonsCompleted?.includes(lid)) completedLessons++; });
+    });
+    const pct = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
+    return `<div class="module-card" onclick="showUnits('${mod.id}')"><div class="module-icon">${mod.icon}</div><div class="module-title">${mod.title}</div><div class="module-cefr">${mod.cefr.join(' \u2192 ')}</div><div class="module-desc">${mod.desc}</div><div class="module-progress">${completedLessons}/${totalLessons} ders tamamland\u0131<div class="module-progress-bar"><div class="module-progress-fill" style="width:${pct}%"></div></div></div></div>`;
+  }).join('');
 }
-function openLesson(id) { const l=LESSONS.find(x=>x.id===id); if(!l)return; document.getElementById('lessonListView').style.display='none'; const d=document.getElementById('lessonDetailView'); d.style.display='block'; d.classList.add('active');
-  d.innerHTML = `<button class="back-btn" onclick="showLessonList()">← Ders Listesine Dön</button><div class="card"><div class="card-header"><div class="card-title">Ders ${l.id}: ${l.title}</div><div class="card-badge">${l.vocab.length} kelime</div></div><div class="lesson-section"><h3>Yeni Kelimeler</h3><div class="vocab-grid">${l.vocab.map(v=>`<div class="vocab-card" onclick="speakWord('${v.en}')"><button class="speak-btn" title="Dinle">&#9834;</button><div class="en">${v.en}</div><div class="tr">${v.tr}</div><div class="phonetic">${v.phonetic}</div></div>`).join('')}</div></div><div class="lesson-section"><h3>Gramer: ${l.grammar.title}</h3><div class="grammar-box"><p>${l.grammar.explanation}</p>${l.grammar.examples.map(ex=>`<div class="example"><div>${ex.en.replace(/<hl>/g,'<span class="highlight">').replace(/<\/hl>/g,'</span>')}</div><div style="color:var(--text-4);font-size:12px;margin-top:4px;">${ex.tr}</div></div>`).join('')}</div></div><div class="lesson-section"><h3>Diyalog</h3><div class="dialogue-box">${l.dialogue.map(x=>`<div class="dialogue-line"><div class="dialogue-speaker ${x.speaker==='B'?'b':''}">${x.speaker}:</div><div class="dialogue-text">${x.text}<span class="translation">${x.tr}</span></div></div>`).join('')}</div><button class="btn btn-secondary" style="margin-top:12px;width:100%;" onclick="speakDialogue(${l.id})">Diyaloğu Dinle</button></div><button class="btn btn-primary" style="width:100%;margin-top:8px;" onclick="completeLesson(${l.id})">Dersi Tamamla</button></div>`;
+
+function showUnits(moduleId) {
+  currentModuleId = moduleId;
+  const mod = MODULES.find(m => m.id === moduleId);
+  if (!mod) return;
+  document.getElementById('moduleListView').style.display = 'none';
+  document.getElementById('unitListView').style.display = 'block';
+  document.getElementById('lessonListView').style.display = 'none';
+  document.getElementById('lessonDetailView').style.display = 'none';
+  const units = UNITS[moduleId] || [];
+  document.getElementById('unitListView').innerHTML = `<button class="back-btn" onclick="showModules()">\u2190 Mod\u00fcllere D\u00f6n</button><div class="card"><div class="card-header"><div class="card-title">${mod.icon} ${mod.title}</div><div class="card-badge">${mod.cefr.join(' \u2192 ')}</div></div><p style="font-size:13px;color:var(--text-4);margin-bottom:20px;">${mod.desc}</p><div class="lesson-list">${units.map((u, i) => {
+    const lessons = UNIT_LESSONS[u.id] || [];
+    const completed = lessons.filter(lid => state?.lessonsCompleted?.includes(lid)).length;
+    const hasLessons = lessons.length > 0;
+    return `<div class="unit-item${!hasLessons ? ' locked' : ''}" ${hasLessons ? `onclick="showUnitLessons('${moduleId}','${u.id}')"` : ''}><div class="unit-num">${i + 1}</div><div class="unit-info"><div class="unit-title">${u.title}</div><div class="unit-meta">${hasLessons ? `${completed}/${lessons.length} ders` : 'Yak\u0131nda'}</div></div><div class="unit-arrow">${hasLessons ? '\u2192' : ''}</div></div>`;
+  }).join('')}</div></div>`;
 }
-function completeLesson(id) { const l=LESSONS.find(x=>x.id===id); if(!state.lessonsCompleted.includes(id)){state.lessonsCompleted.push(id);state.wordsLearned+=l.vocab.length;addActivity(`Ders ${id}: "${l.title}" tamamlandı`);apiFetch('/progress',{method:'POST',body:JSON.stringify({type:'lesson',data:{lessonId:id,section:'complete'}})}).catch(()=>{});} showLessonList(); }
+
+function showUnitLessons(moduleId, unitId) {
+  currentModuleId = moduleId;
+  currentUnitId = unitId;
+  const mod = MODULES.find(m => m.id === moduleId);
+  const unit = (UNITS[moduleId] || []).find(u => u.id === unitId);
+  if (!mod || !unit) return;
+  document.getElementById('moduleListView').style.display = 'none';
+  document.getElementById('unitListView').style.display = 'none';
+  document.getElementById('lessonListView').style.display = 'block';
+  document.getElementById('lessonDetailView').style.display = 'none';
+  const lessons = getUnitLessons(unitId);
+  const typeLabels = { vocabulary:'Kelime', grammar:'Gramer', dialogue:'Diyalog', reading:'Okuma', writing:'Yazma', speaking:'Konu\u015fma', strategy:'Strateji' };
+  document.getElementById('lessonListView').innerHTML = `<button class="back-btn" onclick="showUnits('${moduleId}')">\u2190 ${mod.title}</button><div class="card"><div class="card-header"><div class="card-title">${unit.title}</div><div class="card-badge">${lessons.length} ders</div></div><div class="lesson-list">${lessons.map((l, i) => {
+    const done = state?.lessonsCompleted?.includes(l.id);
+    return `<div class="lesson-item${done ? ' completed' : ''}" onclick="openCurriculumLesson('${l.id}')"><div class="lesson-num ${done ? 'done' : 'active-lesson'}">${done ? '\u2713' : i + 1}</div><div class="lesson-info"><div class="lesson-title">${l.title}</div><div class="lesson-desc"><span class="lesson-type-badge ${l.type}">${typeLabels[l.type] || l.type}</span> ${l.minutes || 15} dk \u00b7 ${l.level}</div></div><div class="lesson-arrow">\u2192</div></div>`;
+  }).join('')}</div></div>`;
+}
+
+function openCurriculumLesson(id) {
+  const l = getLesson(id);
+  if (!l) return;
+  document.getElementById('moduleListView').style.display = 'none';
+  document.getElementById('unitListView').style.display = 'none';
+  document.getElementById('lessonListView').style.display = 'none';
+  const d = document.getElementById('lessonDetailView');
+  d.style.display = 'block';
+  d.classList.add('active');
+  let content = `<button class="back-btn" onclick="showUnitLessons('${currentModuleId}','${l.unitId}')">\u2190 Ders Listesi</button>`;
+  content += `<div class="card"><div class="card-header"><div class="card-title">${l.title}</div><div class="card-badge">${l.level} \u00b7 ${l.minutes || 15} dk</div></div>`;
+  if (l.type === 'vocabulary') { content += renderVocabularyLesson(l); }
+  else if (l.type === 'grammar') { content += renderGrammarLesson(l); }
+  else if (l.type === 'dialogue') { content += renderDialogueLesson(l); }
+  else if (l.type === 'reading') { content += renderReadingLesson(l); }
+  else if (l.type === 'writing') { content += renderWritingLesson(l); }
+  else if (l.type === 'speaking') { content += renderSpeakingLesson(l); }
+  else if (l.type === 'strategy') { content += renderStrategyLesson(l); }
+  if (l.data.exercises && l.data.exercises.length > 0) { content += renderExercises(l.data.exercises, l.id); }
+  content += `<button class="btn btn-primary" style="width:100%;margin-top:16px;" onclick="completeCurriculumLesson('${l.id}')">Dersi Tamamla</button></div>`;
+  d.innerHTML = content;
+}
+
+function renderVocabularyLesson(l) {
+  let html = `<div class="lesson-section"><h3>Yeni Kelimeler \u2014 ${l.data.theme || ''}</h3><div class="vocab-grid">`;
+  l.data.words.forEach(w => {
+    html += `<div class="vocab-card" onclick="speakWord('${w.e.replace(/'/g, "\\'")}')"><button class="speak-btn" title="Dinle">&#9834;</button><div class="en">${w.e}</div><div class="tr">${w.t}</div><div class="phonetic">${w.p}</div>${w.ex ? `<div style="font-size:11px;color:var(--text-4);margin-top:6px;border-top:1px solid var(--border-1);padding-top:6px;">${w.ex}<br><span style="color:var(--text-4);font-style:italic;">${w.ext || ''}</span></div>` : ''}</div>`;
+  });
+  html += `</div></div>`;
+  return html;
+}
+
+function renderGrammarLesson(l) {
+  let html = `<div class="lesson-section"><h3>Gramer: ${l.data.topic || ''}</h3>`;
+  html += `<div class="grammar-box"><p>${l.data.explanationTr}</p>`;
+  if (l.data.rules) {
+    l.data.rules.forEach(r => {
+      html += `<div style="margin-top:16px;"><strong style="color:var(--amber-light);font-size:14px;">${r.rule}</strong>`;
+      if (r.examples) {
+        r.examples.forEach(ex => {
+          html += `<div class="example"><div>${ex.en.replace(/<hl>/g,'<span class="highlight">').replace(/<\/hl>/g,'</span>')}</div><div style="color:var(--text-4);font-size:12px;margin-top:4px;">${ex.tr}</div></div>`;
+        });
+      }
+      html += `</div>`;
+    });
+  }
+  html += `</div></div>`;
+  return html;
+}
+
+function renderDialogueLesson(l) {
+  let html = '';
+  if (l.data.scenarioTr) { html += `<div class="lesson-section"><h3>Senaryo</h3><div class="grammar-box"><p>${l.data.scenarioTr}</p></div></div>`; }
+  html += `<div class="lesson-section"><h3>Diyalog</h3><div class="dialogue-box">`;
+  (l.data.lines || []).forEach(x => {
+    html += `<div class="dialogue-line"><div class="dialogue-speaker ${x.speaker === 'B' ? 'b' : ''}">${x.speaker}:</div><div class="dialogue-text">${x.en}<span class="translation">${x.tr}</span></div></div>`;
+  });
+  html += `</div><button class="btn btn-secondary" style="margin-top:12px;width:100%;" onclick="speakDialogueLines('${l.id}')">Diyalo\u011fu Dinle</button></div>`;
+  if (l.data.keyPhrases && l.data.keyPhrases.length > 0) {
+    html += `<div class="lesson-section"><h3>Anahtar \u0130fadeler</h3><div class="vocab-grid">`;
+    l.data.keyPhrases.forEach(kp => {
+      html += `<div class="vocab-card" onclick="speakWord('${(kp.en || kp.e || '').replace(/'/g, "\\'")}')"><div class="en">${kp.en || kp.e}</div><div class="tr">${kp.tr || kp.t}</div></div>`;
+    });
+    html += `</div></div>`;
+  }
+  return html;
+}
+
+function renderReadingLesson(l) {
+  let html = `<div class="lesson-section"><h3>Okuma Pasaj\u0131</h3>`;
+  html += `<div class="grammar-box" style="border-left-color:var(--sky);"><p style="font-size:14px;line-height:2;white-space:pre-line;">${l.data.passage}</p></div>`;
+  if (l.data.wordGlossary && l.data.wordGlossary.length > 0) {
+    html += `<div style="margin-top:16px;"><strong style="color:var(--amber-light);font-size:13px;">Kelime S\u00f6zl\u00fc\u011f\u00fc</strong><div class="vocab-grid" style="margin-top:8px;">`;
+    l.data.wordGlossary.forEach(w => { html += `<div class="vocab-card"><div class="en">${w.en}</div><div class="tr">${w.tr}</div></div>`; });
+    html += `</div></div>`;
+  }
+  html += `</div>`;
+  if (l.data.questions && l.data.questions.length > 0) {
+    html += `<div class="lesson-section"><h3>Sorular</h3>`;
+    l.data.questions.forEach((q, qi) => {
+      html += `<div class="grammar-box" style="margin-bottom:12px;border-left-color:var(--sky);"><p style="font-weight:600;margin-bottom:8px;">${qi + 1}. ${q.q}</p>`;
+      if (q.type === 'multiple_choice') {
+        html += `<div class="quiz-options" style="margin-top:8px;">`;
+        q.opts.forEach((o, oi) => { html += `<button class="quiz-option" onclick="answerReadingQ(this,${oi},${q.correct})">${o}</button>`; });
+        html += `</div>`;
+      } else if (q.type === 'true_false') {
+        html += `<div class="quiz-options" style="margin-top:8px;"><button class="quiz-option" onclick="answerTFQ(this,true,${q.answer})">True</button><button class="quiz-option" onclick="answerTFQ(this,false,${q.answer})">False</button></div>`;
+      }
+      if (q.explanationTr) { html += `<div class="quiz-feedback" id="readingFb${qi}" style="margin-top:8px;"></div>`; }
+      html += `</div>`;
+    });
+    html += `</div>`;
+  }
+  return html;
+}
+
+function renderWritingLesson(l) {
+  let html = `<div class="lesson-section"><h3>Yazma G\u00f6revi</h3>`;
+  if (l.data.taskTr) { html += `<div class="grammar-box" style="border-left-color:#fb923c;"><p>${l.data.taskTr}</p></div>`; }
+  if (l.data.structure) {
+    html += `<div style="margin-top:16px;"><strong style="color:var(--amber-light);font-size:13px;">Essay Yap\u0131s\u0131</strong>`;
+    html += `<div class="grammar-box" style="margin-top:8px;border-left-color:#fb923c;"><p>${typeof l.data.structure === 'string' ? l.data.structure : JSON.stringify(l.data.structure)}</p></div></div>`;
+  }
+  if (l.data.keyVocabulary && l.data.keyVocabulary.length > 0) {
+    html += `<div style="margin-top:16px;"><strong style="color:var(--amber-light);font-size:13px;">Anahtar Kelimeler</strong><div class="vocab-grid" style="margin-top:8px;">`;
+    l.data.keyVocabulary.forEach(w => { html += `<div class="vocab-card"><div class="en">${w.en || w}</div>${w.tr ? `<div class="tr">${w.tr}</div>` : ''}</div>`; });
+    html += `</div></div>`;
+  }
+  if (l.data.sampleAnswer) {
+    html += `<div style="margin-top:16px;"><strong style="color:var(--amber-light);font-size:13px;">\u00d6rnek Cevap</strong>`;
+    html += `<div class="grammar-box" style="margin-top:8px;border-left-color:#fb923c;"><p style="white-space:pre-line;">${l.data.sampleAnswer}</p></div></div>`;
+  }
+  html += `</div>`;
+  return html;
+}
+
+function renderSpeakingLesson(l) {
+  let html = '';
+  if (l.data.tipsTr) { html += `<div class="lesson-section"><h3>\u0130pu\u00e7lar\u0131</h3><div class="grammar-box" style="border-left-color:#2dd4bf;"><p>${l.data.tipsTr}</p></div></div>`; }
+  if (l.data.questions && l.data.questions.length > 0) {
+    html += `<div class="lesson-section"><h3>Konu\u015fma Sorular\u0131</h3>`;
+    l.data.questions.forEach((q, i) => {
+      html += `<div class="grammar-box" style="margin-bottom:12px;border-left-color:#2dd4bf;"><p style="font-weight:600;">${q}</p>${l.data.sampleAnswersTr && l.data.sampleAnswersTr[i] ? `<div style="margin-top:8px;font-size:13px;color:var(--text-4);"><strong>\u00d6rnek:</strong> ${l.data.sampleAnswersTr[i]}</div>` : ''}<button class="btn btn-secondary" style="margin-top:8px;" onclick="speakWord('${q.replace(/'/g, "\\'")}')">Soruyu Dinle</button></div>`;
+    });
+    html += `</div>`;
+  }
+  return html;
+}
+
+function renderStrategyLesson(l) {
+  let html = `<div class="lesson-section"><h3>Strateji</h3><div class="grammar-box" style="border-left-color:#f472b6;"><p>${l.data.explanationTr}</p></div></div>`;
+  if (l.data.dosDonts) {
+    html += `<div class="lesson-section"><h3>Yap\u0131lmas\u0131 Gerekenler</h3><div class="grammar-box" style="border-left-color:var(--emerald);">`;
+    (l.data.dosDonts.dos || []).forEach(d => { html += `<div style="display:flex;gap:8px;margin-bottom:8px;"><span style="color:var(--emerald);">\u2713</span><span style="font-size:14px;color:var(--text-2);">${d}</span></div>`; });
+    html += `</div></div>`;
+    html += `<div class="lesson-section"><h3>Yap\u0131lmamas\u0131 Gerekenler</h3><div class="grammar-box" style="border-left-color:var(--rose);">`;
+    (l.data.dosDonts.donts || []).forEach(d => { html += `<div style="display:flex;gap:8px;margin-bottom:8px;"><span style="color:var(--rose);">\u2717</span><span style="font-size:14px;color:var(--text-2);">${d}</span></div>`; });
+    html += `</div></div>`;
+  }
+  if (l.data.timingAdvice) {
+    html += `<div class="lesson-section"><h3>Zaman Y\u00f6netimi</h3><div class="grammar-box" style="border-left-color:#f472b6;"><p style="font-family:var(--font-mono);font-size:14px;">${l.data.timingAdvice}</p></div></div>`;
+  }
+  if (l.data.bandTips) {
+    html += `<div class="lesson-section"><h3>Band Hedefine G\u00f6re \u0130pu\u00e7lar\u0131</h3>`;
+    for (const [band, tip] of Object.entries(l.data.bandTips)) {
+      html += `<div class="grammar-box" style="margin-bottom:8px;border-left-color:#f472b6;"><p><strong style="color:var(--amber);">Band ${band}:</strong> ${tip}</p></div>`;
+    }
+    html += `</div>`;
+  }
+  return html;
+}
+
+function renderExercises(exercises, lessonId) {
+  let html = `<div class="lesson-section"><h3>Al\u0131\u015ft\u0131rmalar</h3>`;
+  exercises.forEach((ex, ei) => {
+    if (ex.type === 'quiz') {
+      ex.items.forEach((q, qi) => {
+        html += `<div class="grammar-box" style="margin-bottom:12px;"><p style="font-weight:600;margin-bottom:8px;">${q.q}</p><div class="quiz-options">`;
+        q.opts.forEach((o, oi) => { html += `<button class="quiz-option" onclick="answerExQ(this,${oi},${q.correct})">${o}</button>`; });
+        html += `</div></div>`;
+      });
+    } else if (ex.type === 'match') {
+      html += `<div class="grammar-box" style="margin-bottom:12px;"><p style="font-weight:600;margin-bottom:12px;">${ex.q || 'E\u015fle\u015ftir'}</p><div class="vocab-grid">`;
+      ex.pairs.forEach(([left, right]) => { html += `<div class="vocab-card" style="cursor:default;"><div class="en">${left}</div><div class="tr">${right}</div></div>`; });
+      html += `</div></div>`;
+    }
+  });
+  html += `</div>`;
+  return html;
+}
+
+function answerReadingQ(btn, selected, correct) {
+  const parent = btn.parentElement;
+  const buttons = parent.querySelectorAll('.quiz-option');
+  buttons.forEach((b, i) => { b.disabled = true; if (i === correct) b.classList.add('correct'); if (i === selected && selected !== correct) b.classList.add('wrong'); });
+}
+
+function answerTFQ(btn, selected, correct) {
+  const parent = btn.parentElement;
+  const buttons = parent.querySelectorAll('.quiz-option');
+  buttons.forEach(b => { b.disabled = true; const val = b.textContent === 'True'; if (val === correct) b.classList.add('correct'); if (val === selected && selected !== correct) b.classList.add('wrong'); });
+}
+
+function answerExQ(btn, selected, correct) {
+  const parent = btn.parentElement;
+  const buttons = parent.querySelectorAll('.quiz-option');
+  buttons.forEach((b, i) => { b.disabled = true; if (i === correct) b.classList.add('correct'); if (i === selected && selected !== correct) b.classList.add('wrong'); });
+}
+
+function speakDialogueLines(id) {
+  const l = getLesson(id);
+  if (!l || !l.data.lines || !('speechSynthesis' in window)) return;
+  let d = 0;
+  l.data.lines.forEach(x => { setTimeout(() => { const u = new SpeechSynthesisUtterance(x.en); u.lang = 'en-US'; u.rate = 0.8; speechSynthesis.speak(u); }, d); d += 3000; });
+}
+
+function completeCurriculumLesson(id) {
+  if (!state.lessonsCompleted) state.lessonsCompleted = [];
+  if (!state.lessonsCompleted.includes(id)) {
+    state.lessonsCompleted.push(id);
+    const l = getLesson(id);
+    if (l && l.type === 'vocabulary' && l.data.words) { state.wordsLearned = (state.wordsLearned || 0) + l.data.words.length; }
+    addActivity(`"${l?.title || id}" tamamland\u0131`);
+    apiFetch('/progress', { method: 'POST', body: JSON.stringify({ type: 'lesson', data: { lessonId: id, section: 'complete' } }) }).catch(() => {});
+  }
+  if (currentUnitId) showUnitLessons(currentModuleId, currentUnitId);
+  else showModules();
+}
 
 // ==================== SPEECH ====================
 function speakWord(t) { if('speechSynthesis' in window){const u=new SpeechSynthesisUtterance(t);u.lang='en-US';u.rate=0.85;speechSynthesis.speak(u);} }
-function speakDialogue(id) { const l=LESSONS.find(x=>x.id===id); if(!l||!('speechSynthesis' in window))return; let d=0; l.dialogue.forEach(x=>{setTimeout(()=>{const u=new SpeechSynthesisUtterance(x.text);u.lang='en-US';u.rate=0.8;speechSynthesis.speak(u);},d);d+=3000;}); }
 
 // ==================== QUIZ ====================
 let cQuiz=[],qIdx=0,qOk=0;
-function initQuizPage() { const a=document.getElementById('quizArea'); const al=state.lessonsCompleted.length>0?LESSONS.filter(l=>state.lessonsCompleted.includes(l.id)):[LESSONS[0]]; cQuiz=[]; al.forEach(l=>l.quiz.forEach(q=>cQuiz.push({...q,lessonId:l.id}))); cQuiz=cQuiz.sort(()=>Math.random()-0.5).slice(0,10); qIdx=0; qOk=0; showQ(); }
+function initQuizPage() {
+  const a = document.getElementById('quizArea');
+  cQuiz = [];
+  const completedIds = state?.lessonsCompleted || [];
+  const lessonIds = completedIds.length > 0 ? completedIds : Object.keys(LESSON_DATA).slice(0, 3);
+  lessonIds.forEach(lid => {
+    const l = getLesson(lid);
+    if (!l || !l.data) return;
+    if (l.data.exercises) { l.data.exercises.forEach(ex => { if (ex.type === 'quiz' && ex.items) { ex.items.forEach(q => cQuiz.push({ q: q.q, opts: q.opts, correct: q.correct, lessonId: lid })); } }); }
+    if (l.data.questions) { l.data.questions.forEach(q => { if (q.type === 'multiple_choice') { cQuiz.push({ q: q.q, opts: q.opts, correct: q.correct, lessonId: lid }); } }); }
+  });
+  if (cQuiz.length === 0) { a.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-4);">Hen\u00fcz quiz sorusu yok. \u00d6nce birka\u00e7 ders tamamla!</div>'; return; }
+  cQuiz = cQuiz.sort(() => Math.random() - 0.5).slice(0, 10);
+  qIdx = 0; qOk = 0; showQ();
+}
 function showQ() { const a=document.getElementById('quizArea');
   if(qIdx>=cQuiz.length){const p=Math.round((qOk/cQuiz.length)*100);const sc=p>=80?'good':p>=50?'mid':'low';const msg=p>=80?'Harika!':p>=50?'Fena değil, gelişiyorsun!':'Biraz daha pratik gerekiyor';state.quizScores.push(p);addActivity(`Quiz tamamlandı: %${p}`);apiFetch('/progress',{method:'POST',body:JSON.stringify({type:'quiz',data:{lessonId:0,score:qOk,total:cQuiz.length}})}).catch(()=>{});a.innerHTML=`<div class="quiz-result"><div class="score ${sc}">%${p}</div><div class="message">${msg}</div><p style="font-size:14px;color:var(--text-4);margin-bottom:28px;">${qOk}/${cQuiz.length} doğru</p><button class="btn btn-primary" onclick="initQuizPage()">Tekrar Dene</button></div>`;return;}
   const q=cQuiz[qIdx];const p=Math.round((qIdx/cQuiz.length)*100);
