@@ -11,11 +11,15 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    const baseUrl = `https://${req.headers.host}`;
+    const origin = `https://${req.headers.host}`;
     const r = await fetch(`${process.env.NEON_AUTH_URL}/sign-up/email`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, password, callbackURL: baseUrl })
+      headers: {
+        'Content-Type': 'application/json',
+        'Origin': origin,
+        'Referer': origin + '/'
+      },
+      body: JSON.stringify({ name, email, password, callbackURL: origin })
     });
     const data = await r.json();
     if (!r.ok) {
