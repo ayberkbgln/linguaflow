@@ -1,19 +1,20 @@
-const { getDb, cors, getToken } = require('./_db');
+const { getDb, cors, getUser } = require('./_db');
 
 module.exports = async function handler(req, res) {
   cors(res);
   if (req.method === 'OPTIONS') return res.status(200).end();
 
-  const token = getToken(req);
-  if (!token) return res.status(401).json({ error: 'Yetkisiz' });
+  const user = await getUser(req);
+  if (!user) return res.status(401).json({ error: 'Yetkisiz' });
 
   const sql = getDb();
+  const uid = user.id;
 
   if (req.method === 'GET') {
-    const profiles = await sql`SELECT * FROM user_profiles WHERE user_id = ${token.id}`;
-    const plans = await sql`SELECT plan_data FROM study_plans WHERE user_id = ${token.id}`;
-    const progress = await sql`SELECT * FROM lesson_progress WHERE user_id = ${token.id}`;
-    const quizzes = await sql`SELECT score, total FROM quiz_results WHERE user_id = ${token.id} ORDER BY completed_at DESC`;
+    const profiles = await sql`SELECT * FROM user_profiles WHERE user_id = ${uid}`;
+    const plans = await sql`SELECT plan_data FROM study_plans WHERE user_id = ${uid}`;
+    const progress = await sql`SELECT * FROM lesson_progress WHERE user_id = ${uid}`;
+    const quizzes = await sql`SELECT score, total FROM quiz_results WHERE user_id = ${uid} ORDER BY completed_at DESC`;
 
     const profile = profiles.length > 0 ? profiles[0] : null;
 
@@ -39,7 +40,7 @@ module.exports = async function handler(req, res) {
     if (onboarding) {
       await sql`
         INSERT INTO user_profiles (user_id, english_level, ielts_target, exam_date, daily_time, weak_areas, onboarding_completed)
-        VALUES (${token.id}, ${onboarding.level}, ${onboarding.targetBand}, ${onboarding.examDate}, ${onboarding.dailyTime}, ${onboarding.weakAreas}, true)
+        VALUES (${uid}, ${onboarding.level}, ${onboarding.targetBand}, ${onboarding.examDate}, ${onboarding.dailyTime}, ${onboarding.weakAreas}, true)
         ON CONFLICT (user_id) DO UPDATE SET
           english_level = ${onboarding.level},
           ielts_target = ${onboarding.targetBand},
@@ -54,7 +55,7 @@ module.exports = async function handler(req, res) {
     if (plan) {
       await sql`
         INSERT INTO study_plans (user_id, plan_data)
-        VALUES (${token.id}, ${JSON.stringify(plan)})
+        VALUES (${uid}, ${JSON.stringify(plan)})
         ON CONFLICT (user_id) DO UPDATE SET
           plan_data = ${JSON.stringify(plan)},
           updated_at = NOW()

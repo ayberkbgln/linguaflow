@@ -2,7 +2,6 @@
   "name": "linguaflow",
   "private": true,
   "dependencies": {
-    "@neondatabase/serverless": "^0.9.0",
-    "bcryptjs": "^2.4.3"
+    "@neondatabase/serverless": "^0.9.0"
   }
 }

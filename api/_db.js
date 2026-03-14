@@ -1,5 +1,7 @@
 const { neon } = require('@neondatabase/serverless');
 
+const NEON_AUTH_URL = process.env.NEON_AUTH_URL;
+
 function getDb() {
   const sql = neon(
     `postgresql://${process.env.PGUSER}:${process.env.PGPASSWORD}@${process.env.PGHOST}/${process.env.PGDATABASE}?sslmode=${process.env.PGSSLMODE || 'require'}`
@@ -13,18 +15,20 @@ function cors(res) {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization');
 }
 
-function getToken(req) {
+async function getUser(req) {
   const auth = req.headers.authorization;
   if (!auth || !auth.startsWith('Bearer ')) return null;
+  const token = auth.slice(7);
   try {
-    return JSON.parse(Buffer.from(auth.slice(7), 'base64').toString());
+    const r = await fetch(`${NEON_AUTH_URL}/get-session`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (!r.ok) return null;
+    const data = await r.json();
+    return data.user || null;
   } catch {
     return null;
   }
 }
 
-function makeToken(user) {
-  return Buffer.from(JSON.stringify({ id: user.id, email: user.email })).toString('base64');
-}
-
-module.exports = { getDb, cors, getToken, makeToken };
+module.exports = { getDb, cors, getUser };

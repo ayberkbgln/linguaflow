@@ -1298,10 +1298,20 @@ const ONBOARDING_STEPS = [
 let currentUser = null;
 let state = null;
 const API = '/api';
+const NEON_AUTH_URL = 'https://ep-super-pine-adcs5n9j.neonauth.c-2.us-east-1.aws.neon.tech/neondb/auth';
 
 function getToken() { return localStorage.getItem('lf_token'); }
 function setToken(t) { localStorage.setItem('lf_token', t); }
 function clearToken() { localStorage.removeItem('lf_token'); }
+
+async function neonAuth(path, opts = {}) {
+  const headers = { 'Content-Type': 'application/json', ...(opts.headers || {}) };
+  const token = getToken();
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+  const res = await fetch(NEON_AUTH_URL + path, { ...opts, headers });
+  if (!res.ok) { const err = await res.json().catch(() => ({})); throw new Error(err.message || err.error || 'Kimlik doğrulama hatası'); }
+  return res.json();
+}
 
 async function apiFetch(path, opts = {}) {
   const token = getToken();
@@ -1338,9 +1348,15 @@ async function handleLogin() {
   if (!email || !pw) { err.textContent = 'Lütfen tüm alanları doldurun.'; err.classList.add('show'); return; }
   err.classList.remove('show');
   try {
-    const data = await apiFetch('/auth/login', { method: 'POST', body: JSON.stringify({ email, password: pw }) });
+    const data = await neonAuth('/sign-in/email', { method: 'POST', body: JSON.stringify({ email, password: pw }) });
     setToken(data.token);
-    currentUser = data.user;
+    currentUser = { id: data.user.id, name: data.user.name, email: data.user.email };
+    // Profil verilerini çek
+    try {
+      const profile = await apiFetch('/profile');
+      currentUser.onboarding = profile.onboarding;
+      currentUser.plan = profile.plan;
+    } catch(e) { console.warn('Profil yüklenemedi:', e); }
     loadState();
     currentUser.onboarding ? enterApp() : startOnboarding();
   } catch (e) { err.textContent = e.message; err.classList.add('show'); }
@@ -1352,14 +1368,17 @@ async function handleRegister() {
   if (!email.includes('@')) { err.textContent = 'Geçerli bir e-posta girin.'; err.classList.add('show'); return; }
   err.classList.remove('show');
   try {
-    const data = await apiFetch('/auth/register', { method: 'POST', body: JSON.stringify({ name, email, password: pw }) });
+    const data = await neonAuth('/sign-up/email', { method: 'POST', body: JSON.stringify({ name, email, password: pw }) });
     setToken(data.token);
-    currentUser = data.user;
+    currentUser = { id: data.user.id, name: data.user.name, email: data.user.email };
     loadState();
     startOnboarding();
   } catch (e) { err.textContent = e.message; err.classList.add('show'); }
 }
-function handleLogout() { clearToken(); currentUser = null; state = null; showScreen('screen-login'); }
+async function handleLogout() {
+  try { await neonAuth('/sign-out', { method: 'POST' }); } catch(e) {}
+  clearToken(); currentUser = null; state = null; showScreen('screen-login');
+}
 
 // ==================== ONBOARDING ====================
 let obStep = 0, obData = {};
@@ -1480,11 +1499,18 @@ document.getElementById('regPassword').addEventListener('keydown',(e)=>{if(e.key
   const token = getToken();
   if (token) {
     try {
-      const data = await apiFetch('/auth/me');
-      currentUser = data.user;
-      loadState();
-      currentUser.onboarding ? enterApp() : startOnboarding();
-      return;
+      const session = await neonAuth('/get-session');
+      if (session && session.user) {
+        currentUser = { id: session.user.id, name: session.user.name, email: session.user.email };
+        try {
+          const profile = await apiFetch('/profile');
+          currentUser.onboarding = profile.onboarding;
+          currentUser.plan = profile.plan;
+        } catch(e) {}
+        loadState();
+        currentUser.onboarding ? enterApp() : startOnboarding();
+        return;
+      }
     } catch(e) { clearToken(); }
   }
   showScreen('screen-login');
