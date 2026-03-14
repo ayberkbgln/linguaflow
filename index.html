@@ -1295,39 +1295,71 @@ const ONBOARDING_STEPS = [
 ];
 
 // ==================== STATE ====================
-function getUsers() { return JSON.parse(localStorage.getItem('lf_users') || '{}'); }
-function saveUsers(u) { localStorage.setItem('lf_users', JSON.stringify(u)); }
-function getCurrentUser() { const e = localStorage.getItem('lf_current_user'); if (!e) return null; return getUsers()[e] || null; }
-function saveCurrentUser(data) { const e = localStorage.getItem('lf_current_user'); if (!e) return; const u = getUsers(); u[e] = data; saveUsers(u); }
+let currentUser = null;
 let state = null;
-function loadState() { const u = getCurrentUser(); if (!u) return null; state = u.progress || { streak:0, lastActiveDate:null, lessonsCompleted:[], wordsLearned:0, quizScores:[], chatCount:0, activities:[] }; return state; }
-function saveState() { if (!state) return; const t = new Date().toDateString(); if (state.lastActiveDate !== t) { const y = new Date(Date.now()-86400000).toDateString(); state.streak = (state.lastActiveDate === y) ? state.streak+1 : 1; state.lastActiveDate = t; } const u = getCurrentUser(); if (u) { u.progress = state; saveCurrentUser(u); } updateDashboard(); }
+const API = '/api';
+
+function getToken() { return localStorage.getItem('lf_token'); }
+function setToken(t) { localStorage.setItem('lf_token', t); }
+function clearToken() { localStorage.removeItem('lf_token'); }
+
+async function apiFetch(path, opts = {}) {
+  const token = getToken();
+  const headers = { 'Content-Type': 'application/json', ...(opts.headers || {}) };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+  const res = await fetch(API + path, { ...opts, headers });
+  if (!res.ok) { const err = await res.json().catch(() => ({})); throw new Error(err.error || 'API hatası'); }
+  return res.json();
+}
+
+function getCurrentUser() { return currentUser; }
+function saveCurrentUser(data) { currentUser = data; }
+
+function loadState() {
+  if (!currentUser) return null;
+  state = currentUser.progress || { streak:0, lastActiveDate:null, lessonsCompleted:[], wordsLearned:0, quizScores:[], chatCount:0, activities:[] };
+  return state;
+}
+function saveState() {
+  if (!state) return;
+  const t = new Date().toDateString();
+  if (state.lastActiveDate !== t) { const y = new Date(Date.now()-86400000).toDateString(); state.streak = (state.lastActiveDate === y) ? state.streak+1 : 1; state.lastActiveDate = t; }
+  if (currentUser) { currentUser.progress = state; }
+  updateDashboard();
+}
 function addActivity(text) { state.activities.unshift({ text, time: new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}) }); if (state.activities.length > 10) state.activities.pop(); saveState(); }
 
 // ==================== SCREENS ====================
 function showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
 
 // ==================== AUTH ====================
-function handleLogin() {
+async function handleLogin() {
   const email = document.getElementById('loginEmail').value.trim(), pw = document.getElementById('loginPassword').value, err = document.getElementById('loginError');
   if (!email || !pw) { err.textContent = 'Lütfen tüm alanları doldurun.'; err.classList.add('show'); return; }
-  const users = getUsers();
-  if (!users[email]) { err.textContent = 'Bu e-posta ile kayıtlı hesap bulunamadı.'; err.classList.add('show'); return; }
-  if (users[email].password !== pw) { err.textContent = 'Şifre hatalı.'; err.classList.add('show'); return; }
-  err.classList.remove('show'); localStorage.setItem('lf_current_user', email); loadState();
-  users[email].onboarding ? enterApp() : startOnboarding();
+  err.classList.remove('show');
+  try {
+    const data = await apiFetch('/auth/login', { method: 'POST', body: JSON.stringify({ email, password: pw }) });
+    setToken(data.token);
+    currentUser = data.user;
+    loadState();
+    currentUser.onboarding ? enterApp() : startOnboarding();
+  } catch (e) { err.textContent = e.message; err.classList.add('show'); }
 }
-function handleRegister() {
+async function handleRegister() {
   const name = document.getElementById('regName').value.trim(), email = document.getElementById('regEmail').value.trim(), pw = document.getElementById('regPassword').value, err = document.getElementById('regError');
   if (!name || !email || !pw) { err.textContent = 'Lütfen tüm alanları doldurun.'; err.classList.add('show'); return; }
   if (pw.length < 6) { err.textContent = 'Şifre en az 6 karakter olmalı.'; err.classList.add('show'); return; }
   if (!email.includes('@')) { err.textContent = 'Geçerli bir e-posta girin.'; err.classList.add('show'); return; }
-  const users = getUsers();
-  if (users[email]) { err.textContent = 'Bu e-posta ile zaten bir hesap var.'; err.classList.add('show'); return; }
-  err.classList.remove('show'); users[email] = { name, email, password: pw, onboarding: null, progress: null }; saveUsers(users);
-  localStorage.setItem('lf_current_user', email); loadState(); startOnboarding();
+  err.classList.remove('show');
+  try {
+    const data = await apiFetch('/auth/register', { method: 'POST', body: JSON.stringify({ name, email, password: pw }) });
+    setToken(data.token);
+    currentUser = data.user;
+    loadState();
+    startOnboarding();
+  } catch (e) { err.textContent = e.message; err.classList.add('show'); }
 }
-function handleLogout() { localStorage.removeItem('lf_current_user'); state = null; showScreen('screen-login'); }
+function handleLogout() { clearToken(); currentUser = null; state = null; showScreen('screen-login'); }
 
 // ==================== ONBOARDING ====================
 let obStep = 0, obData = {};
@@ -1353,7 +1385,12 @@ function genPlan(d) {
   const lv = lm[d.level]||lm.zero; const wa = (d.weakAreas||[]).map(a=>al[a]||a);
   return { levelEmoji:lv.emoji, levelLabel:lv.label, targetBand:d.targetBand||"6.0", durationLabel:dm[d.examDate]||"Esnek", dailyLabel:tm[d.dailyTime]||"30 dk", focusAreas:wa.length>0?wa.join(', '):'Genel', weakAreas:d.weakAreas||[], examDate:d.examDate, dailyTime:d.dailyTime, level:d.level };
 }
-function completeOb() { const u=getCurrentUser(); if(u){u.onboarding=obData;u.plan=genPlan(obData);u.progress={streak:0,lastActiveDate:null,lessonsCompleted:[],wordsLearned:0,quizScores:[],chatCount:0,activities:[]};saveCurrentUser(u);} loadState(); enterApp(); }
+async function completeOb() {
+  const plan = genPlan(obData);
+  if (currentUser) { currentUser.onboarding = obData; currentUser.plan = plan; currentUser.progress = { streak:0, lastActiveDate:null, lessonsCompleted:[], wordsLearned:0, quizScores:[], chatCount:0, activities:[] }; }
+  try { await apiFetch('/profile', { method: 'POST', body: JSON.stringify({ onboarding: obData, plan }) }); } catch(e) { console.warn('Profil kaydedilemedi:', e); }
+  loadState(); enterApp();
+}
 
 // ==================== APP ====================
 function enterApp() {
@@ -1405,7 +1442,7 @@ function showLessonList() { document.getElementById('lessonListView').style.disp
 function openLesson(id) { const l=LESSONS.find(x=>x.id===id); if(!l)return; document.getElementById('lessonListView').style.display='none'; const d=document.getElementById('lessonDetailView'); d.style.display='block'; d.classList.add('active');
   d.innerHTML = `<button class="back-btn" onclick="showLessonList()">← Ders Listesine Dön</button><div class="card"><div class="card-header"><div class="card-title">Ders ${l.id}: ${l.title}</div><div class="card-badge">${l.vocab.length} kelime</div></div><div class="lesson-section"><h3>Yeni Kelimeler</h3><div class="vocab-grid">${l.vocab.map(v=>`<div class="vocab-card" onclick="speakWord('${v.en}')"><button class="speak-btn" title="Dinle">&#9834;</button><div class="en">${v.en}</div><div class="tr">${v.tr}</div><div class="phonetic">${v.phonetic}</div></div>`).join('')}</div></div><div class="lesson-section"><h3>Gramer: ${l.grammar.title}</h3><div class="grammar-box"><p>${l.grammar.explanation}</p>${l.grammar.examples.map(ex=>`<div class="example"><div>${ex.en.replace(/<hl>/g,'<span class="highlight">').replace(/<\/hl>/g,'</span>')}</div><div style="color:var(--text-4);font-size:12px;margin-top:4px;">${ex.tr}</div></div>`).join('')}</div></div><div class="lesson-section"><h3>Diyalog</h3><div class="dialogue-box">${l.dialogue.map(x=>`<div class="dialogue-line"><div class="dialogue-speaker ${x.speaker==='B'?'b':''}">${x.speaker}:</div><div class="dialogue-text">${x.text}<span class="translation">${x.tr}</span></div></div>`).join('')}</div><button class="btn btn-secondary" style="margin-top:12px;width:100%;" onclick="speakDialogue(${l.id})">Diyaloğu Dinle</button></div><button class="btn btn-primary" style="width:100%;margin-top:8px;" onclick="completeLesson(${l.id})">Dersi Tamamla</button></div>`;
 }
-function completeLesson(id) { const l=LESSONS.find(x=>x.id===id); if(!state.lessonsCompleted.includes(id)){state.lessonsCompleted.push(id);state.wordsLearned+=l.vocab.length;addActivity(`Ders ${id}: "${l.title}" tamamlandı`);} showLessonList(); }
+function completeLesson(id) { const l=LESSONS.find(x=>x.id===id); if(!state.lessonsCompleted.includes(id)){state.lessonsCompleted.push(id);state.wordsLearned+=l.vocab.length;addActivity(`Ders ${id}: "${l.title}" tamamlandı`);apiFetch('/progress',{method:'POST',body:JSON.stringify({type:'lesson',data:{lessonId:id,section:'complete'}})}).catch(()=>{});} showLessonList(); }
 
 // ==================== SPEECH ====================
 function speakWord(t) { if('speechSynthesis' in window){const u=new SpeechSynthesisUtterance(t);u.lang='en-US';u.rate=0.85;speechSynthesis.speak(u);} }
@@ -1415,7 +1452,7 @@ function speakDialogue(id) { const l=LESSONS.find(x=>x.id===id); if(!l||!('speec
 let cQuiz=[],qIdx=0,qOk=0;
 function initQuizPage() { const a=document.getElementById('quizArea'); const al=state.lessonsCompleted.length>0?LESSONS.filter(l=>state.lessonsCompleted.includes(l.id)):[LESSONS[0]]; cQuiz=[]; al.forEach(l=>l.quiz.forEach(q=>cQuiz.push({...q,lessonId:l.id}))); cQuiz=cQuiz.sort(()=>Math.random()-0.5).slice(0,10); qIdx=0; qOk=0; showQ(); }
 function showQ() { const a=document.getElementById('quizArea');
-  if(qIdx>=cQuiz.length){const p=Math.round((qOk/cQuiz.length)*100);const sc=p>=80?'good':p>=50?'mid':'low';const msg=p>=80?'Harika!':p>=50?'Fena değil, gelişiyorsun!':'Biraz daha pratik gerekiyor';state.quizScores.push(p);addActivity(`Quiz tamamlandı: %${p}`);a.innerHTML=`<div class="quiz-result"><div class="score ${sc}">%${p}</div><div class="message">${msg}</div><p style="font-size:14px;color:var(--text-4);margin-bottom:28px;">${qOk}/${cQuiz.length} doğru</p><button class="btn btn-primary" onclick="initQuizPage()">Tekrar Dene</button></div>`;return;}
+  if(qIdx>=cQuiz.length){const p=Math.round((qOk/cQuiz.length)*100);const sc=p>=80?'good':p>=50?'mid':'low';const msg=p>=80?'Harika!':p>=50?'Fena değil, gelişiyorsun!':'Biraz daha pratik gerekiyor';state.quizScores.push(p);addActivity(`Quiz tamamlandı: %${p}`);apiFetch('/progress',{method:'POST',body:JSON.stringify({type:'quiz',data:{lessonId:0,score:qOk,total:cQuiz.length}})}).catch(()=>{});a.innerHTML=`<div class="quiz-result"><div class="score ${sc}">%${p}</div><div class="message">${msg}</div><p style="font-size:14px;color:var(--text-4);margin-bottom:28px;">${qOk}/${cQuiz.length} doğru</p><button class="btn btn-primary" onclick="initQuizPage()">Tekrar Dene</button></div>`;return;}
   const q=cQuiz[qIdx];const p=Math.round((qIdx/cQuiz.length)*100);
   a.innerHTML=`<div class="quiz-progress"><div class="quiz-progress-bar"><div class="quiz-progress-fill" style="width:${p}%"></div></div><div class="quiz-progress-text">${qIdx+1}/${cQuiz.length}</div></div><div class="quiz-question"><div class="q-label">Soru ${qIdx+1}</div><div class="q-text">${q.q}</div></div><div class="quiz-options">${q.opts.map((o,i)=>`<button class="quiz-option" onclick="ansQ(${i},${q.correct})">${o}</button>`).join('')}</div><div class="quiz-feedback" id="quizFeedback"></div>`;
 }
@@ -1439,7 +1476,19 @@ document.getElementById('loginPassword').addEventListener('keydown',(e)=>{if(e.k
 document.getElementById('regPassword').addEventListener('keydown',(e)=>{if(e.key==='Enter')handleRegister();});
 
 // ==================== INIT ====================
-(function(){const e=localStorage.getItem('lf_current_user');if(e){const u=getUsers();if(u[e]){loadState();u[e].onboarding?enterApp():startOnboarding();return;}}showScreen('screen-login');})();
+(async function(){
+  const token = getToken();
+  if (token) {
+    try {
+      const data = await apiFetch('/auth/me');
+      currentUser = data.user;
+      loadState();
+      currentUser.onboarding ? enterApp() : startOnboarding();
+      return;
+    } catch(e) { clearToken(); }
+  }
+  showScreen('screen-login');
+})();
 </script>
 </body>
 </html>
