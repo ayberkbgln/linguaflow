@@ -11,9 +11,10 @@ module.exports = async function handler(req, res) {
   }
 
   try {
+    const origin = req.headers.origin || req.headers.referer?.replace(/\/$/, '') || `https://${req.headers.host}`;
     const r = await fetch(`${process.env.NEON_AUTH_URL}/sign-in/email`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Origin': origin },
       body: JSON.stringify({ email, password })
     });
     const data = await r.json();
