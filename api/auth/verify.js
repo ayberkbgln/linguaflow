@@ -27,7 +27,7 @@ module.exports = async function handler(req, res) {
       try { data = JSON.parse(text); } catch (_) {}
     }
     if (!r.ok) {
-      return res.status(r.status).json({ error: data.message || data.error || 'Doğrulama hatası' });
+      return res.status(r.status).json({ error: data.message || data.error || 'Doğrulama hatası', debug: { status: r.status, body: text.substring(0, 500) } });
     }
     res.status(200).json(data.status ? data : { ok: true });
   } catch (e) {
