@@ -5,7 +5,7 @@ module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const { code } = req.body;
+  const { code, email } = req.body;
   if (!code) {
     return res.status(400).json({ error: 'Doğrulama kodu gerekli' });
   }
@@ -19,13 +19,17 @@ module.exports = async function handler(req, res) {
         'Origin': origin,
         'Referer': origin + '/'
       },
-      body: JSON.stringify({ code })
+      body: JSON.stringify({ code, email })
     });
-    const data = await r.json();
+    const text = await r.text();
+    let data = {};
+    if (text) {
+      try { data = JSON.parse(text); } catch (_) {}
+    }
     if (!r.ok) {
       return res.status(r.status).json({ error: data.message || data.error || 'Doğrulama hatası' });
     }
-    res.status(200).json(data);
+    res.status(200).json(data.status ? data : { ok: true });
   } catch (e) {
     res.status(500).json({ error: 'Sunucu hatası: ' + e.message });
   }

@@ -1018,8 +1018,8 @@ body::before {
 
 <!-- ===== VERIFY EMAIL ===== -->
 <div class="screen" id="screen-verify">
-  <div class="auth-page" style="justify-content:center;">
-    <div class="auth-form-side" style="max-width:480px;margin:0 auto;">
+  <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg-deep);">
+    <div style="max-width:480px;width:100%;padding:32px;">
       <div class="auth-form-box" style="text-align:center;">
         <div style="font-size:48px;margin-bottom:16px;">📧</div>
         <h2>E-posta Doğrulama</h2>
@@ -1406,7 +1406,7 @@ async function handleVerify() {
   if (!code || code.length < 6) { err.textContent = 'Lütfen 6 haneli kodu gir.'; err.classList.add('show'); return; }
   err.classList.remove('show');
   try {
-    await apiFetch('/auth/verify', { method: 'POST', body: JSON.stringify({ code }) });
+    await apiFetch('/auth/verify', { method: 'POST', body: JSON.stringify({ code, email: pendingVerifyEmail }) });
     // Doğrulama başarılı — giriş yap
     if (pendingVerifyEmail) {
       showScreen('screen-login');
