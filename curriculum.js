@@ -244,7 +244,8 @@ const LESSON_DATA = {
     quiz:[
       {q:"\"Nice to meet you\" ne demek?",opts:["Hoşça kal","Tanıştığıma memnun oldum","Nasılsın","Günaydın"],correct:1},
       {q:"\"Where are you from?\" ne soruyor?",opts:["Ne iş yapıyorsun?","Kaç yaşındasın?","Nerelisin?","Nasılsın?"],correct:2},
-      {q:"\"What do you do?\" ne soruyor?",opts:["Ne yapıyorsun şu an?","Ne iş yapıyorsun?","Nereye gidiyorsun?","Ne istiyorsun?"],correct:1}
+      {q:"\"What do you do?\" ne soruyor?",opts:["Ne yapıyorsun şu an?","Ne iş yapıyorsun?","Nereye gidiyorsun?","Ne istiyorsun?"],correct:1},
+      {q:"Elif ne yapıyor?",opts:["Öğretmen","Doktor","İngilizce öğrenen bir öğrenci","Mühendis"],correct:2}
     ]
   }
 }),
@@ -569,7 +570,9 @@ const LESSON_DATA = {
     ],
     quiz:[
       {q:"\"What about you?\" ne demek?",opts:["Seninle ne?","Ya sen?","Sen nasılsın?","Ne yaparsın?"],correct:1},
-      {q:"\"I usually go to the gym\" ne demek?",opts:["Spor salonuna gidiyorum","Genellikle spor salonuna giderim","Spor salonunu seviyorum","Spor salonuna gittim"],correct:1}
+      {q:"\"I usually go to the gym\" ne demek?",opts:["Spor salonuna gidiyorum","Genellikle spor salonuna giderim","Spor salonunu seviyorum","Spor salonuna gittim"],correct:1},
+      {q:"B saat kaçta uyanıyor?",opts:["7:00","6:00","6:30","8:00"],correct:2},
+      {q:"B işe nasıl gidiyor?",opts:["Yürüyerek","Arabayla","Otobüsle","Metroyla"],correct:2}
     ]
   }
 }),
@@ -704,7 +707,9 @@ const LESSON_DATA = {
     ],
     quiz:[
       {q:"\"I'm looking for a jacket\" ne demek?",opts:["Ceketi beğendim","Ceket arıyorum","Ceketi denedim","Ceketi aldım"],correct:1},
-      {q:"\"I'll take it\" ne demek?",opts:["Geri vereceğim","Düşüneceğim","Alıyorum","Beğenmedim"],correct:2}
+      {q:"\"I'll take it\" ne demek?",opts:["Geri vereceğim","Düşüneceğim","Alıyorum","Beğenmedim"],correct:2},
+      {q:"Bugün ne kadar indirim var?",opts:["%10","%15","%20","%25"],correct:2},
+      {q:"Müşteri nasıl ödeme yapmak istiyor?",opts:["Nakit","Kartla","Havaleyle","Çekle"],correct:1}
     ]
   }
 }),
@@ -740,7 +745,15 @@ const LESSON_DATA = {
       "6.5":"40 sorudan 30-32 doğru yapman gerekiyor.",
       "7.0":"40 sorudan 33-35 doğru yapman gerekiyor.",
       "7.5":"40 sorudan 36-38 doğru yapman gerekiyor."
-    }
+    },
+    exercises:[{type:"quiz",items:[
+      {q:"IELTS Reading testi toplamda kaç dakika sürer?",opts:["30 dakika","45 dakika","60 dakika","90 dakika"],correct:2},
+      {q:"IELTS Reading'de kaç pasaj bulunur?",opts:["2","3","4","5"],correct:1},
+      {q:"Toplam kaç soru cevaplanır?",opts:["20","30","40","50"],correct:2},
+      {q:"En zor pasaj hangisidir?",opts:["Passage 1","Passage 2","Passage 3","Hepsi eşit"],correct:2},
+      {q:"Cevabını bulamadığın soruda ne yapmalısın?",opts:["Boş bırak","Atla, sonra dön","Tahmin etme","Pasajı baştan oku"],correct:1},
+      {q:"Yanlış cevap için puan kırılır mı?",opts:["Evet, -1 puan","Evet, -0.5 puan","Hayır, kırılmaz","Soru tipine göre değişir"],correct:2}
+    ]}]
   }
 }),
 "reading-overview-reading-1": () => ({
@@ -800,7 +813,15 @@ const LESSON_DATA = {
       "6.5":"Fikirlerini detaylı açıkla, karmaşık cümle yapıları kullan.",
       "7.0":"Sofistike kelime seçimleri, tutarlı argüman, minimal hata.",
       "7.5":"Akademik üslup, gelişmiş gramer yapıları, etkileyici kelime dağarcığı."
-    }
+    },
+    exercises:[{type:"quiz",items:[
+      {q:"IELTS Writing testi toplamda kaç dakika sürer?",opts:["30 dakika","45 dakika","60 dakika","90 dakika"],correct:2},
+      {q:"Task 1'de minimum kaç kelime yazılmalıdır?",opts:["100","150","200","250"],correct:1},
+      {q:"Task 2'de minimum kaç kelime yazılmalıdır?",opts:["150","200","250","300"],correct:2},
+      {q:"Hangi task toplam puanın daha büyük kısmını oluşturur?",opts:["Task 1","Task 2","Eşit ağırlıkta","Soru tipine göre değişir"],correct:1},
+      {q:"Task 1'de ne yapılır?",opts:["Essay yazılır","Grafik/tablo açıklanır","Mektup yazılır","Özet çıkarılır"],correct:1},
+      {q:"Yazarken hangisi yapılmamalıdır?",opts:["Bağlaç kullanmak","Paragraf yapmak","Informal dil kullanmak","Planlama yapmak"],correct:2}
+    ]}]
   }
 }),
 "task2-opinion-writing-1": () => ({
@@ -835,7 +856,15 @@ const LESSON_DATA = {
       "Critics argue that ...",
       "In conclusion, I believe that ...",
       "This would ensure both ... and ..."
-    ]
+    ],
+    exercises:[{type:"quiz",items:[
+      {q:"Opinion Essay'de kaç paragraf olmalıdır?",opts:["2","3","4","5"],correct:2},
+      {q:"'Proponents' kelimesinin Türkçe karşılığı nedir?",opts:["Karşıtlar","Savunucular","Öğrenciler","Politikacılar"],correct:1},
+      {q:"Giriş paragrafında ne yapılmalıdır?",opts:["Sadece konu tanıtılır","Konu tanıtılır ve görüş belirtilir","Örnek verilir","Sonuç yazılır"],correct:1},
+      {q:"'Regardless of' ne demektir?",opts:["...yüzünden","...rağmen","...ne olursa olsun","...sayesinde"],correct:2},
+      {q:"Son paragrafta ne yapılır?",opts:["Yeni fikir eklenir","Soru sorulur","Görüş farklı kelimelerle tekrarlanır","Karşı görüş verilir"],correct:2},
+      {q:"'Tuition fees' ne demektir?",opts:["Yemek ücreti","Ulaşım ücreti","Öğrenim ücreti","Konaklama ücreti"],correct:2}
+    ]}]
   }
 }),
 
@@ -870,7 +899,15 @@ const LESSON_DATA = {
       "6.5":"40 sorudan 30-32 doğru yapman gerekiyor.",
       "7.0":"40 sorudan 33-35 doğru yapman gerekiyor.",
       "7.5":"40 sorudan 36-38 doğru yapman gerekiyor."
-    }
+    },
+    exercises:[{type:"quiz",items:[
+      {q:"IELTS Listening testi kaç dakika sürer?",opts:["20 dakika","30 dakika","45 dakika","60 dakika"],correct:1},
+      {q:"Listening testinde kaç bölüm (section) vardır?",opts:["2","3","4","5"],correct:2},
+      {q:"Her bölümü kaç kez dinlersiniz?",opts:["1 kez","2 kez","3 kez","İstediğin kadar"],correct:0},
+      {q:"Section 1'de ne tür bir kayıt duyarsınız?",opts:["Akademik ders","Günlük konuşma","Radyo haberi","Konferans"],correct:1},
+      {q:"Cevap aktarma süresi kaç dakikadır?",opts:["5 dakika","10 dakika","15 dakika","Süre yok"],correct:1},
+      {q:"Bir soruyu kaçırdığında ne yapmalısın?",opts:["Kaydı geri sar","Takıl ve bul","Sonraki soruya geç","Testi bırak"],correct:2}
+    ]}]
   }
 }),
 "listening-overview-vocab-1": () => ({
@@ -1188,7 +1225,15 @@ const LESSON_DATA = {
       "6.5":"Çeşitli kelime ve gramer yapıları kullan, düzgün telaffuz.",
       "7.0":"Doğal akıcılık, idiomatic ifadeler, minimal hata.",
       "7.5":"Sofistike dil kullanımı, tartışmayı derinleştir, mükemmel telaffuz."
-    }
+    },
+    exercises:[{type:"quiz",items:[
+      {q:"IELTS Speaking testi kaç dakika sürer?",opts:["5-7 dk","11-14 dk","20-25 dk","30 dk"],correct:1},
+      {q:"Speaking testi kaç bölümden oluşur?",opts:["2","3","4","5"],correct:1},
+      {q:"Part 2'de kaç dakika hazırlık süresi verilir?",opts:["30 saniye","1 dakika","2 dakika","5 dakika"],correct:1},
+      {q:"Değerlendirme kriterlerinden hangisi DEĞİLDİR?",opts:["Fluency (Akıcılık)","Pronunciation (Telaffuz)","Handwriting (El Yazısı)","Grammar (Dilbilgisi)"],correct:2},
+      {q:"Soruyu anlamadığında ne yapmalısın?",opts:["Tahmin et","Türkçe sor","Tekrar sormasını iste","Sessiz kal"],correct:2},
+      {q:"Part 3'teki sorular nasıldır?",opts:["Kişisel ve basit","Daha derin ve soyut","Yes/No soruları","Kelime soruları"],correct:1}
+    ]}]
   }
 }),
 "part1-intro-speaking-1": () => ({
@@ -1516,7 +1561,8 @@ const LESSON_DATA = {
     quiz:[
       {q:"\"I'm looking for the station\" ne demek?",opts:["İstasyonu gördüm","İstasyonu arıyorum","İstasyona gittim","İstasyonu biliyorum"],correct:1},
       {q:"İstasyon neredeymiş?",opts:["Parkın içinde","Alışveriş merkezinde","Parkın ilerisinde, AVM karşısında","Trafik ışıklarında"],correct:2},
-      {q:"\"How long does it take on foot?\" ne soruyor?",opts:["Ne kadar uzak?","Yürüyerek ne kadar sürer?","Otobüs var mı?","Saat kaçta?"],correct:1}
+      {q:"\"How long does it take on foot?\" ne soruyor?",opts:["Ne kadar uzak?","Yürüyerek ne kadar sürer?","Otobüs var mı?","Saat kaçta?"],correct:1},
+      {q:"Trafik ışıklarında hangi yöne dönmek gerekiyor?",opts:["Sağa","Sola","Düz devam","Geri dönüş"],correct:1}
     ]
   }
 }),
@@ -1594,7 +1640,8 @@ const LESSON_DATA = {
     quiz:[
       {q:"\"What's it like?\" ne soruyor?",opts:["Ne kadar?","Nasıl?","Nerede?","Ne zaman?"],correct:1},
       {q:"Evde bahçe var mı?",opts:["Evet, büyük bir bahçe var","Evet, küçük","Hayır yok","Bahçesi bilinmiyor"],correct:2},
-      {q:"Mutfakta ne var?",opts:["Sadece masa","Buzdolabı ve bulaşık makinesi","Hiçbir şey","Sadece ocak"],correct:1}
+      {q:"Mutfakta ne var?",opts:["Sadece masa","Buzdolabı ve bulaşık makinesi","Hiçbir şey","Sadece ocak"],correct:1},
+      {q:"B'nin en sevdiği oda hangisi?",opts:["Yatak odası","Oturma odası","Mutfak","Balkon"],correct:2}
     ]
   }
 }),
@@ -1675,7 +1722,8 @@ const LESSON_DATA = {
     quiz:[
       {q:"A sporu sever mi?",opts:["Evet, çok sever","Hayır, pek sevmez","Bilinmiyor","Sadece futbolu sever"],correct:1},
       {q:"\"I don't mind cooking\" ne demek?",opts:["Yemek yapmayı sevmem","Yemek yapamam","Yemek yapmaktan rahatsız olmam","Yemek yapmayı unuturum"],correct:2},
-      {q:"\"I'd love to\" ne demek?",opts:["Seviyorum","Çok isterim","Sevmezdim","Aşk istiyorum"],correct:1}
+      {q:"\"I'd love to\" ne demek?",opts:["Seviyorum","Çok isterim","Sevmezdim","Aşk istiyorum"],correct:1},
+      {q:"B hafta sonları ne yapmayı seviyor?",opts:["Film izlemek","Yemek yapmak","Futbol oynamak","Kitap okumak"],correct:2}
     ]
   }
 }),
@@ -1754,7 +1802,8 @@ const LESSON_DATA = {
     quiz:[
       {q:"\"I'd like to book a room\" ne demek?",opts:["Oda var mı?","Oda ayırtmak istiyorum","Oda güzel mi?","Odayı değiştirin"],correct:1},
       {q:"Kahvaltı fiyata dahil mi?",opts:["Hayır","Evet","Belirtilmemiş","Ekstra ücretli"],correct:1},
-      {q:"\"Per night\" ne demek?",opts:["Her gece / gecelik","Toplam","Haftalık","Aylık"],correct:0}
+      {q:"\"Per night\" ne demek?",opts:["Her gece / gecelik","Toplam","Haftalık","Aylık"],correct:0},
+      {q:"Misafir ne tür oda istiyor?",opts:["Tek kişilik","Deniz manzaralı çift kişilik","Bahçe manzaralı","Aile odası"],correct:1}
     ]
   }
 }),
@@ -1832,7 +1881,8 @@ const LESSON_DATA = {
     quiz:[
       {q:"Hastanın şikayetleri neler?",opts:["Mide ağrısı","Baş ve boğaz ağrısı","Sırt ağrısı","Bacak ağrısı"],correct:1},
       {q:"Doktor ne tavsiye ediyor?",opts:["Spor yapmasını","Dinlenmesini ve sıvı içmesini","İşe gitmesini","Yemek yememesini"],correct:1},
-      {q:"\"Twice a day\" ne demek?",opts:["Haftada iki kez","Günde iki kez","İki gün","Her iki saatte"],correct:1}
+      {q:"\"Twice a day\" ne demek?",opts:["Haftada iki kez","Günde iki kez","İki gün","Her iki saatte"],correct:1},
+      {q:"Belirtiler ne zamandır devam ediyor?",opts:["Bir gündür","Bir haftadır","Yaklaşık üç gündür","Bir aydır"],correct:2}
     ]
   }
 }),
@@ -1910,7 +1960,8 @@ const LESSON_DATA = {
     quiz:[
       {q:"A'nın sosyal medya hakkındaki fikri ne?",opts:["Çok iyi","Gençler için kötü","Fikri yok","Herkese lazım"],correct:1},
       {q:"\"I see your point\" ne demek?",opts:["Seni görüyorum","Noktanı gördüm","Bakış açını anlıyorum","Haklısın"],correct:2},
-      {q:"İkisi neyde hemfikir?",opts:["Sosyal medya kötü","Dengenin önemli olduğu","Ekran kullanmamak lazım","Yüz yüze konuşma kötü"],correct:1}
+      {q:"İkisi neyde hemfikir?",opts:["Sosyal medya kötü","Dengenin önemli olduğu","Ekran kullanmamak lazım","Yüz yüze konuşma kötü"],correct:1},
+      {q:"\"I partly agree\" ne demek?",opts:["Tamamen katılıyorum","Hiç katılmıyorum","Kısmen katılıyorum","Emin değilim"],correct:2}
     ]
   }
 }),
@@ -1988,7 +2039,8 @@ const LESSON_DATA = {
     quiz:[
       {q:"Selin nasıl biri?",opts:["Utangaç ve tembel","Canayakın ve hırslı","Sinirli ve sabırsız","Sıkılgan ve sessiz"],correct:1},
       {q:"\"More outgoing than I expected\" ne demek?",opts:["Beklediğimden daha içe dönük","Beklediğimden daha dışa dönük","Beklediğim kadar","Dışarı çıkmayı seviyor"],correct:1},
-      {q:"Eski iş arkadaşının Selin'den daha iyi olduğu özellik ne?",opts:["Hırslılık","Sosyallik","Sabırlılık","Problem çözme"],correct:2}
+      {q:"Eski iş arkadaşının Selin'den daha iyi olduğu özellik ne?",opts:["Hırslılık","Sosyallik","Sabırlılık","Problem çözme"],correct:2},
+      {q:"\"The most sociable person\" ne demek?",opts:["En utangaç kişi","En sosyal kişi","En çalışkan kişi","En sabırlı kişi"],correct:1}
     ]
   }
 }),
@@ -2066,7 +2118,8 @@ const LESSON_DATA = {
     quiz:[
       {q:"Uygulama kimin için tasarlanmış?",opts:["Amerikalı öğrenciler","Türk öğrenciler","İngiliz öğretmenler","Herkes"],correct:1},
       {q:"\"Can it be downloaded for free?\" hangi yapıda?",opts:["Active voice","Passive voice","Past tense","Future tense"],correct:1},
-      {q:"\"I'll download it right now\" ne demek?",opts:["Daha sonra indireceğim","Hemen indireceğim","İndirdim","İndirmeyeceğim"],correct:1}
+      {q:"\"I'll download it right now\" ne demek?",opts:["Daha sonra indireceğim","Hemen indireceğim","İndirdim","İndirmeyeceğim"],correct:1},
+      {q:"Uygulama çevrimdışı kullanılabilir mi?",opts:["Hayır","Evet","Sadece Wi-Fi ile","Belirtilmemiş"],correct:1}
     ]
   }
 }),
