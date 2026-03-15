@@ -106,7 +106,7 @@ const LESSON_DATA = {
         {q:"\"Good morning\" ne zaman kullanılır?",opts:["Gece yatarken","Sabah karşılaşınca","Öğleden sonra","Vedalaşırken"],correct:1},
         {q:"\"Apple\" kelimesinin çoğulu nedir?",opts:["Apples","Appls","Applees","Apple's"],correct:0},
         {q:"Hangisi bir selamlama ifadesidir?",opts:["Thank you","Goodbye","Hello","Sorry"],correct:2},
-        {q:"\"B-O-O-K\" hangi kelimeyi oluşturur?",opts:["Back","Book","Look","Cook"],correct:1}
+        {q:"\"House\" ne demek?",opts:["Araba","Okul","Ev","İş"],correct:2}
       ]}
     ]
   }
@@ -133,9 +133,9 @@ const LESSON_DATA = {
     exercises:[
       {type:"quiz",items:[
         {q:"\"Thank you\" ne demek?",opts:["Özür dilerim","Lütfen","Teşekkür ederim","Merhaba"],correct:2},
-        {q:"\"S-U-N\" hangi kelimeyi oluşturur?",opts:["Son","Sun","Sin","San"],correct:1},
+        {q:"\"Goodbye\" ne zaman kullanılır?",opts:["Karşılaşınca","Teşekkür ederken","Vedalaşırken","Yemek yerken"],correct:2},
         {q:"\"Red\" ne anlama gelir?",opts:["Yeşil","Mavi","Kırmızı","Sarı"],correct:2},
-        {q:"\"Phone\" kelimesinde hangi ses vardır?",opts:["/p/ sesi","/f/ sesi","/h/ sesi","/b/ sesi"],correct:1},
+        {q:"\"Please\" hangi durumda kullanılır?",opts:["Özür dilerken","Rica ederken/Lütfen","Vedalaşırken","Kızgınken"],correct:1},
         {q:"\"Water\" ne demek?",opts:["Ateş","Hava","Toprak","Su"],correct:3}
       ]}
     ]
