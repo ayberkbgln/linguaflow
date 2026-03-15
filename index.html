@@ -461,6 +461,8 @@ body::before {
   font-size: 13px;
   font-weight: 600;
   color: var(--amber-light);
+  position: relative;
+  cursor: default;
 }
 .user-pill {
   display: flex;
@@ -895,6 +897,43 @@ body::before {
 .quiz-result .score.low { color: var(--rose); }
 .quiz-result .message { font-size: 16px; color: var(--text-3); margin-bottom: 28px; }
 
+/* ===== FILL BLANK ===== */
+.fill-blank-item { margin-bottom: 16px; }
+.fill-blank-sentence { font-size: 15px; color: var(--text-2); margin-bottom: 8px; line-height: 1.8; }
+.fill-blank-sentence .blank-slot { display: inline-block; min-width: 80px; border-bottom: 2px dashed var(--amber); padding: 2px 8px; margin: 0 4px; font-weight: 600; color: var(--amber-light); text-align: center; transition: all 0.3s; }
+.fill-blank-sentence .blank-slot.correct { border-color: var(--emerald); color: var(--emerald); background: var(--emerald-glow); }
+.fill-blank-sentence .blank-slot.wrong { border-color: var(--rose); color: var(--rose); background: var(--rose-glow); }
+.fill-blank-opts { display: flex; gap: 8px; flex-wrap: wrap; }
+.fill-blank-opts button { padding: 6px 16px; border-radius: 8px; border: 1px solid var(--border-2); background: var(--bg-card); color: var(--text-2); cursor: pointer; font-family: var(--font-body); font-size: 13px; transition: all 0.2s; }
+.fill-blank-opts button:hover { border-color: var(--border-amber); background: var(--bg-card-hover); }
+.fill-blank-opts button.correct { border-color: var(--emerald); background: var(--emerald-glow); color: var(--emerald); }
+.fill-blank-opts button.wrong { border-color: var(--rose); background: var(--rose-glow); color: var(--rose); }
+.fill-blank-opts button:disabled { cursor: default; opacity: 0.7; }
+
+/* ===== INTERACTIVE MATCH ===== */
+.match-container { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.match-column { display: flex; flex-direction: column; gap: 8px; }
+.match-item { padding: 12px 16px; border-radius: 10px; border: 1px solid var(--border-2); background: var(--bg-card); color: var(--text-2); cursor: pointer; font-family: var(--font-body); font-size: 14px; text-align: center; transition: all 0.2s; user-select: none; }
+.match-item:hover:not(.matched):not(.disabled) { border-color: var(--border-amber); background: var(--bg-card-hover); }
+.match-item.selected { border-color: var(--amber); background: var(--amber-glow); color: var(--amber-light); box-shadow: 0 0 12px var(--amber-glow); }
+.match-item.matched { border-color: var(--emerald); background: var(--emerald-glow); color: var(--emerald); cursor: default; opacity: 0.8; }
+.match-item.wrong-flash { border-color: var(--rose); background: var(--rose-glow); color: var(--rose); }
+.match-item.disabled { cursor: default; }
+.match-score { text-align: center; margin-top: 12px; font-weight: 600; color: var(--emerald); font-size: 14px; }
+
+/* ===== LESSON SCORE ===== */
+.lesson-score-box { text-align: center; padding: 20px; margin-top: 16px; border-radius: 12px; border: 1px solid var(--border-1); background: var(--bg-card); }
+.lesson-score-box .score-value { font-family: var(--font-mono); font-size: 28px; font-weight: 600; }
+.lesson-score-box .score-value.good { color: var(--emerald); }
+.lesson-score-box .score-value.mid { color: var(--amber); }
+.lesson-score-box .score-value.low { color: var(--rose); }
+.lesson-score-box .score-label { font-size: 13px; color: var(--text-4); margin-top: 4px; }
+
+/* ===== LESSON PROGRESS ===== */
+.lesson-progress-bar { display: flex; align-items: center; gap: 12px; padding: 12px 16px; margin-top: 12px; border-radius: 10px; background: var(--bg-elevated); font-size: 13px; color: var(--text-3); }
+.lesson-progress-bar .progress-track { flex: 1; height: 6px; background: var(--bg-input); border-radius: 3px; overflow: hidden; }
+.lesson-progress-bar .progress-fill { height: 100%; background: var(--amber); border-radius: 3px; transition: width 0.3s; }
+
 /* ===== CHAT ===== */
 .chat-container {
   display: flex;
@@ -1205,10 +1244,12 @@ body::before {
         <h1>Lingua<em>Flow</em></h1>
       </div>
       <div class="header-right">
-        <div class="streak-pill">
-          <span>&#9632;</span>
-          <span id="streakCount">0</span> gün seri
+        <div class="streak-pill" id="streakPill">
+          <span id="streakIcon">&#128293;</span>
+          <span id="streakCount">0</span> gün
+          <span id="streakTodayDot" style="width:8px;height:8px;border-radius:50%;margin-left:2px;"></span>
         </div>
+        <div id="streakTodayHint" style="display:none;position:absolute;top:100%;right:0;margin-top:4px;background:var(--bg-card);border:1px solid var(--border-2);border-radius:8px;padding:6px 12px;font-size:11px;white-space:nowrap;z-index:10;"></div>
         <div class="user-pill">
           <div class="user-av" id="userAvatar"></div>
           <span id="userName"></span>
@@ -1251,15 +1292,6 @@ body::before {
           <div class="stat-label">Konuşma Pratiği</div>
           <div class="stat-value" id="chatCount">0</div>
         </div>
-      </div>
-
-      <div class="card" id="studyPlanCard">
-        <div class="card-header">
-          <div class="card-title">Kişisel Çalışma Planın</div>
-          <div class="card-badge" id="planLevelBadge">—</div>
-        </div>
-        <div class="plan-overview" id="planOverview"></div>
-        <div id="planDetails" style="font-size:13px;color:var(--text-3);line-height:1.7;"></div>
       </div>
 
       <div class="card">
@@ -1409,12 +1441,18 @@ function loadState() {
   state = currentUser.progress || { streak:0, lastActiveDate:null, lessonsCompleted:[], wordsLearned:0, quizScores:[], chatCount:0, activities:[] };
   return state;
 }
+let _saveStateTimer = null;
 function saveState() {
   if (!state) return;
   const t = new Date().toDateString();
   if (state.lastActiveDate !== t) { const y = new Date(Date.now()-86400000).toDateString(); state.streak = (state.lastActiveDate === y) ? state.streak+1 : 1; state.lastActiveDate = t; }
   if (currentUser) { currentUser.progress = state; }
   updateDashboard();
+  // Debounced server sync (3s)
+  clearTimeout(_saveStateTimer);
+  _saveStateTimer = setTimeout(() => {
+    apiFetch('/progress', { method: 'POST', body: JSON.stringify({ type: 'state', data: state }) }).catch(() => {});
+  }, 3000);
 }
 function addActivity(text) { state.activities.unshift({ text, time: new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}) }); if (state.activities.length > 10) state.activities.pop(); saveState(); }
 
@@ -1532,18 +1570,6 @@ function enterApp() {
   const u = getCurrentUser(); if(!u){showScreen('screen-login');return;}
   document.getElementById('userName').textContent = u.name;
   document.getElementById('userAvatar').textContent = u.name.charAt(0).toUpperCase();
-  if (u.plan) {
-    document.getElementById('planLevelBadge').textContent = u.plan.levelLabel;
-    document.getElementById('planOverview').innerHTML = `<div class="plan-item"><span class="plan-icon">🎯</span><div><div class="plan-label">IELTS Hedef</div><div class="plan-value">Band ${u.plan.targetBand}</div></div></div><div class="plan-item"><span class="plan-icon">📅</span><div><div class="plan-label">Süre</div><div class="plan-value">${u.plan.durationLabel}</div></div></div><div class="plan-item"><span class="plan-icon">⏰</span><div><div class="plan-label">Günlük Çalışma</div><div class="plan-value">${u.plan.dailyLabel}</div></div></div><div class="plan-item"><span class="plan-icon">🔥</span><div><div class="plan-label">Odak Alanlar</div><div class="plan-value">${u.plan.focusAreas}</div></div></div>`;
-    const int = {"15min":"hafif","30min":"orta","1hour":"yoğun","2hours":"çok yoğun"}; const iv = int[u.plan.dailyTime]||"orta";
-    let adv = `<strong style="color:var(--amber);">Haftalık Önerilen Program (${iv}):</strong><br>`;
-    if(u.plan.dailyTime==="15min") adv+=`• Pazartesi-Cuma: 1 ders + 5 kelime<br>• Cumartesi: Quiz tekrarı<br>• Pazar: Konuşma pratiği`;
-    else if(u.plan.dailyTime==="30min") adv+=`• Pazartesi-Cuma: 1 ders + 10 kelime + mini quiz<br>• Cumartesi: Konuşma pratiği + tekrar<br>• Pazar: Dinleme/okuma pratiği`;
-    else if(u.plan.dailyTime==="1hour") adv+=`• Pazartesi-Cuma: 1 ders + 15 kelime + gramer + quiz<br>• Cumartesi: IELTS pratik testi + konuşma<br>• Pazar: Yazma pratiği + genel tekrar`;
-    else adv+=`• Pazartesi-Cuma: 2 ders + 20 kelime + gramer + quiz + konuşma<br>• Cumartesi: IELTS tam pratik testi<br>• Pazar: Yazma Task 1&2 + genel tekrar`;
-    document.getElementById('planDetails').innerHTML = adv;
-    // lessonPlanBadge removed - curriculum uses module view now
-  }
   document.getElementById('chatMessages').innerHTML = `<div class="msg ai">Merhaba ${u.name}! Ben senin İngilizce konuşma partnerin. Benimle İngilizce pratik yapabilirsin. Yanlış yaparsan düzeltirim, anlamadığın yerleri Türkçe açıklarım.<span class="turkish-help">Bir senaryo seçebilir veya doğrudan İngilizce yazmaya başlayabilirsin!</span></div>`;
   showScreen('screen-app'); updateDashboard(); showModules(); saveState();
 }
@@ -1554,7 +1580,25 @@ document.querySelectorAll('.nav-tab').forEach(tab => { tab.addEventListener('cli
 // ==================== DASHBOARD ====================
 function updateDashboard() {
   if(!state) return;
+  // FIX 5: Enhanced streak display
   document.getElementById('streakCount').textContent = state.streak;
+  const todayStr = new Date().toDateString();
+  const isActiveToday = state.lastActiveDate === todayStr;
+  const dotEl = document.getElementById('streakTodayDot');
+  const hintEl = document.getElementById('streakTodayHint');
+  if (dotEl) {
+    dotEl.style.background = isActiveToday ? 'var(--emerald)' : '#facc15';
+    dotEl.title = isActiveToday ? 'Bugün aktifsin!' : 'Bugün henüz çalışmadın';
+  }
+  if (hintEl) {
+    if (!isActiveToday) {
+      hintEl.style.display = 'block';
+      hintEl.style.color = '#facc15';
+      hintEl.textContent = 'Bugün henüz çalışmadın';
+    } else {
+      hintEl.style.display = 'none';
+    }
+  }
   document.getElementById('lessonsCompleted').textContent = state.lessonsCompleted.length;
   document.getElementById('wordsLearned').textContent = state.wordsLearned;
   document.getElementById('chatCount').textContent = state.chatCount;
@@ -1673,13 +1717,22 @@ function showUnitLessons(moduleId, unitId) {
 function openCurriculumLesson(id) {
   const l = getLesson(id);
   if (!l) return;
+  // FIX 2: Switch nav tab to Dersler (lessons)
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const lessonsTab = document.querySelector('.nav-tab[data-page="lessons"]');
+  if (lessonsTab) lessonsTab.classList.add('active');
+  document.getElementById('page-lessons').classList.add('active');
   document.getElementById('moduleListView').style.display = 'none';
   document.getElementById('unitListView').style.display = 'none';
   document.getElementById('lessonListView').style.display = 'none';
   const d = document.getElementById('lessonDetailView');
   d.style.display = 'block';
   d.classList.add('active');
-  let content = `<button class="back-btn" onclick="showUnitLessons('${currentModuleId}','${l.unitId}')">\u2190 Ders Listesi</button>`;
+  // FIX 3: If opened from dashboard (no current module/unit), back goes to modules list
+  const backAction = (currentModuleId && currentUnitId) ? `showUnitLessons('${currentModuleId}','${l.unitId}')` : `showModules()`;
+  const backLabel = (currentModuleId && currentUnitId) ? '\u2190 Ders Listesi' : '\u2190 Modüller';
+  let content = `<button class="back-btn" onclick="${backAction}">${backLabel}</button>`;
   content += `<div class="card"><div class="card-header"><div class="card-title">${l.title}</div><div class="card-badge">${l.level} \u00b7 ${l.minutes || 15} dk</div></div>`;
   if (l.type === 'vocabulary') { content += renderVocabularyLesson(l); }
   else if (l.type === 'grammar') { content += renderGrammarLesson(l); }
@@ -1689,8 +1742,11 @@ function openCurriculumLesson(id) {
   else if (l.type === 'speaking') { content += renderSpeakingLesson(l); }
   else if (l.type === 'strategy') { content += renderStrategyLesson(l); }
   if (l.data.exercises && l.data.exercises.length > 0) { content += renderExercises(l.data.exercises, l.id); }
-  content += `<button class="btn btn-primary" style="width:100%;margin-top:16px;" onclick="completeCurriculumLesson('${l.id}')">Dersi Tamamla</button></div>`;
+  content += `<div class="lesson-progress-bar" id="lessonProgressBar"></div>`;
+  content += `<button class="btn btn-primary" id="lessonCompleteBtn" style="width:100%;margin-top:16px;" onclick="completeCurriculumLesson('${l.id}')">Dersi Tamamla</button></div>`;
   d.innerHTML = content;
+  matchState = {};
+  setTimeout(() => updateLessonProgress(), 50);
 }
 
 function renderVocabularyLesson(l) {
@@ -1729,7 +1785,8 @@ function renderDialogueLesson(l) {
   (l.data.lines || []).forEach(x => {
     const spk = x.speaker || speakers[x.s] || 'A';
     const isB = x.speaker === 'B' || x.s === 1;
-    html += `<div class="dialogue-line"><div class="dialogue-speaker ${isB ? 'b' : ''}">${spk}:</div><div class="dialogue-text">${x.en}<span class="translation">${x.tr}</span></div></div>`;
+    const enText = x.en || x.text;
+    html += `<div class="dialogue-line"><div class="dialogue-speaker ${isB ? 'b' : ''}">${spk}:</div><div class="dialogue-text">${enText}<span class="translation">${x.tr}</span></div></div>`;
   });
   html += `</div><button class="btn btn-secondary" style="margin-top:12px;width:100%;" onclick="speakDialogueLines('${l.id}')">Diyalo\u011fu Dinle</button></div>`;
   if (l.data.keyPhrases && l.data.keyPhrases.length > 0) {
@@ -1738,6 +1795,15 @@ function renderDialogueLesson(l) {
       html += `<div class="vocab-card" onclick="speakWord('${(kp.en || kp.e || '').replace(/'/g, "\\'")}')"><div class="en">${kp.en || kp.e}</div><div class="tr">${kp.tr || kp.t}</div></div>`;
     });
     html += `</div></div>`;
+  }
+  if (l.data.quiz && l.data.quiz.length > 0) {
+    html += `<div class="lesson-section"><h3>Diyalog Soruları</h3>`;
+    l.data.quiz.forEach((q, qi) => {
+      html += `<div class="grammar-box" style="margin-bottom:12px;"><p style="font-weight:600;margin-bottom:8px;">${q.q}</p><div class="quiz-options">`;
+      q.opts.forEach((o, oi) => { html += `<button class="quiz-option" onclick="answerExQ(this,${oi},${q.correct})">${o}</button>`; });
+      html += `</div></div>`;
+    });
+    html += `</div>`;
   }
   return html;
 }
@@ -1763,7 +1829,8 @@ function renderReadingLesson(l) {
       } else if (q.type === 'true_false') {
         html += `<div class="quiz-options" style="margin-top:8px;"><button class="quiz-option" onclick="answerTFQ(this,true,${q.answer})">True</button><button class="quiz-option" onclick="answerTFQ(this,false,${q.answer})">False</button></div>`;
       }
-      if (q.explanation || q.explanationTr) { html += `<div class="quiz-feedback" id="readingFb${qi}" style="margin-top:8px;"></div>`; }
+      const explText = q.explanationTr || q.explanation || '';
+      if (explText) { html += `<div class="quiz-feedback" id="readingFb${qi}" style="margin-top:8px;" data-explanation="${explText.replace(/"/g,'&quot;')}"></div>`; }
       html += `</div>`;
     });
     html += `</div>`;
@@ -1775,19 +1842,22 @@ function renderWritingLesson(l) {
   let html = `<div class="lesson-section"><h3>Yazma Görevi</h3>`;
   const taskDesc = l.data.taskTr || l.data.explanationTr;
   if (taskDesc) { html += `<div class="grammar-box" style="border-left-color:#fb923c;"><p>${taskDesc}</p></div>`; }
-  if (l.data.samplePrompt) { html += `<div style="margin-top:16px;"><strong style="color:var(--amber-light);font-size:13px;">IELTS Sorusu</strong><div class="grammar-box" style="margin-top:8px;border-left-color:#fb923c;"><p style="font-style:italic;">${l.data.samplePrompt}</p></div></div>`; }
+  const sPrompt = l.data.samplePrompt || l.data.prompt;
+  if (sPrompt) { html += `<div style="margin-top:16px;"><strong style="color:var(--amber-light);font-size:13px;">IELTS Sorusu</strong><div class="grammar-box" style="margin-top:8px;border-left-color:#fb923c;"><p style="font-style:italic;">${sPrompt}</p></div></div>`; }
   if (l.data.structure) {
     html += `<div style="margin-top:16px;"><strong style="color:var(--amber-light);font-size:13px;">Essay Yap\u0131s\u0131</strong>`;
     html += `<div class="grammar-box" style="margin-top:8px;border-left-color:#fb923c;"><p>${typeof l.data.structure === 'string' ? l.data.structure : JSON.stringify(l.data.structure)}</p></div></div>`;
   }
-  if (l.data.keyVocabulary && l.data.keyVocabulary.length > 0) {
+  const keyVocab = l.data.keyVocabulary || l.data.vocabulary;
+  if (keyVocab && keyVocab.length > 0) {
     html += `<div style="margin-top:16px;"><strong style="color:var(--amber-light);font-size:13px;">Anahtar Kelimeler</strong><div class="vocab-grid" style="margin-top:8px;">`;
-    l.data.keyVocabulary.forEach(w => { html += `<div class="vocab-card"><div class="en">${w.en || w}</div>${w.tr ? `<div class="tr">${w.tr}</div>` : ''}</div>`; });
+    keyVocab.forEach(w => { html += `<div class="vocab-card"><div class="en">${w.en || w}</div>${w.tr ? `<div class="tr">${w.tr}</div>` : ''}</div>`; });
     html += `</div></div>`;
   }
-  if (l.data.sampleAnswer) {
+  const sAnswer = l.data.sampleAnswer || l.data.modelAnswer;
+  if (sAnswer) {
     html += `<div style="margin-top:16px;"><strong style="color:var(--amber-light);font-size:13px;">\u00d6rnek Cevap</strong>`;
-    html += `<div class="grammar-box" style="margin-top:8px;border-left-color:#fb923c;"><p style="white-space:pre-line;">${l.data.sampleAnswer}</p></div></div>`;
+    html += `<div class="grammar-box" style="margin-top:8px;border-left-color:#fb923c;"><p style="white-space:pre-line;">${sAnswer}</p></div></div>`;
   }
   html += `</div>`;
   return html;
@@ -1810,11 +1880,16 @@ function renderSpeakingLesson(l) {
   }
   if (l.data.modelAnswers && l.data.modelAnswers.length > 0) {
     html += `<div class="lesson-section"><h3>Örnek Cevaplar</h3>`;
-    l.data.modelAnswers.forEach(ma => {
-      html += `<div class="grammar-box" style="margin-bottom:12px;border-left-color:#2dd4bf;"><p style="font-weight:600;margin-bottom:8px;">${ma.q}</p>`;
-      html += `<div style="font-size:14px;color:var(--text-2);line-height:1.8;">${ma.answer}</div>`;
+        l.data.modelAnswers.forEach(ma => {
+      const maQ = ma.q || '';
+      const maAns = ma.answer || ma.text || '';
+      const maBand = ma.band || '';
+      html += `<div class="grammar-box" style="margin-bottom:12px;border-left-color:#2dd4bf;">`;
+      if (maQ) { html += `<p style="font-weight:600;margin-bottom:8px;">${maQ}</p>`; }
+      if (maBand) { html += `<div style="font-size:11px;color:#2dd4bf;margin-bottom:6px;font-family:var(--font-mono);">Band: ${maBand}</div>`; }
+      html += `<div style="font-size:14px;color:var(--text-2);line-height:1.8;">${maAns}</div>`;
       if (ma.answerTr) { html += `<div style="font-size:12px;color:var(--text-4);margin-top:8px;font-style:italic;">${ma.answerTr}</div>`; }
-      if (ma.tips) { html += `<div style="margin-top:8px;padding:8px;background:rgba(45,212,191,0.1);border-radius:8px;font-size:12px;color:#2dd4bf;">💡 ${ma.tips}</div>`; }
+      if (ma.tips) { html += `<div style="margin-top:8px;padding:8px;background:rgba(45,212,191,0.1);border-radius:8px;font-size:12px;color:#2dd4bf;">${ma.tips}</div>`; }
       html += `</div>`;
     });
     html += `</div>`;
@@ -1868,12 +1943,37 @@ function renderExercises(exercises, lessonId) {
         q.opts.forEach((o, oi) => { html += `<button class="quiz-option" onclick="answerExQ(this,${oi},${q.correct})">${o}</button>`; });
         html += `</div></div>`;
       });
+    } else if (ex.type === 'fillBlank') {
+      ex.items.forEach((fb, fbi) => {
+        const uid = `fb_${ei}_${fbi}`;
+        const parts = fb.sentence.split('___');
+        html += `<div class="grammar-box fill-blank-item" style="margin-bottom:12px;">`;
+        html += `<p class="fill-blank-sentence">${parts[0]}<span class="blank-slot" id="slot_${uid}">___</span>${parts[1] || ''}</p>`;
+        html += `<div class="fill-blank-opts">`;
+        fb.opts.forEach(opt => {
+          html += `<button onclick="answerFillBlank(this,'${opt.replace(/'/g,"\\'")}','${fb.answer.replace(/'/g,"\\'")}','slot_${uid}')">${opt}</button>`;
+        });
+        html += `</div></div>`;
+      });
     } else if (ex.type === 'match') {
-      html += `<div class="grammar-box" style="margin-bottom:12px;"><p style="font-weight:600;margin-bottom:12px;">${ex.q || 'E\u015fle\u015ftir'}</p><div class="vocab-grid">`;
-      ex.pairs.forEach(([left, right]) => { html += `<div class="vocab-card" style="cursor:default;"><div class="en">${left}</div><div class="tr">${right}</div></div>`; });
+      const mid = `match_${ei}`;
+      const shuffled = [...ex.pairs.map(p => p[1])].sort(() => Math.random() - 0.5);
+      html += `<div class="grammar-box" style="margin-bottom:12px;" id="${mid}_box"><p style="font-weight:600;margin-bottom:12px;">${ex.q || 'E\u015fle\u015ftir'}</p>`;
+      html += `<div class="match-container"><div class="match-column">`;
+      ex.pairs.forEach((p, pi) => {
+        html += `<div class="match-item" id="${mid}_l${pi}" onclick="selectMatchItem(this,'${mid}','left',${pi})" data-pair="${pi}">${p[0]}</div>`;
+      });
+      html += `</div><div class="match-column">`;
+      shuffled.forEach((r, ri) => {
+        const origIdx = ex.pairs.findIndex(p => p[1] === r);
+        html += `<div class="match-item" id="${mid}_r${ri}" onclick="selectMatchItem(this,'${mid}','right',${ri})" data-pair="${origIdx}">${r}</div>`;
+      });
       html += `</div></div>`;
+      html += `<div class="match-score" id="${mid}_score" style="display:none;"></div>`;
+      html += `</div>`;
     }
   });
+  html += `<div id="lessonScoreBox"></div>`;
   html += `</div>`;
   return html;
 }
@@ -1882,25 +1982,190 @@ function answerReadingQ(btn, selected, correct) {
   const parent = btn.parentElement;
   const buttons = parent.querySelectorAll('.quiz-option');
   buttons.forEach((b, i) => { b.disabled = true; if (i === correct) b.classList.add('correct'); if (i === selected && selected !== correct) b.classList.add('wrong'); });
+  const wrapper = parent.closest('.grammar-box');
+  if (wrapper) {
+    const fb = wrapper.querySelector('.quiz-feedback');
+    if (fb && fb.dataset.explanation) {
+      fb.textContent = (selected === correct ? 'Dogru! ' : 'Yanlis. ') + fb.dataset.explanation;
+      fb.className = 'quiz-feedback show ' + (selected === correct ? 'correct-fb' : 'wrong-fb');
+    }
+  }
+  updateLessonProgress();
 }
 
 function answerTFQ(btn, selected, correct) {
   const parent = btn.parentElement;
   const buttons = parent.querySelectorAll('.quiz-option');
   buttons.forEach(b => { b.disabled = true; const val = b.textContent === 'True'; if (val === correct) b.classList.add('correct'); if (val === selected && selected !== correct) b.classList.add('wrong'); });
+  updateLessonProgress();
 }
 
 function answerExQ(btn, selected, correct) {
   const parent = btn.parentElement;
   const buttons = parent.querySelectorAll('.quiz-option');
   buttons.forEach((b, i) => { b.disabled = true; if (i === correct) b.classList.add('correct'); if (i === selected && selected !== correct) b.classList.add('wrong'); });
+  updateLessonProgress();
+}
+
+// FIX 1: Fill-in-the-blank handler
+function answerFillBlank(btn, chosen, answer, slotId) {
+  const slot = document.getElementById(slotId);
+  const opts = btn.parentElement;
+  const buttons = opts.querySelectorAll('button');
+  buttons.forEach(b => b.disabled = true);
+  slot.textContent = chosen;
+  if (chosen === answer) {
+    slot.classList.add('correct');
+    btn.classList.add('correct');
+  } else {
+    slot.classList.add('wrong');
+    btn.classList.add('wrong');
+    buttons.forEach(b => { if (b.textContent === answer) b.classList.add('correct'); });
+  }
+  updateLessonProgress();
+}
+
+// FIX 3: Interactive match state
+let matchState = {};
+function selectMatchItem(el, mid, side, idx) {
+  if (el.classList.contains('matched') || el.classList.contains('disabled')) return;
+  if (!matchState[mid]) matchState[mid] = { left: null, right: null, matched: 0, total: 0 };
+  const ms = matchState[mid];
+  if (ms.total === 0) {
+    ms.total = document.querySelectorAll(`[id^="${mid}_l"]`).length;
+  }
+  // Clear previous selection on same side
+  if (ms[side] !== null) {
+    const prev = document.getElementById(`${mid}_${side[0]}${ms[side]}`);
+    if (prev) prev.classList.remove('selected');
+  }
+  ms[side] = idx;
+  el.classList.add('selected');
+  // Check if both sides selected
+  if (ms.left !== null && ms.right !== null) {
+    const leftEl = document.getElementById(`${mid}_l${ms.left}`);
+    const rightEl = document.getElementById(`${mid}_r${ms.right}`);
+    const leftPair = parseInt(leftEl.dataset.pair);
+    const rightPair = parseInt(rightEl.dataset.pair);
+    if (leftPair === rightPair) {
+      leftEl.classList.remove('selected');
+      rightEl.classList.remove('selected');
+      leftEl.classList.add('matched');
+      rightEl.classList.add('matched');
+      ms.matched++;
+      if (ms.matched === ms.total) {
+        const scoreEl = document.getElementById(`${mid}_score`);
+        if (scoreEl) { scoreEl.textContent = 'Tamamlandi!'; scoreEl.style.display = 'block'; }
+      }
+      updateLessonProgress();
+    } else {
+      leftEl.classList.add('wrong-flash');
+      rightEl.classList.add('wrong-flash');
+      setTimeout(() => {
+        leftEl.classList.remove('wrong-flash', 'selected');
+        rightEl.classList.remove('wrong-flash', 'selected');
+      }, 600);
+    }
+    ms.left = null;
+    ms.right = null;
+  }
+}
+
+// FIX 4 + FIX 9: Lesson progress tracking and score display
+function countLessonQuestions() {
+  let total = 0;
+  // quiz options (each quiz-options div = 1 question)
+  document.querySelectorAll('#lessonDetailView .quiz-options').forEach(() => total++);
+  // fill blank items
+  document.querySelectorAll('#lessonDetailView .fill-blank-item').forEach(() => total++);
+  // match containers (each match box = 1 exercise)
+  document.querySelectorAll('#lessonDetailView .match-container').forEach(() => total++);
+  return total;
+}
+
+function countAnsweredQuestions() {
+  let answered = 0;
+  // Quiz: check if any button is disabled in quiz-options
+  document.querySelectorAll('#lessonDetailView .quiz-options').forEach(qo => {
+    const btns = qo.querySelectorAll('.quiz-option');
+    if (btns.length > 0 && btns[0].disabled) answered++;
+  });
+  // Fill blank: check if slot has correct/wrong class
+  document.querySelectorAll('#lessonDetailView .fill-blank-item').forEach(fb => {
+    const slot = fb.querySelector('.blank-slot');
+    if (slot && (slot.classList.contains('correct') || slot.classList.contains('wrong'))) answered++;
+  });
+  // Match: check if all items matched
+  document.querySelectorAll('#lessonDetailView .match-container').forEach(mc => {
+    const box = mc.closest('.grammar-box');
+    const items = mc.querySelectorAll('.match-item');
+    const matched = mc.querySelectorAll('.match-item.matched');
+    if (items.length > 0 && matched.length === items.length) answered++;
+  });
+  return answered;
+}
+
+function countCorrectAnswers() {
+  let correct = 0;
+  document.querySelectorAll('#lessonDetailView .quiz-options').forEach(qo => {
+    const btns = qo.querySelectorAll('.quiz-option');
+    if (btns.length > 0 && btns[0].disabled) {
+      // Check if any button has both correct class and was actually selected (not just showing answer)
+      const wrongBtn = qo.querySelector('.quiz-option.wrong');
+      if (!wrongBtn) correct++;
+    }
+  });
+  document.querySelectorAll('#lessonDetailView .fill-blank-item').forEach(fb => {
+    const slot = fb.querySelector('.blank-slot');
+    if (slot && slot.classList.contains('correct')) correct++;
+  });
+  document.querySelectorAll('#lessonDetailView .match-container').forEach(mc => {
+    const items = mc.querySelectorAll('.match-item');
+    const matched = mc.querySelectorAll('.match-item.matched');
+    if (items.length > 0 && matched.length === items.length) correct++;
+  });
+  return correct;
+}
+
+function updateLessonProgress() {
+  const total = countLessonQuestions();
+  const answered = countAnsweredQuestions();
+  const correctCount = countCorrectAnswers();
+  // Update progress bar
+  const progressBar = document.getElementById('lessonProgressBar');
+  if (progressBar) {
+    const pct = total > 0 ? Math.round((answered / total) * 100) : 0;
+    progressBar.innerHTML = `<span>${answered}/${total} soru cevaplandi</span><div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>`;
+  }
+  // Enable/disable completion button
+  const completeBtn = document.getElementById('lessonCompleteBtn');
+  if (completeBtn) {
+    const threshold = Math.ceil(total * 0.7);
+    completeBtn.disabled = total > 0 && answered < threshold;
+    if (completeBtn.disabled) {
+      completeBtn.style.opacity = '0.5';
+      completeBtn.style.cursor = 'not-allowed';
+    } else {
+      completeBtn.style.opacity = '1';
+      completeBtn.style.cursor = 'pointer';
+    }
+  }
+  // FIX 9: Update score display
+  if (answered === total && total > 0) {
+    const scoreBox = document.getElementById('lessonScoreBox');
+    if (scoreBox) {
+      const pct = Math.round((correctCount / total) * 100);
+      const cls = pct >= 80 ? 'good' : pct >= 50 ? 'mid' : 'low';
+      scoreBox.innerHTML = `<div class="lesson-score-box"><div class="score-value ${cls}">Skor: ${correctCount}/${total} (${pct}%)</div><div class="score-label">${pct >= 80 ? 'Harika!' : pct >= 50 ? 'Iyi gidiyorsun!' : 'Biraz daha calis!'}</div></div>`;
+    }
+  }
 }
 
 function speakDialogueLines(id) {
   const l = getLesson(id);
   if (!l || !l.data.lines || !('speechSynthesis' in window)) return;
   let d = 0;
-  l.data.lines.forEach(x => { setTimeout(() => { const u = new SpeechSynthesisUtterance(x.en); u.lang = 'en-US'; u.rate = 0.8; speechSynthesis.speak(u); }, d); d += 3000; });
+  l.data.lines.forEach(x => { const enText = x.en || x.text; setTimeout(() => { const u = new SpeechSynthesisUtterance(enText); u.lang = 'en-US'; u.rate = 0.8; speechSynthesis.speak(u); }, d); d += 3000; });
 }
 
 function completeCurriculumLesson(id) {
