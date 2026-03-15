@@ -509,7 +509,11 @@ body::before {
   margin-bottom: 32px;
   border-bottom: 1px solid var(--border-1);
   padding-bottom: 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
 }
+.nav-tabs::-webkit-scrollbar { display: none; }
 .nav-tab {
   padding: 12px 20px;
   border: none;
@@ -527,6 +531,8 @@ body::before {
   margin-bottom: -1px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 .nav-tab:hover { color: var(--text-2); }
 .nav-tab.active {
@@ -1076,6 +1082,44 @@ body::before {
 .scenario-item .scenario-emoji { margin-right: 10px; }
 .scenario-item .scenario-desc { display: block; font-size: 11px; color: var(--text-4); margin-top: 3px; }
 
+/* ===== MISTAKE NOTEBOOK ===== */
+.mistake-card { background: var(--bg-card); border-radius: 12px; padding: 16px; margin-bottom: 12px; border-left: 4px solid var(--rose); }
+.mistake-card.mastered { border-left-color: var(--emerald); }
+.review-btn { padding: 12px 20px; border-radius: 10px; border: none; font-weight: 600; cursor: pointer; font-family: var(--font-body); font-size: 14px; transition: all 0.2s; }
+.review-btn.again { background: var(--rose); color: white; }
+.review-btn.hard { background: #f97316; color: white; }
+.review-btn.good { background: var(--amber); color: #1a1a2e; }
+.review-btn.easy { background: var(--emerald); color: #1a1a2e; }
+
+/* ===== XP SYSTEM ===== */
+.xp-toast { position: fixed; top: 20%; left: 50%; transform: translateX(-50%); background: var(--amber-glow); color: var(--amber); padding: 8px 20px; border-radius: 20px; font-weight: 700; animation: xpFloat 1.5s ease forwards; z-index: 9999; pointer-events: none; font-family: var(--font-mono); }
+@keyframes xpFloat { 0% { opacity:1; transform: translateX(-50%) translateY(0); } 100% { opacity:0; transform: translateX(-50%) translateY(-60px); } }
+.xp-bar { height: 8px; background: var(--border-1); border-radius: 4px; overflow: hidden; }
+.xp-bar-fill { height: 100%; background: linear-gradient(90deg, var(--amber), var(--emerald)); border-radius: 4px; transition: width 0.5s ease; }
+
+/* ===== WEAK AREAS ===== */
+.weak-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+.weak-card { padding: 16px; border-radius: 12px; text-align: center; background: var(--bg-card); border: 1px solid var(--border-1); }
+.weak-card.danger { border-color: var(--rose); }
+.weak-card.warning { border-color: var(--amber); }
+.weak-card.good { border-color: var(--emerald); }
+.weak-indicator { width: 48px; height: 48px; border-radius: 50%; margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+
+/* ===== DAILY CHALLENGE ===== */
+.challenge-card { background: linear-gradient(135deg, rgba(245,158,11,0.1), rgba(239,68,68,0.1)); border: 1px solid var(--amber); border-radius: 16px; padding: 20px; margin-bottom: 20px; }
+.challenge-timer { height: 4px; background: var(--border-1); border-radius: 2px; margin-bottom: 16px; }
+.challenge-timer-fill { height: 100%; background: var(--amber); border-radius: 2px; transition: width 1s linear; }
+.challenge-badge { display: inline-block; background: var(--amber); color: #1a1a2e; padding: 4px 12px; border-radius: 20px; font-weight: 700; font-size: 12px; }
+
+/* ===== BAND SCORE ESTIMATOR ===== */
+.band-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+.band-card { background: var(--bg-card); border-radius: 16px; padding: 20px; text-align: center; border: 1px solid var(--border-1); }
+.band-score { font-size: 36px; font-weight: 800; color: var(--amber); }
+.band-label { font-size: 12px; color: var(--text-4); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+.band-overall { font-size: 48px; font-weight: 900; background: linear-gradient(135deg, var(--amber), var(--emerald)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.readiness-bar { height: 12px; background: var(--border-1); border-radius: 6px; overflow: hidden; margin-top: 12px; }
+.readiness-fill { height: 100%; border-radius: 6px; transition: width 0.5s ease; }
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
   .auth-page { grid-template-columns: 1fr; }
@@ -1250,6 +1294,7 @@ body::before {
           <span id="streakTodayDot" style="width:8px;height:8px;border-radius:50%;margin-left:2px;"></span>
         </div>
         <div id="streakTodayHint" style="display:none;position:absolute;top:100%;right:0;margin-top:4px;background:var(--bg-card);border:1px solid var(--border-2);border-radius:8px;padding:6px 12px;font-size:11px;white-space:nowrap;z-index:10;"></div>
+        <div class="streak-pill" id="xpPill"><span>⭐</span> <span id="xpDisplay">0</span> XP</div>
         <div class="user-pill">
           <div class="user-av" id="userAvatar"></div>
           <span id="userName"></span>
@@ -1270,6 +1315,12 @@ body::before {
       </button>
       <button class="nav-tab" data-page="chat">
         <span class="icon">&#9998;</span><span class="label">Konuşma</span>
+      </button>
+      <button class="nav-tab" data-page="mistakes">
+        <span class="icon">📋</span><span class="label">Tekrar</span>
+      </button>
+      <button class="nav-tab" data-page="band">
+        <span class="icon">🏆</span><span class="label">IELTS Skor</span>
       </button>
     </div>
 
@@ -1332,6 +1383,30 @@ body::before {
         <div id="nextLessonsList"></div>
       </div>
 
+      <div id="dailyChallengeArea"></div>
+
+      <div class="card" id="xpDashCard" style="display:none;">
+        <div class="card-header">
+          <div class="card-title">Günlük XP</div>
+          <div class="card-badge" id="xpLevelBadge">Seviye 1</div>
+        </div>
+        <div style="margin-bottom:12px;">
+          <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--text-3);margin-bottom:6px;">
+            <span id="xpDailyText">0 / 100 XP</span>
+            <span id="xpDailyPct">0%</span>
+          </div>
+          <div class="xp-bar"><div class="xp-bar-fill" id="xpBarFill" style="width:0%"></div></div>
+        </div>
+        <div style="font-size:13px;color:var(--text-4);">Toplam: <span id="xpTotalDisplay" style="color:var(--amber);font-weight:600;">0</span> XP</div>
+      </div>
+
+      <div class="card" id="weakAreaCard" style="display:none;">
+        <div class="card-header">
+          <div class="card-title">Zayıf Alanlar</div>
+        </div>
+        <div id="weakAreaGrid"></div>
+      </div>
+
       <div class="card">
         <div class="card-header"><div class="card-title">Son Aktiviteler</div></div>
         <div id="activityLog" style="font-size:13px;color:var(--text-4);">
@@ -1381,6 +1456,16 @@ body::before {
           <button class="chat-send" id="chatSendBtn">&#8594;</button>
         </div>
       </div>
+    </div>
+
+    <!-- Mistakes / Review -->
+    <div class="page" id="page-mistakes">
+      <div id="mistakeArea"></div>
+    </div>
+
+    <!-- Band Score Estimator -->
+    <div class="page" id="page-band">
+      <div id="bandArea"></div>
     </div>
   </div>
 </div>
@@ -1571,11 +1656,11 @@ function enterApp() {
   document.getElementById('userName').textContent = u.name;
   document.getElementById('userAvatar').textContent = u.name.charAt(0).toUpperCase();
   document.getElementById('chatMessages').innerHTML = `<div class="msg ai">Merhaba ${u.name}! Ben senin İngilizce konuşma partnerin. Benimle İngilizce pratik yapabilirsin. Yanlış yaparsan düzeltirim, anlamadığın yerleri Türkçe açıklarım.<span class="turkish-help">Bir senaryo seçebilir veya doğrudan İngilizce yazmaya başlayabilirsin!</span></div>`;
-  showScreen('screen-app'); updateDashboard(); showModules(); saveState();
+  showScreen('screen-app'); loadXP(); updateDashboard(); showModules(); saveState();
 }
 
 // ==================== NAV ====================
-document.querySelectorAll('.nav-tab').forEach(tab => { tab.addEventListener('click', () => { document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active')); document.querySelectorAll('.page').forEach(p=>p.classList.remove('active')); tab.classList.add('active'); document.getElementById(`page-${tab.dataset.page}`).classList.add('active'); if(tab.dataset.page==='quiz')initQuizPage(); if(tab.dataset.page==='lessons')showModules(); }); });
+document.querySelectorAll('.nav-tab').forEach(tab => { tab.addEventListener('click', () => { document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active')); document.querySelectorAll('.page').forEach(p=>p.classList.remove('active')); tab.classList.add('active'); document.getElementById(`page-${tab.dataset.page}`).classList.add('active'); if(tab.dataset.page==='quiz')initQuizPage(); if(tab.dataset.page==='lessons')showModules(); if(tab.dataset.page==='mistakes')renderMistakeNotebook(); if(tab.dataset.page==='band')renderBandEstimator(); }); });
 
 // ==================== DASHBOARD ====================
 function updateDashboard() {
@@ -1650,6 +1735,11 @@ function updateDashboard() {
 // ==================== CURRICULUM NAVIGATION ====================
 let currentModuleId = null;
 let currentUnitId = null;
+let currentLessonId = null;
+let questionStartTime = 0;
+let mistakeCache = [];
+let xpState = { total: 0, daily: 0, goal: 100, level: 1 };
+let dailyChallengeState = null;
 
 function showModules() {
   document.getElementById('moduleListView').style.display = 'block';
@@ -1717,6 +1807,8 @@ function showUnitLessons(moduleId, unitId) {
 function openCurriculumLesson(id) {
   const l = getLesson(id);
   if (!l) return;
+  currentLessonId = id;
+  questionStartTime = Date.now();
   // FIX 2: Switch nav tab to Dersler (lessons)
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -1982,28 +2074,45 @@ function answerReadingQ(btn, selected, correct) {
   const parent = btn.parentElement;
   const buttons = parent.querySelectorAll('.quiz-option');
   buttons.forEach((b, i) => { b.disabled = true; if (i === correct) b.classList.add('correct'); if (i === selected && selected !== correct) b.classList.add('wrong'); });
+  const isCorrect = selected === correct;
   const wrapper = parent.closest('.grammar-box');
+  const qText = wrapper ? (wrapper.querySelector('p')?.textContent || '') : '';
   if (wrapper) {
     const fb = wrapper.querySelector('.quiz-feedback');
     if (fb && fb.dataset.explanation) {
-      fb.textContent = (selected === correct ? 'Dogru! ' : 'Yanlis. ') + fb.dataset.explanation;
-      fb.className = 'quiz-feedback show ' + (selected === correct ? 'correct-fb' : 'wrong-fb');
+      fb.textContent = (isCorrect ? 'Dogru! ' : 'Yanlis. ') + fb.dataset.explanation;
+      fb.className = 'quiz-feedback show ' + (isCorrect ? 'correct-fb' : 'wrong-fb');
     }
   }
+  if (isCorrect) { awardXP(10, 'correct_answer'); } else { recordMistake({ word: qText, correct_answer: buttons[correct]?.textContent, user_answer: buttons[selected]?.textContent, lesson_id: currentLessonId, module_id: currentModuleId, question_type: 'reading' }).catch(()=>{}); }
+  recordTopicStat(currentModuleId, currentUnitId, isCorrect, Date.now() - questionStartTime).catch(()=>{});
+  questionStartTime = Date.now();
   updateLessonProgress();
 }
 
 function answerTFQ(btn, selected, correct) {
   const parent = btn.parentElement;
   const buttons = parent.querySelectorAll('.quiz-option');
+  const isCorrect = selected === correct;
   buttons.forEach(b => { b.disabled = true; const val = b.textContent === 'True'; if (val === correct) b.classList.add('correct'); if (val === selected && selected !== correct) b.classList.add('wrong'); });
+  const wrapper = parent.closest('.grammar-box');
+  const qText = wrapper ? (wrapper.querySelector('p')?.textContent || '') : '';
+  if (isCorrect) { awardXP(10, 'correct_answer'); } else { recordMistake({ word: qText, correct_answer: String(correct), user_answer: String(selected), lesson_id: currentLessonId, module_id: currentModuleId, question_type: 'true_false' }).catch(()=>{}); }
+  recordTopicStat(currentModuleId, currentUnitId, isCorrect, Date.now() - questionStartTime).catch(()=>{});
+  questionStartTime = Date.now();
   updateLessonProgress();
 }
 
 function answerExQ(btn, selected, correct) {
   const parent = btn.parentElement;
   const buttons = parent.querySelectorAll('.quiz-option');
+  const isCorrect = selected === correct;
   buttons.forEach((b, i) => { b.disabled = true; if (i === correct) b.classList.add('correct'); if (i === selected && selected !== correct) b.classList.add('wrong'); });
+  const wrapper = parent.closest('.grammar-box');
+  const qText = wrapper ? (wrapper.querySelector('p')?.textContent || '') : '';
+  if (isCorrect) { awardXP(10, 'correct_answer'); } else { recordMistake({ word: qText, correct_answer: buttons[correct]?.textContent, user_answer: buttons[selected]?.textContent, lesson_id: currentLessonId, module_id: currentModuleId, question_type: 'quiz' }).catch(()=>{}); }
+  recordTopicStat(currentModuleId, currentUnitId, isCorrect, Date.now() - questionStartTime).catch(()=>{});
+  questionStartTime = Date.now();
   updateLessonProgress();
 }
 
@@ -2014,14 +2123,21 @@ function answerFillBlank(btn, chosen, answer, slotId) {
   const buttons = opts.querySelectorAll('button');
   buttons.forEach(b => b.disabled = true);
   slot.textContent = chosen;
-  if (chosen === answer) {
+  const isCorrect = chosen === answer;
+  if (isCorrect) {
     slot.classList.add('correct');
     btn.classList.add('correct');
+    awardXP(10, 'correct_answer');
   } else {
     slot.classList.add('wrong');
     btn.classList.add('wrong');
     buttons.forEach(b => { if (b.textContent === answer) b.classList.add('correct'); });
+    const wrapper = opts.closest('.grammar-box') || opts.closest('.fill-blank-item');
+    const sentence = wrapper ? (wrapper.querySelector('.fill-blank-sentence')?.textContent || '') : '';
+    recordMistake({ word: sentence, correct_answer: answer, user_answer: chosen, lesson_id: currentLessonId, module_id: currentModuleId, question_type: 'fillBlank' }).catch(()=>{});
   }
+  recordTopicStat(currentModuleId, currentUnitId, isCorrect, Date.now() - questionStartTime).catch(()=>{});
+  questionStartTime = Date.now();
   updateLessonProgress();
 }
 
@@ -2053,6 +2169,9 @@ function selectMatchItem(el, mid, side, idx) {
       leftEl.classList.add('matched');
       rightEl.classList.add('matched');
       ms.matched++;
+      awardXP(10, 'correct_answer');
+      recordTopicStat(currentModuleId, currentUnitId, true, Date.now() - questionStartTime).catch(()=>{});
+      questionStartTime = Date.now();
       if (ms.matched === ms.total) {
         const scoreEl = document.getElementById(`${mid}_score`);
         if (scoreEl) { scoreEl.textContent = 'Tamamlandi!'; scoreEl.style.display = 'block'; }
@@ -2061,6 +2180,9 @@ function selectMatchItem(el, mid, side, idx) {
     } else {
       leftEl.classList.add('wrong-flash');
       rightEl.classList.add('wrong-flash');
+      recordMistake({ word: leftEl.textContent, correct_answer: '(match)', user_answer: rightEl.textContent, lesson_id: currentLessonId, module_id: currentModuleId, question_type: 'match' }).catch(()=>{});
+      recordTopicStat(currentModuleId, currentUnitId, false, Date.now() - questionStartTime).catch(()=>{});
+      questionStartTime = Date.now();
       setTimeout(() => {
         leftEl.classList.remove('wrong-flash', 'selected');
         rightEl.classList.remove('wrong-flash', 'selected');
@@ -2176,6 +2298,11 @@ function completeCurriculumLesson(id) {
     if (l && l.type === 'vocabulary' && l.data.words) { state.wordsLearned = (state.wordsLearned || 0) + l.data.words.length; }
     addActivity(`"${l?.title || id}" tamamland\u0131`);
     apiFetch('/progress', { method: 'POST', body: JSON.stringify({ type: 'lesson', data: { lessonId: id, section: 'complete' } }) }).catch(() => {});
+    // XP award: 50 base + 100 bonus for perfect score
+    const totalQ = countLessonQuestions();
+    const correctQ = countCorrectAnswers();
+    const isPerfect = totalQ > 0 && correctQ === totalQ;
+    awardXP(isPerfect ? 150 : 50, 'lesson_complete', id);
   }
   if (currentUnitId) showUnitLessons(currentModuleId, currentUnitId);
   else showModules();
@@ -2228,14 +2355,14 @@ function initQuizPage() {
   // Weighted shuffle: higher priority questions appear more often
   cQuiz.sort((a, b) => (b.priority - a.priority) + (Math.random() - 0.5) * 4);
   cQuiz = cQuiz.slice(0, 10);
-  qIdx = 0; qOk = 0; showQ();
+  qIdx = 0; qOk = 0; questionStartTime = Date.now(); showQ();
 }
 function showQ() { const a=document.getElementById('quizArea');
   if(qIdx>=cQuiz.length){const p=Math.round((qOk/cQuiz.length)*100);const sc=p>=80?'good':p>=50?'mid':'low';const msg=p>=80?'Harika!':p>=50?'Fena değil, gelişiyorsun!':'Biraz daha pratik gerekiyor';state.quizScores.push(p);addActivity(`Quiz tamamlandı: %${p}`);apiFetch('/progress',{method:'POST',body:JSON.stringify({type:'quiz',data:{lessonId:0,score:qOk,total:cQuiz.length}})}).catch(()=>{});a.innerHTML=`<div class="quiz-result"><div class="score ${sc}">%${p}</div><div class="message">${msg}</div><p style="font-size:14px;color:var(--text-4);margin-bottom:28px;">${qOk}/${cQuiz.length} doğru</p><button class="btn btn-primary" onclick="initQuizPage()">Tekrar Dene</button></div>`;return;}
   const q=cQuiz[qIdx];const p=Math.round((qIdx/cQuiz.length)*100);
   a.innerHTML=`<div class="quiz-progress"><div class="quiz-progress-bar"><div class="quiz-progress-fill" style="width:${p}%"></div></div><div class="quiz-progress-text">${qIdx+1}/${cQuiz.length}</div></div><div class="quiz-question"><div class="q-label">Soru ${qIdx+1}</div><div class="q-text">${q.q}</div></div><div class="quiz-options">${q.opts.map((o,i)=>`<button class="quiz-option" onclick="ansQ(${i},${q.correct})">${o}</button>`).join('')}</div><div class="quiz-feedback" id="quizFeedback"></div>`;
 }
-function ansQ(s,c) { const opts=document.querySelectorAll('.quiz-option'),fb=document.getElementById('quizFeedback'); opts.forEach((o,i)=>{o.disabled=true;if(i===c)o.classList.add('correct');if(i===s&&s!==c)o.classList.add('wrong');}); if(s===c){qOk++;fb.textContent='Doğru!';fb.className='quiz-feedback show correct-fb';}else{fb.textContent=`Yanlış! Doğru cevap: ${cQuiz[qIdx].opts[c]}`;fb.className='quiz-feedback show wrong-fb';} setTimeout(()=>{qIdx++;showQ();},1500); }
+function ansQ(s,c) { const opts=document.querySelectorAll('.quiz-option'),fb=document.getElementById('quizFeedback'); opts.forEach((o,i)=>{o.disabled=true;if(i===c)o.classList.add('correct');if(i===s&&s!==c)o.classList.add('wrong');}); const isCorrect=s===c; if(isCorrect){qOk++;fb.textContent='Doğru!';fb.className='quiz-feedback show correct-fb';awardXP(10,'correct_answer');}else{fb.textContent=`Yanlış! Doğru cevap: ${cQuiz[qIdx].opts[c]}`;fb.className='quiz-feedback show wrong-fb';recordMistake({word:cQuiz[qIdx].q,correct_answer:cQuiz[qIdx].opts[c],user_answer:cQuiz[qIdx].opts[s],lesson_id:cQuiz[qIdx].lessonId,module_id:currentModuleId,question_type:'quiz'}).catch(()=>{});} recordTopicStat(currentModuleId,currentUnitId,isCorrect,Date.now()-questionStartTime).catch(()=>{}); questionStartTime=Date.now(); setTimeout(()=>{qIdx++;showQ();},1500); }
 
 // ==================== CHAT ====================
 let chatH=[],curScen=null;
@@ -2249,6 +2376,517 @@ async function sendAI(msg,isSys=false){addTyping();document.getElementById('chat
 document.getElementById('chatSendBtn').addEventListener('click',sendUser);
 document.getElementById('chatInput').addEventListener('keydown',(e)=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendUser();}});
 function sendUser(){const inp=document.getElementById('chatInput');const t=inp.value.trim();if(!t)return;inp.value='';addMsg('user',t);addActivity('Konuşma pratiği yapıldı');sendAI(t);}
+
+// ==================== FEATURE: MISTAKE NOTEBOOK + SM-2 ====================
+async function recordMistake(data) {
+  const entry = { ...data, timestamp: Date.now(), ease_factor: 2.5, interval: 1, repetitions: 0 };
+  mistakeCache.push(entry);
+  apiFetch('/mistakes', { method: 'POST', body: JSON.stringify(data) }).catch(() => {});
+}
+
+async function recordTopicStat(moduleId, unitId, isCorrect, responseMs) {
+  apiFetch('/topic-stats', { method: 'POST', body: JSON.stringify({ module_id: moduleId, unit_id: unitId, is_correct: isCorrect, response_ms: responseMs }) }).catch(() => {});
+}
+
+function renderMistakeNotebook() {
+  const area = document.getElementById('mistakeArea');
+  if (mistakeCache.length === 0) {
+    area.innerHTML = `<div class="card"><div class="card-header"><div class="card-title">Hata Defteri</div></div><div style="text-align:center;padding:40px;color:var(--text-4);"><p style="font-size:48px;margin-bottom:16px;">📋</p><p>Henüz bir hata kaydedilmedi.</p><p style="font-size:13px;margin-top:8px;">Ders ve quiz çözdükçe hatalı cevapların burada görünecek.</p></div></div>`;
+    return;
+  }
+  // Group by module
+  const grouped = {};
+  mistakeCache.forEach(m => {
+    const key = m.module_id || 'Genel';
+    if (!grouped[key]) grouped[key] = [];
+    grouped[key].push(m);
+  });
+  let html = `<div class="card"><div class="card-header"><div class="card-title">Hata Defteri</div><div class="card-badge">${mistakeCache.length} hata</div></div>`;
+  html += `<button class="btn btn-primary" style="width:100%;margin-bottom:20px;" onclick="startReviewSession()">Tekrar Oturumu Başlat</button>`;
+  for (const [mod, items] of Object.entries(grouped)) {
+    const modObj = typeof MODULES !== 'undefined' ? MODULES.find(m => m.id === mod) : null;
+    html += `<h4 style="color:var(--amber-light);font-size:14px;margin:16px 0 8px;">${modObj ? modObj.icon + ' ' + modObj.title : mod}</h4>`;
+    items.forEach(m => {
+      const isMastered = m.ease_factor >= 3.5;
+      html += `<div class="mistake-card${isMastered ? ' mastered' : ''}">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div style="font-size:14px;font-weight:600;color:var(--text-1);max-width:70%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${m.word || ''}</div>
+          <span style="font-size:11px;color:${isMastered ? 'var(--emerald)' : 'var(--rose)'};font-family:var(--font-mono);">${isMastered ? 'Öğrenildi' : 'Tekrar gerekli'}</span>
+        </div>
+        <div style="font-size:12px;color:var(--text-4);margin-top:6px;">Doğru: <span style="color:var(--emerald);">${m.correct_answer || ''}</span> | Senin cevabın: <span style="color:var(--rose);">${m.user_answer || ''}</span></div>
+      </div>`;
+    });
+  }
+  html += `</div>`;
+  area.innerHTML = html;
+}
+
+async function startReviewSession() {
+  // Fetch due items or use cache
+  let dueItems = mistakeCache.filter(m => m.ease_factor < 3.5);
+  try {
+    const resp = await apiFetch('/mistakes?due=true');
+    if (resp && resp.length > 0) dueItems = resp;
+  } catch(e) {}
+  if (dueItems.length === 0) {
+    const area = document.getElementById('mistakeArea');
+    area.innerHTML = `<div class="card" style="text-align:center;padding:40px;"><p style="font-size:48px;margin-bottom:16px;">🎉</p><h3 style="color:var(--emerald);margin-bottom:8px;">Tüm tekrarlar tamamlandı!</h3><p style="color:var(--text-4);">Şu an tekrar edilecek öğe yok. Harika gidiyorsun!</p></div>`;
+    return;
+  }
+  let reviewIdx = 0;
+  let reviewCorrect = 0;
+  const showReviewCard = () => {
+    if (reviewIdx >= dueItems.length) {
+      awardXP(30, 'review_complete');
+      const area = document.getElementById('mistakeArea');
+      area.innerHTML = `<div class="card" style="text-align:center;padding:40px;"><p style="font-size:48px;margin-bottom:16px;">✅</p><h3 style="color:var(--emerald);margin-bottom:8px;">Tekrar Tamamlandı! +30 XP</h3><p style="color:var(--text-3);">${reviewCorrect}/${dueItems.length} doğru hatırlandı</p><button class="btn btn-primary" style="margin-top:16px;" onclick="renderMistakeNotebook()">Hata Defterine Dön</button></div>`;
+      return;
+    }
+    const item = dueItems[reviewIdx];
+    const area = document.getElementById('mistakeArea');
+    area.innerHTML = `<div class="card"><div class="card-header"><div class="card-title">Tekrar Oturumu</div><div class="card-badge">${reviewIdx + 1}/${dueItems.length}</div></div>
+      <div style="text-align:center;padding:20px;">
+        <div style="font-size:11px;color:var(--text-4);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Soru</div>
+        <div style="font-family:var(--font-display);font-size:22px;font-weight:600;margin-bottom:12px;">${item.word || ''}</div>
+        <div style="font-size:13px;color:var(--text-4);margin-bottom:24px;">Doğru cevap: <strong style="color:var(--emerald);">${item.correct_answer || ''}</strong></div>
+        <div style="font-size:13px;color:var(--text-3);margin-bottom:20px;">Bu soruyu ne kadar iyi hatırlıyorsun?</div>
+        <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+          <button class="review-btn again" onclick="rateReview(0)">Tekrar (0)</button>
+          <button class="review-btn hard" onclick="rateReview(3)">Zor (3)</button>
+          <button class="review-btn good" onclick="rateReview(4)">İyi (4)</button>
+          <button class="review-btn easy" onclick="rateReview(5)">Kolay (5)</button>
+        </div>
+      </div></div>`;
+  };
+  window.rateReview = (quality) => {
+    const item = dueItems[reviewIdx];
+    if (quality >= 3) reviewCorrect++;
+    // SM-2 update
+    if (quality >= 3) {
+      item.ease_factor = Math.max(1.3, item.ease_factor + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02)));
+      item.repetitions = (item.repetitions || 0) + 1;
+      item.interval = item.repetitions === 1 ? 1 : item.repetitions === 2 ? 6 : Math.round((item.interval || 1) * item.ease_factor);
+    } else {
+      item.repetitions = 0;
+      item.interval = 1;
+    }
+    // Update in cache
+    const cacheIdx = mistakeCache.findIndex(m => m.word === item.word && m.lesson_id === item.lesson_id);
+    if (cacheIdx >= 0) Object.assign(mistakeCache[cacheIdx], item);
+    apiFetch('/mistakes', { method: 'PUT', body: JSON.stringify({ word: item.word, quality, ease_factor: item.ease_factor, interval: item.interval, repetitions: item.repetitions }) }).catch(() => {});
+    reviewIdx++;
+    showReviewCard();
+  };
+  showReviewCard();
+}
+
+// ==================== FEATURE: XP SYSTEM ====================
+async function loadXP() {
+  try {
+    const data = await apiFetch('/xp');
+    if (data) {
+      xpState.total = data.total || 0;
+      xpState.daily = data.daily || 0;
+      xpState.goal = data.goal || 100;
+      xpState.level = data.level || Math.floor(xpState.total / 500) + 1;
+    }
+  } catch(e) {}
+  updateXPDisplay();
+}
+
+async function awardXP(amount, reason, sourceId) {
+  xpState.total += amount;
+  xpState.daily += amount;
+  xpState.level = Math.floor(xpState.total / 500) + 1;
+  updateXPDisplay();
+  showXPToast(amount);
+  apiFetch('/xp', { method: 'POST', body: JSON.stringify({ amount, reason, source_id: sourceId }) }).catch(() => {});
+}
+
+function updateXPDisplay() {
+  const xpDisp = document.getElementById('xpDisplay');
+  if (xpDisp) xpDisp.textContent = xpState.total;
+  const xpCard = document.getElementById('xpDashCard');
+  if (xpCard) {
+    xpCard.style.display = 'block';
+    const pct = Math.min(100, Math.round((xpState.daily / xpState.goal) * 100));
+    document.getElementById('xpDailyText').textContent = `${xpState.daily} / ${xpState.goal} XP`;
+    document.getElementById('xpDailyPct').textContent = `${pct}%`;
+    document.getElementById('xpBarFill').style.width = `${pct}%`;
+    document.getElementById('xpLevelBadge').textContent = `Seviye ${xpState.level}`;
+    document.getElementById('xpTotalDisplay').textContent = xpState.total;
+  }
+}
+
+function showXPToast(amount) {
+  const toast = document.createElement('div');
+  toast.className = 'xp-toast';
+  toast.textContent = `+${amount} XP`;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 1600);
+}
+
+// ==================== FEATURE: WEAK AREA DASHBOARD ====================
+async function loadWeakAreas() {
+  const card = document.getElementById('weakAreaCard');
+  if (!card) return;
+  let stats = [];
+  try {
+    const resp = await apiFetch('/topic-stats');
+    if (resp && Array.isArray(resp)) stats = resp;
+  } catch(e) {}
+  if (stats.length === 0 && typeof MODULES !== 'undefined') {
+    // Generate from local state
+    stats = MODULES.map(m => ({
+      module_id: m.id,
+      title: m.title,
+      icon: m.icon,
+      total: 0,
+      correct: 0,
+      error_rate: 0
+    }));
+  }
+  renderWeakAreas(stats);
+}
+
+function renderWeakAreas(stats) {
+  const card = document.getElementById('weakAreaCard');
+  const grid = document.getElementById('weakAreaGrid');
+  if (!card || !grid) return;
+  if (!stats || stats.length === 0) { card.style.display = 'none'; return; }
+  card.style.display = 'block';
+  // Compute error rate per module
+  const moduleStats = {};
+  if (typeof MODULES !== 'undefined') {
+    MODULES.forEach(m => { moduleStats[m.id] = { title: m.title, icon: m.icon, total: 0, correct: 0 }; });
+  }
+  stats.forEach(s => {
+    const key = s.module_id;
+    if (moduleStats[key]) {
+      moduleStats[key].total += (s.total || 0);
+      moduleStats[key].correct += (s.correct || 0);
+    } else {
+      moduleStats[key] = { title: s.title || key, icon: s.icon || '📚', total: s.total || 0, correct: s.correct || 0 };
+    }
+  });
+  const entries = Object.entries(moduleStats).filter(([, v]) => v.total > 0);
+  if (entries.length === 0) {
+    grid.innerHTML = '<div style="font-size:13px;color:var(--text-4);padding:8px 0;">Henüz yeterli veri yok. Derslerden soru çözdükçe burada analizler görünecek.</div>';
+    return;
+  }
+  let html = '<div class="weak-grid">';
+  entries.sort((a, b) => (a[1].correct / Math.max(1, a[1].total)) - (b[1].correct / Math.max(1, b[1].total)));
+  entries.forEach(([, v]) => {
+    const accuracy = v.total > 0 ? Math.round((v.correct / v.total) * 100) : 0;
+    const cls = accuracy < 50 ? 'danger' : accuracy < 75 ? 'warning' : 'good';
+    const indicatorBg = accuracy < 50 ? 'var(--rose-glow)' : accuracy < 75 ? 'var(--amber-glow)' : 'var(--emerald-glow)';
+    html += `<div class="weak-card ${cls}">
+      <div class="weak-indicator" style="background:${indicatorBg};">${v.icon}</div>
+      <div style="font-size:13px;font-weight:600;margin-bottom:4px;">${v.title}</div>
+      <div style="font-family:var(--font-mono);font-size:18px;font-weight:700;color:${accuracy < 50 ? 'var(--rose)' : accuracy < 75 ? 'var(--amber)' : 'var(--emerald)'};">%${accuracy}</div>
+      <div style="font-size:11px;color:var(--text-4);">${v.total} soru</div>
+    </div>`;
+  });
+  html += '</div>';
+  html += `<button class="btn btn-secondary" style="width:100%;margin-top:12px;" onclick="startWeakAreaPractice()">Zayıf Alanları Çalış</button>`;
+  grid.innerHTML = html;
+}
+
+async function startWeakAreaPractice() {
+  // Collect questions from worst modules
+  const weakModules = [];
+  if (typeof MODULES !== 'undefined') {
+    MODULES.forEach(m => {
+      const units = typeof UNITS !== 'undefined' ? (UNITS[m.id] || []) : [];
+      let total = 0, correct = 0;
+      units.forEach(u => {
+        const lessons = typeof UNIT_LESSONS !== 'undefined' ? (UNIT_LESSONS[u.id] || []) : [];
+        lessons.forEach(lid => { if (state?.lessonsCompleted?.includes(lid)) total++; });
+      });
+      weakModules.push({ id: m.id, ratio: total });
+    });
+  }
+  weakModules.sort((a, b) => a.ratio - b.ratio);
+  // Switch to quiz tab with weak area focus
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const quizTab = document.querySelector('.nav-tab[data-page="quiz"]');
+  if (quizTab) quizTab.classList.add('active');
+  document.getElementById('page-quiz').classList.add('active');
+  initQuizPage();
+}
+
+// ==================== FEATURE: DAILY CHALLENGE ====================
+async function loadDailyChallenge() {
+  try {
+    const resp = await apiFetch('/daily-challenge');
+    if (resp) dailyChallengeState = resp;
+  } catch(e) {}
+  renderDailyChallengeCard();
+}
+
+function renderDailyChallengeCard() {
+  const area = document.getElementById('dailyChallengeArea');
+  if (!area) return;
+  const today = new Date().toDateString();
+  const isDone = dailyChallengeState && dailyChallengeState.date === today && dailyChallengeState.completed;
+  if (isDone) {
+    area.innerHTML = `<div class="challenge-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div style="font-size:16px;font-weight:700;">🏆 Günlük Meydan Okuma</div>
+        <span class="challenge-badge">Tamamlandı</span>
+      </div>
+      <div style="font-size:14px;color:var(--text-3);">Bugünkü skor: <strong style="color:var(--amber);">${dailyChallengeState.score}/${dailyChallengeState.total}</strong></div>
+    </div>`;
+  } else {
+    area.innerHTML = `<div class="challenge-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div style="font-size:16px;font-weight:700;">🏆 Günlük Meydan Okuma</div>
+        <span class="challenge-badge">5 Soru · 2x XP</span>
+      </div>
+      <p style="font-size:13px;color:var(--text-3);margin-bottom:16px;">Her gün 5 karışık soru çöz, zayıf alanlarından ağırlıklı. Zamana karşı yarış!</p>
+      <button class="btn btn-primary btn-full" onclick="startDailyChallenge()">Başlat</button>
+    </div>`;
+  }
+}
+
+function startDailyChallenge() {
+  // Generate 5 mixed questions from curriculum
+  let questions = [];
+  const allLessonIds = typeof LESSON_DATA !== 'undefined' ? Object.keys(LESSON_DATA) : [];
+  const pool = [];
+  allLessonIds.forEach(lid => {
+    try {
+      const l = typeof getLesson === 'function' ? getLesson(lid) : null;
+      if (!l || !l.data) return;
+      if (l.data.exercises) {
+        l.data.exercises.forEach(ex => {
+          if (ex.type === 'quiz' && ex.items) {
+            ex.items.forEach(q => pool.push({ q: q.q, opts: q.opts, correct: q.correct, lessonId: lid }));
+          }
+        });
+      }
+      if (l.data.questions) {
+        l.data.questions.forEach(q => { if (q.opts) pool.push({ q: q.q, opts: q.opts, correct: q.correct, lessonId: lid }); });
+      }
+    } catch(e) {}
+  });
+  // Shuffle and pick 5
+  for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
+  questions = pool.slice(0, 5);
+  if (questions.length === 0) {
+    document.getElementById('dailyChallengeArea').innerHTML = `<div class="challenge-card"><p style="color:var(--text-4);text-align:center;">Yeterli soru bulunamadı. Önce birkaç ders tamamla!</p></div>`;
+    return;
+  }
+  let chIdx = 0, chCorrect = 0, chTimerInterval = null;
+  const chStartTime = Date.now();
+
+  const renderChallengeQ = () => {
+    if (chIdx >= questions.length) {
+      if (chTimerInterval) clearInterval(chTimerInterval);
+      const timeTaken = Math.round((Date.now() - chStartTime) / 1000);
+      completeDailyChallenge(chCorrect, questions.length, timeTaken);
+      return;
+    }
+    const q = questions[chIdx];
+    const area = document.getElementById('dailyChallengeArea');
+    let timeLeft = 60;
+    area.innerHTML = `<div class="challenge-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <div style="font-size:14px;font-weight:700;">Soru ${chIdx + 1}/${questions.length}</div>
+        <div style="font-family:var(--font-mono);font-size:13px;color:var(--amber);" id="chTimer">${timeLeft}s</div>
+      </div>
+      <div class="challenge-timer"><div class="challenge-timer-fill" id="chTimerBar" style="width:100%"></div></div>
+      <div style="font-family:var(--font-display);font-size:20px;font-weight:600;text-align:center;margin:20px 0;">${q.q}</div>
+      <div class="quiz-options" id="chOpts">${q.opts.map((o, i) => `<button class="quiz-option" onclick="answerChallenge(${i},${q.correct})">${o}</button>`).join('')}</div>
+    </div>`;
+    if (chTimerInterval) clearInterval(chTimerInterval);
+    chTimerInterval = setInterval(() => {
+      timeLeft--;
+      const timerEl = document.getElementById('chTimer');
+      const barEl = document.getElementById('chTimerBar');
+      if (timerEl) timerEl.textContent = `${timeLeft}s`;
+      if (barEl) barEl.style.width = `${(timeLeft / 60) * 100}%`;
+      if (timeLeft <= 0) {
+        clearInterval(chTimerInterval);
+        // Auto-skip
+        chIdx++;
+        renderChallengeQ();
+      }
+    }, 1000);
+  };
+
+  window.answerChallenge = (selected, correct) => {
+    if (chTimerInterval) clearInterval(chTimerInterval);
+    const opts = document.querySelectorAll('#chOpts .quiz-option');
+    const isCorrect = selected === correct;
+    opts.forEach((o, i) => { o.disabled = true; if (i === correct) o.classList.add('correct'); if (i === selected && selected !== correct) o.classList.add('wrong'); });
+    if (isCorrect) chCorrect++;
+    setTimeout(() => { chIdx++; renderChallengeQ(); }, 1000);
+  };
+  renderChallengeQ();
+}
+
+async function completeDailyChallenge(score, total, timeTaken) {
+  const today = new Date().toDateString();
+  dailyChallengeState = { date: today, completed: true, score, total, timeTaken };
+  // Award 2x XP
+  awardXP(score * 20, 'daily_challenge');
+  addActivity(`Günlük meydan okuma: ${score}/${total}`);
+  apiFetch('/daily-challenge', { method: 'POST', body: JSON.stringify({ score, total, time_taken: timeTaken }) }).catch(() => {});
+  const area = document.getElementById('dailyChallengeArea');
+  const pct = Math.round((score / total) * 100);
+  area.innerHTML = `<div class="challenge-card" style="text-align:center;">
+    <p style="font-size:48px;margin-bottom:12px;">🎯</p>
+    <h3 style="margin-bottom:8px;">Günlük Meydan Okuma Tamamlandı!</h3>
+    <div style="font-family:var(--font-mono);font-size:36px;font-weight:700;color:${pct >= 80 ? 'var(--emerald)' : pct >= 50 ? 'var(--amber)' : 'var(--rose)'};">${score}/${total}</div>
+    <p style="color:var(--text-3);margin:8px 0;">Süre: ${timeTaken} saniye</p>
+    <p style="color:var(--amber);font-weight:600;">+${score * 20} XP kazanıldı! (2x bonus)</p>
+  </div>`;
+}
+
+// ==================== FEATURE: BAND SCORE ESTIMATOR ====================
+function accuracyToBand(acc) {
+  if (acc >= 95) return 8.0;
+  if (acc >= 90) return 7.5;
+  if (acc >= 85) return 7.0;
+  if (acc >= 75) return 6.5;
+  if (acc >= 65) return 6.0;
+  if (acc >= 55) return 5.5;
+  if (acc >= 45) return 5.0;
+  if (acc >= 35) return 4.5;
+  return 4.0;
+}
+
+function renderBandGauge(label, score, target) {
+  const pct = Math.min(100, (score / 9) * 100);
+  const targetPct = Math.min(100, (target / 9) * 100);
+  const radius = 40;
+  const circumference = Math.PI * radius;
+  const offset = circumference - (pct / 100) * circumference;
+  const color = score >= target ? 'var(--emerald)' : score >= target - 0.5 ? 'var(--amber)' : 'var(--rose)';
+  return `<div class="band-card">
+    <div class="band-label">${label}</div>
+    <svg width="100" height="60" viewBox="0 0 100 60" style="margin:0 auto 8px;">
+      <path d="M 10 55 A 40 40 0 0 1 90 55" fill="none" stroke="var(--border-1)" stroke-width="6" stroke-linecap="round"/>
+      <path d="M 10 55 A 40 40 0 0 1 90 55" fill="none" stroke="${color}" stroke-width="6" stroke-linecap="round"
+        stroke-dasharray="${circumference}" stroke-dashoffset="${offset}" style="transition:stroke-dashoffset 1s ease;"/>
+    </svg>
+    <div class="band-score">${score.toFixed(1)}</div>
+    <div style="font-size:11px;color:var(--text-4);margin-top:4px;">Hedef: ${target}</div>
+  </div>`;
+}
+
+async function renderBandEstimator() {
+  const area = document.getElementById('bandArea');
+  const target = parseFloat(currentUser?.plan?.targetBand || '6.0');
+  // Compute accuracy from topic stats per IELTS section
+  const sectionModules = {
+    'Listening': 'ielts-listening',
+    'Reading': 'ielts-reading',
+    'Writing': 'ielts-writing',
+    'Speaking': 'ielts-speaking'
+  };
+  let sectionScores = {};
+  let hasData = false;
+
+  // Try from API
+  try {
+    const stats = await apiFetch('/topic-stats');
+    if (stats && Array.isArray(stats)) {
+      for (const [label, modId] of Object.entries(sectionModules)) {
+        const modStats = stats.filter(s => s.module_id === modId);
+        const total = modStats.reduce((a, s) => a + (s.total || 0), 0);
+        const correct = modStats.reduce((a, s) => a + (s.correct || 0), 0);
+        const acc = total > 0 ? (correct / total) * 100 : 0;
+        sectionScores[label] = { accuracy: acc, band: accuracyToBand(acc), total };
+        if (total > 0) hasData = true;
+      }
+    }
+  } catch(e) {}
+
+  // Fallback: compute from lesson completion
+  if (!hasData && typeof MODULES !== 'undefined' && typeof UNITS !== 'undefined' && typeof UNIT_LESSONS !== 'undefined') {
+    for (const [label, modId] of Object.entries(sectionModules)) {
+      const units = UNITS[modId] || [];
+      let totalLessons = 0, completedLessons = 0;
+      units.forEach(u => {
+        const lessons = UNIT_LESSONS[u.id] || [];
+        totalLessons += lessons.length;
+        lessons.forEach(lid => { if (state?.lessonsCompleted?.includes(lid)) completedLessons++; });
+      });
+      const acc = totalLessons > 0 ? (completedLessons / totalLessons) * 100 : 0;
+      sectionScores[label] = { accuracy: acc, band: accuracyToBand(acc), total: totalLessons };
+    }
+  }
+
+  const bands = Object.values(sectionScores).map(s => s.band);
+  const overallBand = bands.length > 0 ? (bands.reduce((a, b) => a + b, 0) / bands.length) : 4.0;
+  const overallRounded = Math.round(overallBand * 2) / 2;
+  const readiness = Math.min(100, Math.round((overallRounded / target) * 100));
+  const readinessColor = readiness >= 90 ? 'var(--emerald)' : readiness >= 70 ? 'var(--amber)' : 'var(--rose)';
+
+  let html = `<div class="card">
+    <div class="card-header"><div class="card-title">IELTS Band Skor Tahmini</div></div>
+    <div style="text-align:center;margin-bottom:24px;">
+      <div class="band-label">Tahmini Genel Skor</div>
+      <div class="band-overall">${overallRounded.toFixed(1)}</div>
+      <div style="font-size:13px;color:var(--text-4);margin-top:4px;">Hedef: Band ${target}</div>
+    </div>
+    <div class="band-grid">`;
+  for (const [label, data] of Object.entries(sectionScores)) {
+    html += renderBandGauge(label, data.band, target);
+  }
+  html += `</div>
+    <div style="margin-top:24px;">
+      <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--text-3);margin-bottom:6px;">
+        <span>Hazırlık Durumu</span>
+        <span style="color:${readinessColor};font-weight:600;">%${readiness}</span>
+      </div>
+      <div class="readiness-bar"><div class="readiness-fill" style="width:${readiness}%;background:${readinessColor};"></div></div>
+    </div>
+    <div style="margin-top:20px;display:grid;grid-template-columns:1fr 1fr;gap:12px;">`;
+  for (const [label, data] of Object.entries(sectionScores)) {
+    const diff = data.band - target;
+    const statusColor = diff >= 0 ? 'var(--emerald)' : diff >= -0.5 ? 'var(--amber)' : 'var(--rose)';
+    const statusText = diff >= 0 ? 'Hedefte' : diff >= -0.5 ? 'Yakın' : 'Geliştirilmeli';
+    html += `<div style="background:var(--bg-primary);border:1px solid var(--border-1);border-radius:10px;padding:12px;">
+      <div style="font-size:12px;color:var(--text-4);margin-bottom:4px;">${label}</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-family:var(--font-mono);font-weight:700;font-size:18px;">${data.band.toFixed(1)}</span>
+        <span style="font-size:11px;color:${statusColor};font-weight:600;">${statusText}</span>
+      </div>
+    </div>`;
+  }
+  html += `</div>
+    <button class="btn btn-secondary" style="width:100%;margin-top:16px;" onclick="saveBandSnapshot()">Skor Anlık Görüntüsü Kaydet</button>
+  </div>`;
+  area.innerHTML = html;
+}
+
+async function saveBandSnapshot() {
+  try {
+    await apiFetch('/band-estimate', { method: 'POST', body: JSON.stringify({ timestamp: Date.now() }) });
+    showXPToast(0);
+    const btn = document.querySelector('#bandArea .btn-secondary');
+    if (btn) { btn.textContent = 'Kaydedildi!'; btn.style.color = 'var(--emerald)'; setTimeout(() => { btn.textContent = 'Skor Anlık Görüntüsü Kaydet'; btn.style.color = ''; }, 2000); }
+  } catch(e) {}
+}
+
+// Update dashboard to include new features
+let _dashExtrasLoaded = false;
+const _origUpdateDashboard = updateDashboard;
+updateDashboard = function() {
+  _origUpdateDashboard();
+  updateXPDisplay();
+  if (!_dashExtrasLoaded) {
+    _dashExtrasLoaded = true;
+    loadDailyChallenge();
+    loadWeakAreas();
+    // Reset flag after 30s to allow refresh
+    setTimeout(() => { _dashExtrasLoaded = false; }, 30000);
+  }
+};
 
 // ==================== ENTER KEY ====================
 document.getElementById('loginPassword').addEventListener('keydown',(e)=>{if(e.key==='Enter')handleLogin();});
