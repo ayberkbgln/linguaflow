@@ -3219,3 +3219,162 @@ function countTotalLessons() {
   }
   return count;
 }
+
+// ==================== QUIZ BANK ====================
+// Ayrı quiz havuzu — derslerdeki sorulardan farklı, çeşitli sorular
+// Her soru: { q, opts, correct, level, module, tag? }
+const QUIZ_BANK = [
+  // ===== FOUNDATIONS (A1) =====
+  { q:"'I ___ a student.' cümlesinde boşluğa ne gelir?", opts:["am","is","are","be"], correct:0, level:"A1", module:"foundations" },
+  { q:"'She ___ from Turkey.' cümlesini tamamlayın.", opts:["are","is","am","be"], correct:1, level:"A1", module:"foundations" },
+  { q:"'We ___ happy.' cümlesinde doğru fiil hangisi?", opts:["is","am","are","be"], correct:2, level:"A1", module:"foundations" },
+  { q:"'There ___ two cats on the table.' boşluğa ne gelir?", opts:["is","are","has","have"], correct:1, level:"A1", module:"foundations" },
+  { q:"Hangi cümle doğrudur?", opts:["He don't like coffee.","He doesn't likes coffee.","He doesn't like coffee.","He not like coffee."], correct:2, level:"A1", module:"foundations" },
+  { q:"'beautiful' kelimesinin Türkçe karşılığı nedir?", opts:["çirkin","güzel","büyük","küçük"], correct:1, level:"A1", module:"foundations" },
+  { q:"'How ___ are you?' — Yaşını sormak için hangi kelime kullanılır?", opts:["much","many","old","long"], correct:2, level:"A1", module:"foundations" },
+  { q:"'My brother ___ tall.' cümlesinde boşluğa ne gelir?", opts:["are","am","is","be"], correct:2, level:"A1", module:"foundations" },
+  { q:"Haftanın günlerinden hangisi İngilizce'de doğru yazılmıştır?", opts:["Wensday","Wendsday","Wednesday","Wednseday"], correct:2, level:"A1", module:"foundations" },
+  { q:"'I have two ___.' — İki çocuk için doğru olan nedir?", opts:["childs","childrens","child","children"], correct:3, level:"A1", module:"foundations" },
+  { q:"'Can I have ___ water, please?' boşluğa ne gelir?", opts:["a","an","some","many"], correct:2, level:"A1", module:"foundations" },
+  { q:"'What time ___ it?' sorusunu tamamlayın.", opts:["are","is","do","does"], correct:1, level:"A1", module:"foundations" },
+  { q:"'kitchen' ne demektir?", opts:["yatak odası","banyo","mutfak","salon"], correct:2, level:"A1", module:"foundations" },
+  { q:"'I ___ breakfast at 8 o'clock.' cümlesinde doğru fiil?", opts:["has","have","having","haves"], correct:1, level:"A1", module:"foundations" },
+  { q:"'This is ___ umbrella.' boşluğa ne gelir?", opts:["a","an","the","—"], correct:1, level:"A1", module:"foundations" },
+
+  // ===== DAILY LIFE (A2) =====
+  { q:"'I usually ___ to work by bus.' cümlesini tamamlayın.", opts:["going","goes","go","gone"], correct:2, level:"A2", module:"daily-life" },
+  { q:"'She ___ cooking right now.' — Şu anda yapıyor, hangi form?", opts:["is","are","am","does"], correct:0, level:"A2", module:"daily-life" },
+  { q:"'How much ___ these shoes?' boşluğa ne gelir?", opts:["is","are","does","do"], correct:1, level:"A2", module:"daily-life" },
+  { q:"'I went to the supermarket ___ buy some milk.' boşluğa ne gelir?", opts:["for","to","at","in"], correct:1, level:"A2", module:"daily-life" },
+  { q:"'Could you ___ me the way to the station?' boşluğa ne gelir?", opts:["say","talk","tell","speak"], correct:2, level:"A2", module:"daily-life" },
+  { q:"'I ___ my homework yesterday.' — Geçmiş zaman formu?", opts:["do","did","done","does"], correct:1, level:"A2", module:"daily-life" },
+  { q:"'Turn left ___ the traffic lights.' boşluğa ne gelir?", opts:["in","on","at","to"], correct:2, level:"A2", module:"daily-life" },
+  { q:"'receipt' kelimesinin anlamı nedir?", opts:["tarif","fiş/makbuz","resepsiyon","reçete"], correct:1, level:"A2", module:"daily-life" },
+  { q:"'I ___ TV when the phone rang.' hangi zaman kullanılır?", opts:["watch","watched","was watching","am watching"], correct:2, level:"A2", module:"daily-life" },
+  { q:"'Would you like ___ cup of tea?' boşluğa ne gelir?", opts:["a","an","the","some"], correct:0, level:"A2", module:"daily-life" },
+  { q:"'She has ___ been to London.' — Hiç gitmedi anlamında?", opts:["ever","never","already","yet"], correct:1, level:"A2", module:"daily-life" },
+  { q:"'I'm looking ___ my keys. Have you seen them?' boşluğa?", opts:["at","after","for","up"], correct:2, level:"A2", module:"daily-life" },
+  { q:"'He arrived ___ Monday morning.' boşluğa ne gelir?", opts:["in","at","on","to"], correct:2, level:"A2", module:"daily-life" },
+  { q:"'convenient' kelimesinin anlamı nedir?", opts:["geleneksel","uygun/elverişli","ikna edici","güvenilir"], correct:1, level:"A2", module:"daily-life" },
+  { q:"'I ___ to the gym three times a week.' doğru fiil?", opts:["goes","going","go","am go"], correct:2, level:"A2", module:"daily-life" },
+
+  // ===== SOCIAL (B1) =====
+  { q:"'If I ___ rich, I would travel the world.' boşluğa ne gelir?", opts:["am","was","were","will be"], correct:2, level:"B1", module:"social" },
+  { q:"'She suggested ___ a movie.' boşluğa ne gelir?", opts:["watch","watching","to watch","watched"], correct:1, level:"B1", module:"social" },
+  { q:"'I wish I ___ speak French fluently.' boşluğa ne gelir?", opts:["can","could","would","should"], correct:1, level:"B1", module:"social" },
+  { q:"'despite' kelimesinin anlamı nedir?", opts:["...den dolayı","...e rağmen","...e göre","bundan başka"], correct:1, level:"B1", module:"social" },
+  { q:"'The movie was ___ boring that I fell asleep.' boşluğa?", opts:["too","so","such","very"], correct:1, level:"B1", module:"social" },
+  { q:"'He's been working here ___ 2015.' boşluğa ne gelir?", opts:["for","since","from","during"], correct:1, level:"B1", module:"social" },
+  { q:"'I'm used to ___ early.' boşluğa ne gelir?", opts:["wake","waking","woke","waken"], correct:1, level:"B1", module:"social" },
+  { q:"'reluctant' kelimesinin anlamı nedir?", opts:["isteksiz","ilgili","güvenilir","sabırsız"], correct:0, level:"B1", module:"social" },
+  { q:"'He ___ have left already. His car isn't here.' boşluğa?", opts:["can","should","must","would"], correct:2, level:"B1", module:"social" },
+  { q:"'I'd rather ___ at home tonight.' boşluğa ne gelir?", opts:["staying","to stay","stay","stayed"], correct:2, level:"B1", module:"social" },
+  { q:"'Run into' deyiminin anlamı nedir?", opts:["koşarak girmek","tesadüfen karşılaşmak","kaçmak","takip etmek"], correct:1, level:"B1", module:"social" },
+  { q:"'The exam was much harder ___ I expected.' boşluğa?", opts:["that","than","then","as"], correct:1, level:"B1", module:"social" },
+  { q:"'I haven't seen her ___ last Monday.' boşluğa?", opts:["for","from","since","during"], correct:2, level:"B1", module:"social" },
+  { q:"'break the ice' deyiminin anlamı nedir?", opts:["buzları kırmak (fiziksel)","ortamı yumuşatmak","soğuk davranmak","zor duruma düşmek"], correct:1, level:"B1", module:"social" },
+  { q:"'You ___ told me earlier!' (keşke söyleseydin) boşluğa?", opts:["must have","could have","should have","would have"], correct:2, level:"B1", module:"social" },
+
+  // ===== ACADEMIC (B2) =====
+  { q:"'Furthermore' kelimesinin akademik metinde işlevi nedir?", opts:["Zıtlık belirtir","Ek bilgi ekler","Sonuç belirtir","Örnek verir"], correct:1, level:"B2", module:"academic" },
+  { q:"'The results ___ that the hypothesis was correct.' boşluğa?", opts:["indicated","indicating","indicate to","indicates at"], correct:0, level:"B2", module:"academic" },
+  { q:"'phenomenon' kelimesinin çoğul hali nedir?", opts:["phenomenons","phenomenas","phenomena","phenomenies"], correct:2, level:"B2", module:"academic" },
+  { q:"Akademik yazıda hangi ifade tercih edilir?", opts:["I think this is wrong.","This appears to be inaccurate.","This is totally wrong.","Everyone knows this is wrong."], correct:1, level:"B2", module:"academic" },
+  { q:"'criterion' kelimesinin çoğul hali nedir?", opts:["criterions","criterias","criteria","criteriums"], correct:2, level:"B2", module:"academic" },
+  { q:"'Nevertheless' ne anlama gelir?", opts:["Bunun yanında","Buna rağmen/yine de","Sonuç olarak","Örneğin"], correct:1, level:"B2", module:"academic" },
+  { q:"'The data ___ collected over a period of six months.' boşluğa?", opts:["was","were","is","has"], correct:1, level:"B2", module:"academic" },
+  { q:"Paragraf başında 'On the other hand' kullanıldığında ne yapılır?", opts:["Özet verilir","Zıt görüş sunulur","Örnek verilir","Sonuç çıkarılır"], correct:1, level:"B2", module:"academic" },
+  { q:"'analyse' kelimesinin isim hali nedir?", opts:["analysion","analysment","analysis","analyser"], correct:2, level:"B2", module:"academic" },
+  { q:"Akademik yazıda 'In conclusion' ne zaman kullanılır?", opts:["Giriş paragrafında","Gelişme paragrafında","Sonuç paragrafında","Her yerde"], correct:2, level:"B2", module:"academic" },
+
+  // ===== IELTS READING (B1-B2) =====
+  { q:"[IELTS Reading] 'Skimming' tekniği ne için kullanılır?", opts:["Detaylı bilgi bulmak","Genel fikir edinmek","Belirli kelime aramak","Yazarın tonunu anlamak"], correct:1, level:"B1", module:"ielts-reading", tag:"IELTS" },
+  { q:"[IELTS Reading] 'Scanning' tekniği ne için kullanılır?", opts:["Genel anlam çıkarmak","Spesifik bilgi/kelime bulmak","Paragraf özetlemek","Yazar fikrini anlamak"], correct:1, level:"B1", module:"ielts-reading", tag:"IELTS" },
+  { q:"[IELTS Reading] True/False/Not Given sorularında 'Not Given' ne demektir?", opts:["Bilgi yanlış","Bilgi doğru ama eksik","Metinde bu bilgi hiç yok","Bilgi belirsiz"], correct:2, level:"B1", module:"ielts-reading", tag:"IELTS" },
+  { q:"[IELTS Reading] Matching headings sorusunda ilk ne yapmalısınız?", opts:["Tüm metni okumak","Her paragrafın ilk ve son cümlesini okumak","Heading listesini ezberlemek","Rastgele eşleştirmek"], correct:1, level:"B1", module:"ielts-reading", tag:"IELTS" },
+  { q:"[IELTS Reading] 'Paraphrase' ne demektir?", opts:["Kelimesi kelimesine çeviri","Aynı anlamı farklı kelimelerle ifade etme","Metni kısaltma","Yeni bilgi ekleme"], correct:1, level:"B2", module:"ielts-reading", tag:"IELTS" },
+  { q:"[IELTS Reading] Bir paragrafta 'topic sentence' genelde nerededir?", opts:["Ortada","Sonda","Başta","Değişir, kuralı yok"], correct:2, level:"B1", module:"ielts-reading", tag:"IELTS" },
+  { q:"[IELTS Reading] 'However' gördüğünüzde ne beklemelisiniz?", opts:["Ek bilgi","Zıt/karşıt bir fikir","Bir örnek","Bir sonuç"], correct:1, level:"B1", module:"ielts-reading", tag:"IELTS" },
+  { q:"[IELTS Reading] Summary completion sorusunda kelime sınırına dikkat etmezseniz ne olur?", opts:["Yarım puan alırsınız","Puan kazanamazsınız","Sınav iptal olur","Fark etmez"], correct:1, level:"B1", module:"ielts-reading", tag:"IELTS" },
+
+  // ===== IELTS WRITING (B1-B2) =====
+  { q:"[IELTS Writing] Task 1'de grafik tanımlarken hangi zaman kullanılır?", opts:["Present continuous","Present simple veya past simple","Future tense","Present perfect"], correct:1, level:"B1", module:"ielts-writing", tag:"IELTS" },
+  { q:"[IELTS Writing] Task 2'de kaç kelime yazmalısınız?", opts:["En az 150","En az 200","En az 250","En az 300"], correct:2, level:"B1", module:"ielts-writing", tag:"IELTS" },
+  { q:"[IELTS Writing] 'Firstly, Secondly, Finally' ne tür bağlaçlardır?", opts:["Zıtlık bağlaçları","Sıralama bağlaçları","Neden-sonuç bağlaçları","Karşılaştırma bağlaçları"], correct:1, level:"B1", module:"ielts-writing", tag:"IELTS" },
+  { q:"[IELTS Writing] Task 2'de 'discuss both views' sorusunda ne yapmalısınız?", opts:["Sadece kendi görüşünüzü yazın","Her iki tarafı da tartışıp kendi görüşünüzü belirtin","Sadece bir tarafı savunun","Tarafsız kalın"], correct:1, level:"B2", module:"ielts-writing", tag:"IELTS" },
+  { q:"[IELTS Writing] Hangi ifade akademik yazıda uygun DEĞİLDİR?", opts:["It is widely believed that...","Research suggests that...","I reckon that...","Evidence indicates that..."], correct:2, level:"B2", module:"ielts-writing", tag:"IELTS" },
+  { q:"[IELTS Writing] 'whereas' ne tür bir bağlaçtır?", opts:["Ekleme","Karşılaştırma/zıtlık","Neden","Sonuç"], correct:1, level:"B1", module:"ielts-writing", tag:"IELTS" },
+  { q:"[IELTS Writing] Task 1'de kendi fikrinizi belirtmeli misiniz?", opts:["Evet, mutlaka","Hayır, sadece verileri raporlayın","Bazen","Sonuç paragrafında"], correct:1, level:"B1", module:"ielts-writing", tag:"IELTS" },
+  { q:"[IELTS Writing] 'a significant increase' ne demektir?", opts:["Küçük bir düşüş","Önemli bir artış","Sabit kalma","Dalgalanma"], correct:1, level:"B1", module:"ielts-writing", tag:"IELTS" },
+
+  // ===== IELTS LISTENING (B1-B2) =====
+  { q:"[IELTS Listening] Section 1 genelde ne hakkındadır?", opts:["Akademik ders","Günlük diyalog (rezervasyon, kayıt vb.)","Grup tartışması","Monolog"], correct:1, level:"B1", module:"ielts-listening", tag:"IELTS" },
+  { q:"[IELTS Listening] Cevabınızda spelling hatası yaparsanız ne olur?", opts:["Yarım puan","Sıfır puan","Kabul edilir","Sınava bağlı"], correct:1, level:"B1", module:"ielts-listening", tag:"IELTS" },
+  { q:"[IELTS Listening] 'Distractor' nedir?", opts:["Doğru cevap","Yanlış yönlendiren bilgi","Soru tekrarı","Ek bilgi"], correct:1, level:"B1", module:"ielts-listening", tag:"IELTS" },
+  { q:"[IELTS Listening] Section 4 genelde ne hakkındadır?", opts:["Telefon görüşmesi","İki kişi arası diyalog","Akademik monolog/ders","Grup çalışması"], correct:2, level:"B2", module:"ielts-listening", tag:"IELTS" },
+  { q:"[IELTS Listening] Form completion sorusunda büyük/küçük harf önemli mi?", opts:["Evet, çok önemli","Hayır, önemli değil","Sadece isimler için","Sadece ülkeler için"], correct:1, level:"B1", module:"ielts-listening", tag:"IELTS" },
+  { q:"[IELTS Listening] 'signpost words' (yön gösteren kelimeler) ne işe yarar?", opts:["Konunun değiştiğini gösterir","Soru numarasını belirtir","Doğru cevabı verir","Zaman kazandırır"], correct:0, level:"B1", module:"ielts-listening", tag:"IELTS" },
+
+  // ===== IELTS SPEAKING (B1-C1) =====
+  { q:"[IELTS Speaking] Part 2'de ne kadar konuşmalısınız?", opts:["30 saniye","1 dakika","1-2 dakika","3-4 dakika"], correct:2, level:"B1", module:"ielts-speaking", tag:"IELTS" },
+  { q:"[IELTS Speaking] Part 2'de size ne verilir?", opts:["Bir soru listesi","Bir konu kartı (cue card)","Bir metin","Bir resim"], correct:1, level:"B1", module:"ielts-speaking", tag:"IELTS" },
+  { q:"[IELTS Speaking] Fluency (akıcılık) puanını ne düşürür?", opts:["Uzun cevaplar","Doğal duraklamalar","Uzun ve sık 'umm/ahh' kullanımı","Bağlaç kullanmak"], correct:2, level:"B1", module:"ielts-speaking", tag:"IELTS" },
+  { q:"[IELTS Speaking] 'I'd say that...' ne tür bir ifadedir?", opts:["Kesin yargı","Yumuşatılmış fikir ifadesi","Soru sorma","Özür dileme"], correct:1, level:"B1", module:"ielts-speaking", tag:"IELTS" },
+  { q:"[IELTS Speaking] Part 3'te ne tür sorular gelir?", opts:["Kişisel sorular","Soyut/tartışma soruları","Günlük rutinler","Aile hakkında"], correct:1, level:"B2", module:"ielts-speaking", tag:"IELTS" },
+  { q:"[IELTS Speaking] Bilmediğiniz bir kelimeyi hatırlayamadığınızda ne yapmalısınız?", opts:["Sessiz kalın","Türkçe söyleyin","Farklı kelimelerle açıklayın (paraphrase)","Soruyu geçin"], correct:2, level:"B1", module:"ielts-speaking", tag:"IELTS" },
+
+  // ===== TURKISH-SPECIFIC ERRORS (all levels) =====
+  { q:"Türkçe'de cinsiyet farkı yoktur. Doğru olan hangisi?", opts:["He is a doctor. (kadın için)","She is a doctor. (kadın için)","It is a doctor. (kadın için)","They is a doctor. (kadın için)"], correct:1, level:"A1", module:"foundations", tag:"TR" },
+  { q:"Türkler sık karıştırır: 'I am agree with you.' Doğrusu?", opts:["I am agree with you.","I agree with you.","I do agree to you.","I am agreeing you."], correct:1, level:"A2", module:"foundations", tag:"TR" },
+  { q:"Türkçe'de article yoktur. Doğru olan hangisi?", opts:["I want to be engineer.","I want to be a engineer.","I want to be an engineer.","I want to be the engineer."], correct:2, level:"A1", module:"foundations", tag:"TR" },
+  { q:"'He/She' yerine Türkler genelde ne yapar?", opts:["Doğru kullanır","Her zaman 'he' der","Her zaman 'it' der","Karıştırır, çünkü Türkçe'de 'o' hem erkek hem kadın"], correct:3, level:"A1", module:"foundations", tag:"TR" },
+  { q:"'I am living in Istanbul since 2010.' Doğrusu?", opts:["I am living in Istanbul since 2010.","I live in Istanbul since 2010.","I have been living in Istanbul since 2010.","I was living in Istanbul since 2010."], correct:2, level:"B1", module:"social", tag:"TR" },
+  { q:"'He said me that...' Doğru olan hangisi?", opts:["He said me that...","He told to me that...","He told me that...","He said to me to that..."], correct:2, level:"A2", module:"daily-life", tag:"TR" },
+  { q:"Türkçe söz dizimi SOV'dir. İngilizce'de doğru sıra?", opts:["I the book read.","I read the book.","The book I read.","Read I the book."], correct:1, level:"A1", module:"foundations", tag:"TR" },
+  { q:"'information' kelimesi sayılabilir mi?", opts:["Evet: informations","Hayır: information (sayılamaz)","İkisi de olur","Sadece çoğulda"], correct:1, level:"A2", module:"foundations", tag:"TR" },
+  { q:"'I didn't went there.' Doğrusu?", opts:["I didn't went there.","I didn't go there.","I don't went there.","I not go there."], correct:1, level:"A1", module:"foundations", tag:"TR" },
+  { q:"'make' ve 'do' farkı: 'Hata yapmak' nasıl denir?", opts:["do a mistake","make a mistake","have a mistake","take a mistake"], correct:1, level:"A2", module:"daily-life", tag:"TR" },
+  { q:"'I'm afraid ___ spiders.' boşluğa ne gelir?", opts:["from","of","about","with"], correct:1, level:"A2", module:"social", tag:"TR" },
+  { q:"Türkçe'de 'var/yok' yapısı İngilizce'de nasıl karşılanır?", opts:["It has a book on the table.","There is a book on the table.","A book has on the table.","On the table has a book."], correct:1, level:"A1", module:"foundations", tag:"TR" },
+];
+
+// Get quiz bank questions filtered by user level and completed modules
+function getQuizBankQuestions(userLevel, completedLessonIds, weakAreas) {
+  const levelMap = {1:'A1',2:'A2',3:'B1',4:'B2',5:'C1'};
+  const targetLevel = levelMap[userLevel] || 'A2';
+  const levelOrder = ['A0','A1','A2','B1','B2','C1'];
+  const targetIdx = levelOrder.indexOf(targetLevel);
+
+  // Determine which modules user has seen
+  const seenModules = new Set();
+  (completedLessonIds || []).forEach(lid => {
+    const l = LESSON_DATA[lid] ? LESSON_DATA[lid]() : null;
+    if (l && l.unitId) {
+      for (const modId in UNITS) {
+        if ((UNITS[modId] || []).some(u => u.id === l.unitId)) {
+          seenModules.add(modId);
+          break;
+        }
+      }
+    }
+  });
+
+  // Weak area module mapping
+  const weakModules = new Set();
+  const wMap = {listening:['ielts-listening'],reading:['ielts-reading'],writing:['ielts-writing','academic'],speaking:['ielts-speaking'],vocabulary:['foundations','daily-life','social'],grammar:['foundations','daily-life']};
+  (weakAreas || []).forEach(wa => (wMap[wa]||[]).forEach(m => weakModules.add(m)));
+
+  // Filter and score questions
+  return QUIZ_BANK
+    .filter(q => {
+      const qIdx = levelOrder.indexOf(q.level);
+      return qIdx <= targetIdx + 1; // Allow one level above target
+    })
+    .map(q => {
+      let priority = levelOrder.indexOf(q.level) + 1;
+      if (weakModules.has(q.module)) priority += 3;
+      if (seenModules.has(q.module)) priority += 1;
+      if (q.tag === 'TR') priority += 2; // Turkish-specific errors are always high priority
+      return { ...q, priority };
+    });
+}

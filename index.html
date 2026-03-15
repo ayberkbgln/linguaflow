@@ -3029,39 +3029,22 @@ function initQuizPage() {
   cQuiz = [];
   const completedIds = state?.lessonsCompleted || [];
   const userLevel = currentUser?.plan?.level || 2;
-  // Determine which lessons to pull questions from
-  let lessonIds;
-  if (completedIds.length > 0) {
-    lessonIds = completedIds;
-  } else {
-    // No completed lessons: use lessons matching user level
-    const levelMap = {1:'A1',2:'A2',3:'B1',4:'B2',5:'C1'};
-    const targetLevel = levelMap[userLevel] || 'A2';
-    const allIds = Object.keys(LESSON_DATA);
-    lessonIds = allIds.filter(id => {
-      const l = LESSON_DATA[id]();
-      return l.level === targetLevel || l.level === 'B1';
-    }).slice(0, 10);
-    if (lessonIds.length === 0) lessonIds = allIds.slice(0, 5);
-  }
-  // Collect quiz questions with priority scoring
-  const levelPriority = {'A0':1,'A1':2,'A2':3,'B1':4,'B2':5,'C1':6};
   const weakAreas = currentUser?.plan?.weakAreas || [];
-  const weakModules = new Set();
-  const wMap = {listening:['ielts-listening'],reading:['ielts-reading'],writing:['ielts-writing','academic'],speaking:['ielts-speaking'],vocabulary:['foundations','daily-life','social'],grammar:['foundations','daily-life']};
-  weakAreas.forEach(wa => (wMap[wa]||[]).forEach(m => weakModules.add(m)));
 
-  lessonIds.forEach(lid => {
-    const l = getLesson(lid);
-    if (!l || !l.data) return;
-    const lessonLevel = levelPriority[l.level] || 3;
-    // Calculate priority: higher level + weak area = higher priority
-    let priority = lessonLevel;
-    const unitModule = MODULES.find(m => (UNITS[m.id]||[]).some(u => u.id === l.unitId));
-    if (unitModule && weakModules.has(unitModule.id)) priority += 3;
-    if (l.data.exercises) { l.data.exercises.forEach(ex => { if (ex.type === 'quiz' && ex.items) { ex.items.forEach(q => cQuiz.push({ q: q.q, opts: q.opts, correct: q.correct, lessonId: lid, priority })); } }); }
-    if (l.data.questions) { l.data.questions.forEach(q => { if (q.opts) { cQuiz.push({ q: q.q, opts: q.opts, correct: q.correct, lessonId: lid, priority }); } }); }
+  // Use dedicated QUIZ_BANK (separate from lesson exercises)
+  const bankQuestions = getQuizBankQuestions(userLevel, completedIds, weakAreas);
+
+  bankQuestions.forEach(q => {
+    cQuiz.push({
+      q: q.q,
+      opts: q.opts,
+      correct: q.correct,
+      module: q.module,
+      tag: q.tag || null,
+      priority: q.priority
+    });
   });
+
   if (cQuiz.length === 0) { a.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-4);">Henüz quiz sorusu yok. Önce birkaç ders tamamla!</div>'; return; }
   // Weighted shuffle: higher priority questions appear more often
   cQuiz.sort((a, b) => (b.priority - a.priority) + (Math.random() - 0.5) * 4);
@@ -3071,7 +3054,8 @@ function initQuizPage() {
 function showQ() { const a=document.getElementById('quizArea');
   if(qIdx>=cQuiz.length){const p=Math.round((qOk/cQuiz.length)*100);const sc=p>=80?'good':p>=50?'mid':'low';const msg=p>=80?'Harika!':p>=50?'Fena değil, gelişiyorsun!':'Biraz daha pratik gerekiyor';state.quizScores.push(p);addActivity(`Quiz tamamlandı: %${p}`);apiFetch('/progress',{method:'POST',body:JSON.stringify({type:'quiz',data:{lessonId:0,score:qOk,total:cQuiz.length}})}).catch(()=>{});a.innerHTML=`<div class="quiz-result"><div class="score ${sc}">%${p}</div><div class="message">${msg}</div><p style="font-size:14px;color:var(--text-4);margin-bottom:28px;">${qOk}/${cQuiz.length} doğru</p><button class="btn btn-primary" onclick="initQuizPage()">Tekrar Dene</button></div>`;return;}
   const q=cQuiz[qIdx];const p=Math.round((qIdx/cQuiz.length)*100);
-  a.innerHTML=`<div class="quiz-progress"><div class="quiz-progress-bar"><div class="quiz-progress-fill" style="width:${p}%"></div></div><div class="quiz-progress-text">${qIdx+1}/${cQuiz.length}</div></div><div class="quiz-question"><div class="q-label">Soru ${qIdx+1}</div><div class="q-text">${q.q}</div></div><div class="quiz-options">${q.opts.map((o,i)=>`<button class="quiz-option" onclick="ansQ(${i},${q.correct})">${o}</button>`).join('')}</div><div class="quiz-feedback" id="quizFeedback"></div>`;
+  const tagBadge = q.tag === 'IELTS' ? '<span style="display:inline-block;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;font-size:11px;padding:2px 8px;border-radius:12px;margin-bottom:8px;">IELTS</span> ' : q.tag === 'TR' ? '<span style="display:inline-block;background:linear-gradient(135deg,#e53e3e,#c53030);color:#fff;font-size:11px;padding:2px 8px;border-radius:12px;margin-bottom:8px;">Türkçe Hata</span> ' : '';
+  a.innerHTML=`<div class="quiz-progress"><div class="quiz-progress-bar"><div class="quiz-progress-fill" style="width:${p}%"></div></div><div class="quiz-progress-text">${qIdx+1}/${cQuiz.length}</div></div><div class="quiz-question"><div class="q-label">Soru ${qIdx+1}</div>${tagBadge}<div class="q-text">${q.q}</div></div><div class="quiz-options">${q.opts.map((o,i)=>`<button class="quiz-option" onclick="ansQ(${i},${q.correct})">${o}</button>`).join('')}</div><div class="quiz-feedback" id="quizFeedback"></div>`;
 }
 function ansQ(s,c) { const opts=document.querySelectorAll('.quiz-option'),fb=document.getElementById('quizFeedback'); opts.forEach((o,i)=>{o.disabled=true;if(i===c)o.classList.add('correct');if(i===s&&s!==c)o.classList.add('wrong');}); const isCorrect=s===c; if(isCorrect){qOk++;fb.textContent='Doğru!';fb.className='quiz-feedback show correct-fb';awardXP(10,'correct_answer');}else{fb.textContent=`Yanlış! Doğru cevap: ${cQuiz[qIdx].opts[c]}`;fb.className='quiz-feedback show wrong-fb';recordMistake({word:cQuiz[qIdx].q,correct_answer:cQuiz[qIdx].opts[c],user_answer:cQuiz[qIdx].opts[s],lesson_id:cQuiz[qIdx].lessonId,module_id:currentModuleId,question_type:'quiz'}).catch(()=>{});} recordTopicStat(currentModuleId,currentUnitId,isCorrect,Date.now()-questionStartTime).catch(()=>{}); questionStartTime=Date.now(); setTimeout(()=>{qIdx++;showQ();},1500); }
 
