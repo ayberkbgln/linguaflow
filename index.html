@@ -2545,11 +2545,11 @@ function sendUser(){const inp=document.getElementById('chatInput');const t=inp.v
 async function recordMistake(data) {
   const entry = { ...data, timestamp: Date.now(), ease_factor: 2.5, interval: 1, repetitions: 0 };
   mistakeCache.push(entry);
-  apiFetch('/mistakes', { method: 'POST', body: JSON.stringify(data) }).catch(() => {});
+  apiFetch('/stats?type=mistakes', { method: 'POST', body: JSON.stringify(data) }).catch(() => {});
 }
 
 async function recordTopicStat(moduleId, unitId, isCorrect, responseMs) {
-  apiFetch('/topic-stats', { method: 'POST', body: JSON.stringify({ module_id: moduleId, unit_id: unitId, is_correct: isCorrect, response_ms: responseMs }) }).catch(() => {});
+  apiFetch('/stats?type=topic-stats', { method: 'POST', body: JSON.stringify({ module_id: moduleId, unit_id: unitId, is_correct: isCorrect, response_ms: responseMs }) }).catch(() => {});
 }
 
 function renderMistakeNotebook() {
@@ -2589,7 +2589,7 @@ async function startReviewSession() {
   // Fetch due items or use cache
   let dueItems = mistakeCache.filter(m => m.ease_factor < 3.5);
   try {
-    const resp = await apiFetch('/mistakes?due=true');
+    const resp = await apiFetch('/stats?type=mistakes&due=true');
     if (resp && resp.length > 0) dueItems = resp;
   } catch(e) {}
   if (dueItems.length === 0) {
@@ -2637,7 +2637,7 @@ async function startReviewSession() {
     // Update in cache
     const cacheIdx = mistakeCache.findIndex(m => m.word === item.word && m.lesson_id === item.lesson_id);
     if (cacheIdx >= 0) Object.assign(mistakeCache[cacheIdx], item);
-    apiFetch('/mistakes', { method: 'PUT', body: JSON.stringify({ word: item.word, quality, ease_factor: item.ease_factor, interval: item.interval, repetitions: item.repetitions }) }).catch(() => {});
+    apiFetch('/stats?type=mistakes', { method: 'PUT', body: JSON.stringify({ word: item.word, quality, ease_factor: item.ease_factor, interval: item.interval, repetitions: item.repetitions }) }).catch(() => {});
     reviewIdx++;
     showReviewCard();
   };
@@ -2647,7 +2647,7 @@ async function startReviewSession() {
 // ==================== FEATURE: XP SYSTEM ====================
 async function loadXP() {
   try {
-    const data = await apiFetch('/xp');
+    const data = await apiFetch('/stats?type=xp');
     if (data) {
       xpState.total = data.total || 0;
       xpState.daily = data.daily || 0;
@@ -2664,7 +2664,7 @@ async function awardXP(amount, reason, sourceId) {
   xpState.level = Math.floor(xpState.total / 500) + 1;
   updateXPDisplay();
   showXPToast(amount);
-  apiFetch('/xp', { method: 'POST', body: JSON.stringify({ amount, reason, source_id: sourceId }) }).catch(() => {});
+  apiFetch('/stats?type=xp', { method: 'POST', body: JSON.stringify({ amount, reason, source_id: sourceId }) }).catch(() => {});
 }
 
 function updateXPDisplay() {
@@ -2696,7 +2696,7 @@ async function loadWeakAreas() {
   if (!card) return;
   let stats = [];
   try {
-    const resp = await apiFetch('/topic-stats');
+    const resp = await apiFetch('/stats?type=topic-stats');
     if (resp && Array.isArray(resp)) stats = resp;
   } catch(e) {}
   if (stats.length === 0 && typeof MODULES !== 'undefined') {
@@ -2783,7 +2783,7 @@ async function startWeakAreaPractice() {
 // ==================== FEATURE: DAILY CHALLENGE ====================
 async function loadDailyChallenge() {
   try {
-    const resp = await apiFetch('/daily-challenge');
+    const resp = await apiFetch('/progress?type=daily-challenge');
     if (resp) dailyChallengeState = resp;
   } catch(e) {}
   renderDailyChallengeCard();
@@ -2897,7 +2897,7 @@ async function completeDailyChallenge(score, total, timeTaken) {
   // Award 2x XP
   awardXP(score * 20, 'daily_challenge');
   addActivity(`Günlük meydan okuma: ${score}/${total}`);
-  apiFetch('/daily-challenge', { method: 'POST', body: JSON.stringify({ score, total, time_taken: timeTaken }) }).catch(() => {});
+  apiFetch('/progress?type=daily-challenge', { method: 'POST', body: JSON.stringify({ score, total, time_taken: timeTaken }) }).catch(() => {});
   const area = document.getElementById('dailyChallengeArea');
   const pct = Math.round((score / total) * 100);
   area.innerHTML = `<div class="challenge-card" style="text-align:center;">
@@ -2956,7 +2956,7 @@ async function renderBandEstimator() {
 
   // Try from API
   try {
-    const stats = await apiFetch('/topic-stats');
+    const stats = await apiFetch('/stats?type=topic-stats');
     if (stats && Array.isArray(stats)) {
       for (const [label, modId] of Object.entries(sectionModules)) {
         const modStats = stats.filter(s => s.module_id === modId);
@@ -3030,7 +3030,7 @@ async function renderBandEstimator() {
 
 async function saveBandSnapshot() {
   try {
-    await apiFetch('/band-estimate', { method: 'POST', body: JSON.stringify({ timestamp: Date.now() }) });
+    await apiFetch('/stats?type=band-estimate', { method: 'POST', body: JSON.stringify({ timestamp: Date.now() }) });
     showXPToast(0);
     const btn = document.querySelector('#bandArea .btn-secondary');
     if (btn) { btn.textContent = 'Kaydedildi!'; btn.style.color = 'var(--emerald)'; setTimeout(() => { btn.textContent = 'Skor Anlık Görüntüsü Kaydet'; btn.style.color = ''; }, 2000); }
