@@ -2985,11 +2985,52 @@ function generateLearningPath(onboarding) {
   const startModuleId = LEVEL_START[onboarding.level] || "foundations";
   const startIdx = MODULES.findIndex(m => m.id === startModuleId);
   const weakAreas = onboarding.weakAreas || [];
+  const targetBand = parseFloat(onboarding.targetBand) || 6.0;
+  const examDate = onboarding.examDate || "nodate";
 
-  // Collect all lessons from start module onward
+  // Map weak areas to module IDs for prioritization
+  const weakToModules = {
+    listening: ["ielts-listening"],
+    reading: ["ielts-reading"],
+    writing: ["ielts-writing", "academic"],
+    speaking: ["ielts-speaking"],
+    vocabulary: ["foundations", "daily-life", "social"],
+    grammar: ["foundations", "daily-life"]
+  };
+  const priorityModules = new Set();
+  weakAreas.forEach(wa => (weakToModules[wa] || []).forEach(m => priorityModules.add(m)));
+
+  // Determine minimum lesson level based on user level
+  const levelOrder = ["A0", "A1", "A2", "B1", "B2", "C1"];
+  const userLevelMap = { zero: "A0", beginner: "A1", elementary: "A2", intermediate: "B1", upper: "B2" };
+  const userLevel = userLevelMap[onboarding.level] || "A1";
+  const userLevelIdx = levelOrder.indexOf(userLevel);
+
+  // Build module order: prioritize weak-area modules, then others
+  let moduleOrder = [];
+  // First: modules from start index onward
+  let availableModules = MODULES.slice(startIdx);
+  // Separate priority and non-priority modules
+  let priorityMods = availableModules.filter(m => priorityModules.has(m.id));
+  let normalMods = availableModules.filter(m => !priorityModules.has(m.id));
+
+  // For high band targets (7.0+), put IELTS strategy modules earlier
+  if (targetBand >= 7.0) {
+    const ieltsModIds = ["ielts-reading", "ielts-writing", "ielts-listening", "ielts-speaking"];
+    const ieltsMods = normalMods.filter(m => ieltsModIds.includes(m.id));
+    normalMods = normalMods.filter(m => !ieltsModIds.includes(m.id));
+    priorityMods = [...priorityMods, ...ieltsMods.filter(m => !priorityModules.has(m.id))];
+  }
+
+  // Interleave: priority modules first, then normal
+  moduleOrder = [...priorityMods, ...normalMods];
+  // Remove duplicates while preserving order
+  const seen = new Set();
+  moduleOrder = moduleOrder.filter(m => { if (seen.has(m.id)) return false; seen.add(m.id); return true; });
+
+  // Collect lessons with smart filtering
   let path = [];
-  for (let i = startIdx; i < MODULES.length; i++) {
-    const mod = MODULES[i];
+  for (const mod of moduleOrder) {
     const units = UNITS[mod.id] || [];
     for (const unit of units) {
       const lessonIds = UNIT_LESSONS[unit.id] || [];
@@ -2997,23 +3038,42 @@ function generateLearningPath(onboarding) {
         const factory = LESSON_DATA[lid];
         if (!factory) continue;
         const lesson = factory();
-        let priority = 1;
+        const lessonLevelIdx = levelOrder.indexOf(lesson.level);
 
-        // Boost priority for weak areas
-        if (weakAreas.includes("vocabulary") && lesson.type === "vocabulary") priority += 2;
-        if (weakAreas.includes("grammar") && lesson.type === "grammar") priority += 2;
-        if (weakAreas.includes("reading") && lesson.type === "reading") priority += 2;
-        if (weakAreas.includes("writing") && lesson.type === "writing") priority += 2;
-        if (weakAreas.includes("speaking") && lesson.type === "speaking") priority += 2;
-        if (weakAreas.includes("listening") && lesson.type === "listening") priority += 2;
+        // Skip lessons too easy for advanced users (more than 2 levels below)
+        if (userLevelIdx >= 3 && lessonLevelIdx < userLevelIdx - 2) continue;
 
-        path.push({ id: lid, moduleId: mod.id, unitId: unit.id, type: lesson.type, priority, title: lesson.title });
+        // Calculate priority score (higher = more important)
+        let priority = 5;
+
+        // Boost weak area lessons significantly
+        if (weakAreas.includes("vocabulary") && lesson.type === "vocabulary") priority += 4;
+        if (weakAreas.includes("grammar") && lesson.type === "grammar") priority += 4;
+        if (weakAreas.includes("reading") && (lesson.type === "reading" || lesson.type === "strategy")) priority += 3;
+        if (weakAreas.includes("writing") && (lesson.type === "writing" || lesson.type === "strategy")) priority += 3;
+        if (weakAreas.includes("speaking") && (lesson.type === "speaking" || lesson.type === "dialogue")) priority += 3;
+        if (weakAreas.includes("listening") && (lesson.type === "dialogue" || lesson.type === "strategy")) priority += 3;
+
+        // Boost lessons at user's level
+        if (lessonLevelIdx === userLevelIdx) priority += 2;
+        if (lessonLevelIdx === userLevelIdx + 1) priority += 1;
+
+        // For high band targets, boost strategy and academic content
+        if (targetBand >= 7.0 && lesson.type === "strategy") priority += 2;
+        if (targetBand >= 7.0 && mod.id === "academic") priority += 2;
+
+        // For lower band targets, boost foundations
+        if (targetBand <= 5.5 && (mod.id === "foundations" || mod.id === "daily-life")) priority += 2;
+
+        // Priority module boost
+        if (priorityModules.has(mod.id)) priority += 3;
+
+        path.push({ id: lid, moduleId: mod.id, unitId: unit.id, type: lesson.type, level: lesson.level, priority, title: lesson.title });
       }
     }
   }
 
-  // Sort within each module: higher priority first, but keep module order
-  // This ensures weak-area lessons come earlier within each module
+  // Sort: within each module group, higher priority first
   let sorted = [];
   let currentModule = null;
   let moduleBuffer = [];
@@ -3034,15 +3094,23 @@ function generateLearningPath(onboarding) {
     sorted.push(...moduleBuffer);
   }
 
-  // Daily allocation
+  // Daily allocation based on time AND exam urgency
   const dailyMap = { "15min": 1, "30min": 2, "1hour": 3, "2hours": 5 };
-  const daily = dailyMap[onboarding.dailyTime] || 2;
+  let daily = dailyMap[onboarding.dailyTime] || 2;
+
+  // Increase intensity for urgent exam dates
+  if (examDate === "3months") daily = Math.max(daily, 3);
+
+  // Estimate study plan duration
+  const totalDays = Math.ceil(sorted.length / daily);
 
   return {
     lessons: sorted.map(s => s.id),
     currentIndex: 0,
     dailyAllocation: daily,
-    totalEstimatedDays: Math.ceil(sorted.length / daily)
+    totalEstimatedDays: totalDays,
+    targetBand: targetBand,
+    examUrgency: examDate
   };
 }
 
