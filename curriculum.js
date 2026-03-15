@@ -103,9 +103,9 @@ const LESSON_DATA = {
     exercises:[
       {type:"match",q:"Harfi sesle eşleştir",pairs:[["A","Ey"],["B","Bi"],["C","Si"],["F","Ef"],["H","Eyç"]]},
       {type:"quiz",items:[
-        {q:"\"Apple\" hangi harfle başlar?",opts:["E","A","I","O"],correct:1},
-        {q:"\"Book\" hangi harfle başlar?",opts:["D","P","B","G"],correct:2},
-        {q:"H harfinin okunuşu nedir?",opts:["Ha","Eyç","He","Aş"],correct:1}
+        {q:"\"Good morning\" ne demek?",opts:["İyi akşamlar","Günaydın","İyi geceler","Hoşça kal"],correct:1},
+        {q:"\"H\" harfi İngilizcede nasıl okunur?",opts:["Ha","Eyç","He","Aş"],correct:1},
+        {q:"\"I\" harfi İngilizcede nasıl okunur?",opts:["İ","Ay","Ayn","İy"],correct:1}
       ]}
     ]
   }
@@ -131,10 +131,10 @@ const LESSON_DATA = {
     ],
     exercises:[
       {type:"quiz",items:[
-        {q:"\"Phone\" hangi harfle başlar?",opts:["F","B","P","T"],correct:2},
-        {q:"W harfinin okunuşu nedir?",opts:["Ve","Dablyu","Vu","Vi"],correct:1},
-        {q:"\"Zero\" hangi harfle başlar?",opts:["S","X","C","Z"],correct:3},
-        {q:"Kaç harf var İngiliz alfabesinde?",opts:["24","26","28","29"],correct:1}
+        {q:"\"W\" harfinin İngilizce okunuşu nedir?",opts:["Ve","Dablyu","Vu","Vi"],correct:1},
+        {q:"İngiliz alfabesinde kaç harf vardır?",opts:["24","26","28","29"],correct:1},
+        {q:"\"Ph\" harfleri bir arada hangi sesi verir?",opts:["/p/","/f/","/h/","/b/"],correct:1},
+        {q:"\"Th\" harfleri hangi Türkçede olmayan sesi verir?",opts:["/t/","/d/","/θ/ (dil dişlerin arasında)","/s/"],correct:2}
       ]}
     ]
   }
