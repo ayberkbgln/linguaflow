@@ -2058,7 +2058,23 @@ function saveCurrentUser(data) { currentUser = data; }
 
 function loadState() {
   if (!currentUser) return null;
-  state = currentUser.progress || { streak:0, lastActiveDate:null, lessonsCompleted:[], wordsLearned:0, quizScores:[], chatCount:0, activities:[] };
+  // Try localStorage first, then API data, then default
+  const cached = localStorage.getItem('lf_state_' + currentUser.id);
+  if (cached) {
+    try { state = JSON.parse(cached); return state; } catch(e) {}
+  }
+  // Build from API profile data
+  const apiProgress = currentUser.progress || {};
+  const completedFromDB = Array.isArray(apiProgress.lessons)
+    ? apiProgress.lessons.filter(l => l.completed).map(l => l.lesson_id)
+    : [];
+  state = {
+    streak: 0, lastActiveDate: null,
+    lessonsCompleted: completedFromDB,
+    wordsLearned: completedFromDB.length * 8,
+    quizScores: apiProgress.quizScores || [],
+    chatCount: 0, activities: []
+  };
   return state;
 }
 let _saveStateTimer = null;
@@ -2066,13 +2082,12 @@ function saveState() {
   if (!state) return;
   const t = new Date().toDateString();
   if (state.lastActiveDate !== t) { const y = new Date(Date.now()-86400000).toDateString(); state.streak = (state.lastActiveDate === y) ? state.streak+1 : 1; state.lastActiveDate = t; }
-  if (currentUser) { currentUser.progress = state; }
+  if (currentUser) {
+    currentUser.progress = state;
+    // Always cache to localStorage for persistence
+    localStorage.setItem('lf_state_' + currentUser.id, JSON.stringify(state));
+  }
   updateDashboard();
-  // Debounced server sync (3s)
-  clearTimeout(_saveStateTimer);
-  _saveStateTimer = setTimeout(() => {
-    apiFetch('/progress', { method: 'POST', body: JSON.stringify({ type: 'state', data: state }) }).catch(() => {});
-  }, 3000);
 }
 function addActivity(text) { state.activities.unshift({ text, time: new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}) }); if (state.activities.length > 10) state.activities.pop(); saveState(); }
 
@@ -2166,7 +2181,13 @@ async function resendVerification() {
 }
 async function handleLogout() {
   try { await apiFetch('/auth/logout', { method: 'POST' }); } catch(e) {}
-  clearToken(); localStorage.removeItem('lf_onboarding'); localStorage.removeItem('lf_plan'); currentUser = null; state = null; showScreen('screen-login');
+  // Clear all cached data
+  const uid = currentUser?.id;
+  clearToken();
+  localStorage.removeItem('lf_onboarding');
+  localStorage.removeItem('lf_plan');
+  if (uid) localStorage.removeItem('lf_state_' + uid);
+  currentUser = null; state = null; showScreen('screen-login');
 }
 
 // ==================== ONBOARDING ====================
