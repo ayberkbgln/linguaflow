@@ -1165,6 +1165,470 @@ body::before {
 .readiness-bar { height: 12px; background: var(--border-1); border-radius: 6px; overflow: hidden; margin-top: 12px; }
 .readiness-fill { height: 100%; border-radius: 6px; transition: width 0.5s ease; }
 
+/* ===== LESSON FULLSCREEN CARD SYSTEM ===== */
+.lesson-fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: var(--bg-deep);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.lesson-fs-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 20px;
+  flex-shrink: 0;
+}
+.lesson-exit-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--border-2);
+  background: transparent;
+  color: var(--text-3);
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  line-height: 1;
+}
+.lesson-exit-btn:hover { color: var(--rose); border-color: rgba(251,113,133,0.3); background: var(--rose-glow); }
+.lesson-fs-progress {
+  flex: 1;
+  height: 6px;
+  background: var(--bg-elevated);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.lesson-fs-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--amber), var(--amber-light));
+  border-radius: 6px;
+  transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  min-width: 0;
+}
+.lesson-fs-counter {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-4);
+  flex-shrink: 0;
+  min-width: 44px;
+  text-align: right;
+}
+.lesson-fs-body {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow-y: auto;
+  padding: 20px;
+  -webkit-overflow-scrolling: touch;
+}
+.lesson-card {
+  width: 100%;
+  max-width: 560px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-1);
+  border-radius: 20px;
+  padding: 36px 32px;
+  animation: lc-enter 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  position: relative;
+}
+@keyframes lc-enter {
+  from { opacity: 0; transform: translateX(60px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes lc-enter-left {
+  from { opacity: 0; transform: translateX(-60px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.lesson-card.from-left { animation-name: lc-enter-left; }
+.lesson-card .lc-tag {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  padding: 3px 10px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+}
+.lesson-card .lc-tag.vocab { background: rgba(96,165,250,0.15); color: #60a5fa; }
+.lesson-card .lc-tag.grammar { background: rgba(251,191,36,0.15); color: #fbbf24; }
+.lesson-card .lc-tag.quiz { background: rgba(192,132,252,0.15); color: #c084fc; }
+.lesson-card .lc-tag.dialogue { background: rgba(74,222,128,0.15); color: #4ade80; }
+.lesson-card .lc-tag.reading { background: rgba(125,211,252,0.15); color: #7dd3fc; }
+.lesson-card .lc-tag.writing { background: rgba(251,146,60,0.15); color: #fb923c; }
+.lesson-card .lc-tag.speaking { background: rgba(45,212,191,0.15); color: #2dd4bf; }
+.lesson-card .lc-tag.strategy { background: rgba(244,114,182,0.15); color: #f472b6; }
+.lesson-card .lc-tag.match { background: rgba(226,162,41,0.15); color: var(--amber); }
+.lesson-card .lc-tag.fill { background: rgba(196,181,253,0.15); color: var(--violet); }
+.lesson-card .lc-tag.complete { background: rgba(74,222,128,0.15); color: var(--emerald); }
+
+.lesson-card .lc-word {
+  font-family: var(--font-mono);
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--amber-light);
+  margin-bottom: 8px;
+  line-height: 1.2;
+}
+.lesson-card .lc-translation {
+  font-size: 20px;
+  color: var(--text-2);
+  margin-bottom: 6px;
+}
+.lesson-card .lc-phonetic {
+  font-size: 14px;
+  color: var(--text-4);
+  font-style: italic;
+  margin-bottom: 16px;
+}
+.lesson-card .lc-example {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-1);
+  border-radius: 10px;
+  padding: 14px 16px;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text-3);
+  margin-bottom: 12px;
+}
+.lesson-card .lc-example .tr { font-size: 12px; color: var(--text-4); font-style: italic; margin-top: 4px; display: block; }
+.lesson-card .lc-speak-btn {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-2);
+  border-radius: 10px;
+  padding: 10px 20px;
+  color: var(--text-3);
+  font-size: 14px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-body);
+  transition: all 0.2s;
+}
+.lesson-card .lc-speak-btn:hover { border-color: var(--amber); color: var(--amber); }
+
+/* Grammar card */
+.lesson-card .lc-rule-title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--amber-light);
+  margin-bottom: 14px;
+  line-height: 1.3;
+}
+.lesson-card .lc-explanation {
+  font-size: 15px;
+  line-height: 1.8;
+  color: var(--text-3);
+  margin-bottom: 16px;
+}
+.lesson-card .lc-grammar-example {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-1);
+  border-left: 3px solid var(--amber);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--text-2);
+}
+.lesson-card .lc-grammar-example .highlight { color: var(--amber); font-weight: 600; }
+.lesson-card .lc-grammar-example .tr { font-family: var(--font-body); font-size: 12px; color: var(--text-4); margin-top: 6px; display: block; }
+
+/* Quiz card */
+.lesson-card .lc-question {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-1);
+  margin-bottom: 24px;
+  text-align: center;
+  line-height: 1.4;
+}
+.lesson-card .lc-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.lesson-card .lc-option {
+  width: 100%;
+  padding: 16px 20px;
+  background: var(--bg-primary);
+  border: 1.5px solid var(--border-2);
+  border-radius: 12px;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-1);
+  text-align: left;
+  transition: all 0.15s;
+  min-height: 52px;
+}
+.lesson-card .lc-option:hover:not(:disabled) { border-color: var(--border-amber); background: var(--bg-card-hover); }
+.lesson-card .lc-option.correct { border-color: var(--emerald); background: var(--emerald-glow); color: var(--emerald); pointer-events: none; }
+.lesson-card .lc-option.wrong { border-color: var(--rose); background: var(--rose-glow); color: var(--rose); pointer-events: none; }
+.lesson-card .lc-option:disabled { pointer-events: none; opacity: 0.6; }
+.lesson-card .lc-feedback {
+  text-align: center;
+  padding: 12px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 14px;
+  margin-top: 16px;
+  animation: lc-enter 0.2s ease;
+}
+.lesson-card .lc-feedback.correct-fb { background: var(--emerald-glow); color: var(--emerald); }
+.lesson-card .lc-feedback.wrong-fb { background: var(--rose-glow); color: var(--rose); }
+
+/* Fill-in-the-blank card */
+.lesson-card .lc-fill-sentence {
+  font-size: 18px;
+  line-height: 2;
+  color: var(--text-2);
+  text-align: center;
+  margin-bottom: 24px;
+}
+.lesson-card .lc-fill-blank {
+  display: inline-block;
+  min-width: 100px;
+  border-bottom: 2.5px dashed var(--amber);
+  padding: 2px 12px;
+  margin: 0 4px;
+  font-weight: 600;
+  color: var(--amber-light);
+  text-align: center;
+  transition: all 0.3s;
+}
+.lesson-card .lc-fill-blank.correct { border-color: var(--emerald); color: var(--emerald); background: var(--emerald-glow); }
+.lesson-card .lc-fill-blank.wrong { border-color: var(--rose); color: var(--rose); background: var(--rose-glow); }
+.lesson-card .lc-fill-opts {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.lesson-card .lc-fill-opt {
+  padding: 10px 22px;
+  border-radius: 10px;
+  border: 1.5px solid var(--border-2);
+  background: var(--bg-primary);
+  color: var(--text-2);
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 500;
+  transition: all 0.2s;
+  min-height: 48px;
+}
+.lesson-card .lc-fill-opt:hover:not(:disabled) { border-color: var(--border-amber); background: var(--bg-card-hover); }
+.lesson-card .lc-fill-opt.correct { border-color: var(--emerald); background: var(--emerald-glow); color: var(--emerald); }
+.lesson-card .lc-fill-opt.wrong { border-color: var(--rose); background: var(--rose-glow); color: var(--rose); }
+.lesson-card .lc-fill-opt:disabled { pointer-events: none; opacity: 0.6; }
+
+/* Matching card */
+.lesson-card .lc-match-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 16px;
+}
+.lesson-card .lc-match-col-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-4);
+  text-align: center;
+  margin-bottom: 4px;
+}
+.lesson-card .lc-match-item {
+  padding: 14px 16px;
+  border-radius: 10px;
+  border: 1.5px solid var(--border-2);
+  background: var(--bg-primary);
+  color: var(--text-2);
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 14px;
+  text-align: center;
+  transition: all 0.2s;
+  user-select: none;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.lesson-card .lc-match-item:hover:not(.matched):not(.disabled) { border-color: var(--border-amber); background: var(--bg-card-hover); }
+.lesson-card .lc-match-item.selected { border-color: var(--amber); background: var(--amber-glow); color: var(--amber-light); box-shadow: 0 0 12px var(--amber-glow); }
+.lesson-card .lc-match-item.matched {
+  border-color: var(--emerald);
+  background: var(--emerald-glow);
+  color: var(--emerald);
+  cursor: default;
+  opacity: 0.6;
+  transform: scale(0.95);
+  transition: all 0.4s;
+}
+.lesson-card .lc-match-item.wrong-flash { border-color: var(--rose); background: var(--rose-glow); color: var(--rose); }
+
+/* Dialogue card */
+.lesson-card .lc-dialogue-bubble {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.lesson-card .lc-dialogue-bubble.right { flex-direction: row-reverse; }
+.lesson-card .lc-dialogue-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+.lesson-card .lc-dialogue-avatar.speaker-a { background: rgba(125,211,252,0.2); color: var(--sky); }
+.lesson-card .lc-dialogue-avatar.speaker-b { background: rgba(74,222,128,0.2); color: var(--emerald); }
+.lesson-card .lc-dialogue-content {
+  flex: 1;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-1);
+  border-radius: 14px;
+  padding: 16px;
+}
+.lesson-card .lc-dialogue-en { font-size: 16px; color: var(--text-1); margin-bottom: 6px; line-height: 1.6; }
+.lesson-card .lc-dialogue-tr { font-size: 13px; color: var(--text-4); font-style: italic; line-height: 1.5; }
+
+/* Reading card */
+.lesson-card .lc-passage {
+  font-size: 15px;
+  line-height: 2;
+  color: var(--text-2);
+  max-height: 380px;
+  overflow-y: auto;
+  padding-right: 8px;
+  white-space: pre-line;
+}
+.lesson-card .lc-passage::-webkit-scrollbar { width: 3px; }
+.lesson-card .lc-passage::-webkit-scrollbar-thumb { background: var(--bg-elevated); border-radius: 3px; }
+
+/* Lesson complete card */
+.lesson-card.lc-complete { text-align: center; padding: 48px 32px; }
+.lesson-card .lc-score-big {
+  font-family: var(--font-mono);
+  font-size: 72px;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+.lesson-card .lc-score-big.good { color: var(--emerald); }
+.lesson-card .lc-score-big.mid { color: var(--amber); }
+.lesson-card .lc-score-big.low { color: var(--rose); }
+.lesson-card .lc-stars {
+  font-size: 36px;
+  margin-bottom: 12px;
+  letter-spacing: 4px;
+}
+@keyframes lc-star-pop {
+  0% { transform: scale(0); }
+  50% { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}
+.lesson-card .lc-star {
+  display: inline-block;
+  animation: lc-star-pop 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  opacity: 0;
+  transform: scale(0);
+}
+.lesson-card .lc-star:nth-child(1) { animation-delay: 0.2s; }
+.lesson-card .lc-star:nth-child(2) { animation-delay: 0.4s; }
+.lesson-card .lc-star:nth-child(3) { animation-delay: 0.6s; }
+@keyframes lc-star-pop-end { 0% { transform: scale(0); opacity: 0; } 50% { transform: scale(1.3); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+.lesson-card .lc-star { animation: lc-star-pop-end 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+.lesson-card .lc-xp-earned {
+  font-family: var(--font-mono);
+  font-size: 18px;
+  color: var(--amber);
+  font-weight: 600;
+  margin-bottom: 24px;
+}
+.lesson-card .lc-complete-msg {
+  font-size: 16px;
+  color: var(--text-3);
+  margin-bottom: 24px;
+}
+.lesson-card .lc-complete-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Bottom action area */
+.lesson-fs-action {
+  padding: 16px 20px 24px;
+  display: flex;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.lesson-fs-action .btn {
+  min-width: 280px;
+  padding: 16px 32px;
+  font-size: 16px;
+  border-radius: 14px;
+}
+
+/* Exit confirmation overlay */
+.lesson-exit-confirm {
+  position: fixed;
+  inset: 0;
+  z-index: 10001;
+  background: rgba(12,10,9,0.85);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.lesson-exit-confirm-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border-2);
+  border-radius: 16px;
+  padding: 32px;
+  max-width: 360px;
+  width: 90%;
+  text-align: center;
+  animation: lc-enter 0.25s ease;
+}
+.lesson-exit-confirm-box h3 {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.lesson-exit-confirm-box p {
+  font-size: 14px;
+  color: var(--text-3);
+  margin-bottom: 20px;
+}
+.lesson-exit-confirm-box .exit-actions {
+  display: flex;
+  gap: 10px;
+}
+.lesson-exit-confirm-box .exit-actions .btn { flex: 1; }
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
   .auth-page { grid-template-columns: 1fr; }
@@ -1181,6 +1645,11 @@ body::before {
   .plan-overview { grid-template-columns: 1fr; }
   .ob-card { padding: 28px; }
   .brand-headline { font-size: 36px; }
+  .lesson-card { padding: 24px 20px; border-radius: 16px; }
+  .lesson-card .lc-word { font-size: 28px; }
+  .lesson-card .lc-question { font-size: 18px; }
+  .lesson-card .lc-score-big { font-size: 56px; }
+  .lesson-fs-action .btn { min-width: 100%; }
 }
 </style>
 </head>
@@ -1968,363 +2437,410 @@ function showUnitLessons(moduleId, unitId) {
   }).join('')}</div></div>`;
 }
 
+// ==================== CARD-BASED LESSON SYSTEM ====================
+let lessonCards = [];
+let currentCardIndex = 0;
+let lessonScore = { correct: 0, total: 0, mistakes: [] };
+let lessonFSElement = null;
+let cardMatchState = {};
+let cardAnswered = false;
+
 function openCurriculumLesson(id) {
   const l = getLesson(id);
   if (!l) return;
   currentLessonId = id;
   questionStartTime = Date.now();
-  // FIX 2: Switch nav tab to Dersler (lessons)
-  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  const lessonsTab = document.querySelector('.nav-tab[data-page="lessons"]');
-  if (lessonsTab) lessonsTab.classList.add('active');
-  document.getElementById('page-lessons').classList.add('active');
-  document.getElementById('moduleListView').style.display = 'none';
-  document.getElementById('unitListView').style.display = 'none';
-  document.getElementById('lessonListView').style.display = 'none';
-  const d = document.getElementById('lessonDetailView');
-  d.style.display = 'block';
-  d.classList.add('active');
-  // FIX 3: If opened from dashboard (no current module/unit), back goes to modules list
-  const backAction = (currentModuleId && currentUnitId) ? `showUnitLessons('${currentModuleId}','${l.unitId}')` : `showModules()`;
-  const backLabel = (currentModuleId && currentUnitId) ? '\u2190 Ders Listesi' : '\u2190 Modüller';
-  let content = `<button class="back-btn" onclick="${backAction}">${backLabel}</button>`;
-  content += `<div class="card"><div class="card-header"><div class="card-title">${l.title}</div><div class="card-badge">${l.level} \u00b7 ${l.minutes || 15} dk</div></div>`;
-  if (l.type === 'vocabulary') { content += renderVocabularyLesson(l); }
-  else if (l.type === 'grammar') { content += renderGrammarLesson(l); }
-  else if (l.type === 'dialogue') { content += renderDialogueLesson(l); }
-  else if (l.type === 'reading') { content += renderReadingLesson(l); }
-  else if (l.type === 'writing') { content += renderWritingLesson(l); }
-  else if (l.type === 'speaking') { content += renderSpeakingLesson(l); }
-  else if (l.type === 'strategy') { content += renderStrategyLesson(l); }
-  if (l.data.exercises && l.data.exercises.length > 0) { content += renderExercises(l.data.exercises, l.id); }
-  content += `<div class="lesson-progress-bar" id="lessonProgressBar"></div>`;
-  content += `<button class="btn btn-primary" id="lessonCompleteBtn" style="width:100%;margin-top:16px;" onclick="completeCurriculumLesson('${l.id}')">Dersi Tamamla</button></div>`;
-  d.innerHTML = content;
-  matchState = {};
-  setTimeout(() => updateLessonProgress(), 50);
+  lessonCards = [];
+  currentCardIndex = 0;
+  lessonScore = { correct: 0, total: 0, mistakes: [] };
+  cardMatchState = {};
+  cardAnswered = false;
+
+  // Build cards from lesson data
+  buildLessonCards(l);
+
+  // Create fullscreen overlay
+  if (lessonFSElement) lessonFSElement.remove();
+  lessonFSElement = document.createElement('div');
+  lessonFSElement.className = 'lesson-fullscreen';
+  lessonFSElement.id = 'lessonFullscreen';
+  lessonFSElement.innerHTML = `
+    <div class="lesson-fs-header">
+      <button class="lesson-exit-btn" onclick="confirmExitLesson()">&times;</button>
+      <div class="lesson-fs-progress"><div class="lesson-fs-progress-fill" id="lfsProgressFill" style="width:0%"></div></div>
+      <div class="lesson-fs-counter" id="lfsCounter">1/${lessonCards.length}</div>
+    </div>
+    <div class="lesson-fs-body" id="lfsBody"></div>
+    <div class="lesson-fs-action" id="lfsAction"></div>
+  `;
+  document.body.appendChild(lessonFSElement);
+  renderCurrentCard();
 }
 
-function renderVocabularyLesson(l) {
-  let html = `<div class="lesson-section"><h3>Yeni Kelimeler \u2014 ${l.data.theme || ''}</h3><div class="vocab-grid">`;
-  l.data.words.forEach(w => {
-    html += `<div class="vocab-card" onclick="speakWord('${w.e.replace(/'/g, "\\'")}')"><button class="speak-btn" title="Dinle">&#9834;</button><div class="en">${w.e}</div><div class="tr">${w.t}</div><div class="phonetic">${w.p}</div>${w.ex ? `<div style="font-size:11px;color:var(--text-4);margin-top:6px;border-top:1px solid var(--border-1);padding-top:6px;">${w.ex}<br><span style="color:var(--text-4);font-style:italic;">${w.ext || ''}</span></div>` : ''}</div>`;
-  });
-  html += `</div></div>`;
-  return html;
-}
-
-function renderGrammarLesson(l) {
-  let html = `<div class="lesson-section"><h3>Gramer: ${l.data.topic || ''}</h3>`;
-  html += `<div class="grammar-box"><p>${l.data.explanationTr}</p>`;
-  if (l.data.rules) {
-    l.data.rules.forEach(r => {
-      html += `<div style="margin-top:16px;"><strong style="color:var(--amber-light);font-size:14px;">${r.rule}</strong>`;
-      if (r.examples) {
-        r.examples.forEach(ex => {
-          html += `<div class="example"><div>${ex.en.replace(/<hl>/g,'<span class="highlight">').replace(/<\/hl>/g,'</span>')}</div><div style="color:var(--text-4);font-size:12px;margin-top:4px;">${ex.tr}</div></div>`;
-        });
+function buildLessonCards(l) {
+  const d = l.data;
+  if (l.type === 'vocabulary') {
+    // Intro card for each word
+    if (d.words) d.words.forEach(w => {
+      lessonCards.push({ type: 'vocab', word: w });
+    });
+    // Quiz cards from exercises
+    addExerciseCards(d);
+    // Quiz cards from data.quiz
+    if (d.quiz) d.quiz.forEach(q => lessonCards.push({ type: 'quiz', q: q.q, opts: q.opts, correct: q.correct }));
+  } else if (l.type === 'grammar') {
+    // Grammar explanation cards per rule
+    if (d.rules && d.rules.length > 0) {
+      d.rules.forEach(r => lessonCards.push({ type: 'grammar', rule: r.rule, explanation: d.explanationTr || '', examples: r.examples || [] }));
+    } else {
+      lessonCards.push({ type: 'grammar', rule: d.topic || 'Gramer', explanation: d.explanationTr || '', examples: [] });
+    }
+    addExerciseCards(d);
+  } else if (l.type === 'dialogue') {
+    // Scenario card
+    const situation = d.scenarioTr || d.situation;
+    if (situation) lessonCards.push({ type: 'info', title: 'Senaryo', text: situation, tag: 'dialogue' });
+    // Dialogue line cards
+    const speakers = d.speakers || ['A','B'];
+    (d.lines || []).forEach(x => {
+      const spk = x.speaker || speakers[x.s] || 'A';
+      const isB = x.speaker === 'B' || x.s === 1;
+      const enText = x.en || x.text;
+      lessonCards.push({ type: 'dialogue', speaker: spk, isB, en: enText, tr: x.tr });
+    });
+    // Key phrases as vocab cards
+    if (d.keyPhrases) d.keyPhrases.forEach(kp => {
+      lessonCards.push({ type: 'vocab', word: { e: kp.en || kp.e, t: kp.tr || kp.t, p: '' } });
+    });
+    // Dialogue quiz
+    if (d.quiz) d.quiz.forEach(q => lessonCards.push({ type: 'quiz', q: q.q, opts: q.opts, correct: q.correct }));
+    addExerciseCards(d);
+  } else if (l.type === 'reading') {
+    // Reading passage card
+    lessonCards.push({ type: 'reading', passage: d.passage, glossary: d.wordGlossary || d.vocabulary || [] });
+    // Reading questions one by one
+    if (d.questions) d.questions.forEach(q => {
+      if (q.type === 'true_false') {
+        lessonCards.push({ type: 'quiz', q: q.q, opts: ['True', 'False'], correct: q.answer ? 0 : 1, explanation: q.explanationTr || q.explanation || '' });
+      } else if (q.opts) {
+        lessonCards.push({ type: 'quiz', q: q.q, opts: q.opts, correct: q.correct, explanation: q.explanationTr || q.explanation || '' });
       }
-      html += `</div>`;
     });
-  }
-  html += `</div></div>`;
-  return html;
-}
-
-function renderDialogueLesson(l) {
-  let html = '';
-  const situation = l.data.scenarioTr || l.data.situation;
-  if (situation) { html += `<div class="lesson-section"><h3>Senaryo</h3><div class="grammar-box"><p>${situation}</p></div></div>`; }
-  html += `<div class="lesson-section"><h3>Diyalog</h3><div class="dialogue-box">`;
-  const speakers = l.data.speakers || ['A','B'];
-  (l.data.lines || []).forEach(x => {
-    const spk = x.speaker || speakers[x.s] || 'A';
-    const isB = x.speaker === 'B' || x.s === 1;
-    const enText = x.en || x.text;
-    html += `<div class="dialogue-line"><div class="dialogue-speaker ${isB ? 'b' : ''}">${spk}:</div><div class="dialogue-text">${enText}<span class="translation">${x.tr}</span></div></div>`;
-  });
-  html += `</div><button class="btn btn-secondary" style="margin-top:12px;width:100%;" onclick="speakDialogueLines('${l.id}')">Diyalo\u011fu Dinle</button></div>`;
-  if (l.data.keyPhrases && l.data.keyPhrases.length > 0) {
-    html += `<div class="lesson-section"><h3>Anahtar \u0130fadeler</h3><div class="vocab-grid">`;
-    l.data.keyPhrases.forEach(kp => {
-      html += `<div class="vocab-card" onclick="speakWord('${(kp.en || kp.e || '').replace(/'/g, "\\'")}')"><div class="en">${kp.en || kp.e}</div><div class="tr">${kp.tr || kp.t}</div></div>`;
+    addExerciseCards(d);
+  } else if (l.type === 'writing') {
+    // Task description card
+    const taskDesc = d.taskTr || d.explanationTr;
+    if (taskDesc) lessonCards.push({ type: 'info', title: 'Yazma Gorevi', text: taskDesc, tag: 'writing' });
+    // IELTS prompt
+    const sPrompt = d.samplePrompt || d.prompt;
+    if (sPrompt) lessonCards.push({ type: 'info', title: 'IELTS Sorusu', text: sPrompt, tag: 'writing' });
+    // Structure
+    if (d.structure) lessonCards.push({ type: 'info', title: 'Essay Yapisi', text: typeof d.structure === 'string' ? d.structure : JSON.stringify(d.structure), tag: 'writing' });
+    // Key vocabulary as vocab cards
+    const keyVocab = d.keyVocabulary || d.vocabulary;
+    if (keyVocab) keyVocab.forEach(w => {
+      if (typeof w === 'string') lessonCards.push({ type: 'vocab', word: { e: w, t: '', p: '' } });
+      else lessonCards.push({ type: 'vocab', word: { e: w.en || '', t: w.tr || '', p: '' } });
     });
-    html += `</div></div>`;
-  }
-  if (l.data.quiz && l.data.quiz.length > 0) {
-    html += `<div class="lesson-section"><h3>Diyalog Soruları</h3>`;
-    l.data.quiz.forEach((q, qi) => {
-      html += `<div class="grammar-box" style="margin-bottom:12px;"><p style="font-weight:600;margin-bottom:8px;">${q.q}</p><div class="quiz-options">`;
-      q.opts.forEach((o, oi) => { html += `<button class="quiz-option" onclick="answerExQ(this,${oi},${q.correct})">${o}</button>`; });
-      html += `</div></div>`;
-    });
-    html += `</div>`;
-  }
-  return html;
-}
-
-function renderReadingLesson(l) {
-  let html = `<div class="lesson-section"><h3>Okuma Pasaj\u0131</h3>`;
-  html += `<div class="grammar-box" style="border-left-color:var(--sky);"><p style="font-size:14px;line-height:2;white-space:pre-line;">${l.data.passage}</p></div>`;
-  const glossary = l.data.wordGlossary || l.data.vocabulary;
-  if (glossary && glossary.length > 0) {
-    html += `<div style="margin-top:16px;"><strong style="color:var(--amber-light);font-size:13px;">Kelime Sözlüğü</strong><div class="vocab-grid" style="margin-top:8px;">`;
-    glossary.forEach(w => { html += `<div class="vocab-card"><div class="en">${w.en}</div><div class="tr">${w.tr}</div></div>`; });
-    html += `</div></div>`;
-  }
-  html += `</div>`;
-  if (l.data.questions && l.data.questions.length > 0) {
-    html += `<div class="lesson-section"><h3>Sorular</h3>`;
-    l.data.questions.forEach((q, qi) => {
-      html += `<div class="grammar-box" style="margin-bottom:12px;border-left-color:var(--sky);"><p style="font-weight:600;margin-bottom:8px;">${qi + 1}. ${q.q}</p>`;
-      if (q.opts) {
-        html += `<div class="quiz-options" style="margin-top:8px;">`;
-        q.opts.forEach((o, oi) => { html += `<button class="quiz-option" onclick="answerReadingQ(this,${oi},${q.correct})">${o}</button>`; });
-        html += `</div>`;
-      } else if (q.type === 'true_false') {
-        html += `<div class="quiz-options" style="margin-top:8px;"><button class="quiz-option" onclick="answerTFQ(this,true,${q.answer})">True</button><button class="quiz-option" onclick="answerTFQ(this,false,${q.answer})">False</button></div>`;
-      }
-      const explText = q.explanationTr || q.explanation || '';
-      if (explText) { html += `<div class="quiz-feedback" id="readingFb${qi}" style="margin-top:8px;" data-explanation="${explText.replace(/"/g,'&quot;')}"></div>`; }
-      html += `</div>`;
-    });
-    html += `</div>`;
-  }
-  return html;
-}
-
-function renderWritingLesson(l) {
-  let html = `<div class="lesson-section"><h3>Yazma Görevi</h3>`;
-  const taskDesc = l.data.taskTr || l.data.explanationTr;
-  if (taskDesc) { html += `<div class="grammar-box" style="border-left-color:#fb923c;"><p>${taskDesc}</p></div>`; }
-  const sPrompt = l.data.samplePrompt || l.data.prompt;
-  if (sPrompt) { html += `<div style="margin-top:16px;"><strong style="color:var(--amber-light);font-size:13px;">IELTS Sorusu</strong><div class="grammar-box" style="margin-top:8px;border-left-color:#fb923c;"><p style="font-style:italic;">${sPrompt}</p></div></div>`; }
-  if (l.data.structure) {
-    html += `<div style="margin-top:16px;"><strong style="color:var(--amber-light);font-size:13px;">Essay Yap\u0131s\u0131</strong>`;
-    html += `<div class="grammar-box" style="margin-top:8px;border-left-color:#fb923c;"><p>${typeof l.data.structure === 'string' ? l.data.structure : JSON.stringify(l.data.structure)}</p></div></div>`;
-  }
-  const keyVocab = l.data.keyVocabulary || l.data.vocabulary;
-  if (keyVocab && keyVocab.length > 0) {
-    html += `<div style="margin-top:16px;"><strong style="color:var(--amber-light);font-size:13px;">Anahtar Kelimeler</strong><div class="vocab-grid" style="margin-top:8px;">`;
-    keyVocab.forEach(w => { html += `<div class="vocab-card"><div class="en">${w.en || w}</div>${w.tr ? `<div class="tr">${w.tr}</div>` : ''}</div>`; });
-    html += `</div></div>`;
-  }
-  const sAnswer = l.data.sampleAnswer || l.data.modelAnswer;
-  if (sAnswer) {
-    html += `<div style="margin-top:16px;"><strong style="color:var(--amber-light);font-size:13px;">\u00d6rnek Cevap</strong>`;
-    html += `<div class="grammar-box" style="margin-top:8px;border-left-color:#fb923c;"><p style="white-space:pre-line;">${sAnswer}</p></div></div>`;
-  }
-  html += `</div>`;
-  return html;
-}
-
-function renderSpeakingLesson(l) {
-  let html = '';
-  const explanation = l.data.tipsTr || l.data.explanationTr;
-  if (explanation) { html += `<div class="lesson-section"><h3>İpuçları</h3><div class="grammar-box" style="border-left-color:#2dd4bf;"><p>${explanation}</p></div></div>`; }
-  const questions = l.data.questions || l.data.sampleQuestions || [];
-  if (questions.length > 0) {
-    html += `<div class="lesson-section"><h3>Konuşma Soruları</h3>`;
+    // Model answer
+    const sAnswer = d.sampleAnswer || d.modelAnswer;
+    if (sAnswer) lessonCards.push({ type: 'info', title: 'Ornek Cevap', text: sAnswer, tag: 'writing' });
+    addExerciseCards(d);
+  } else if (l.type === 'speaking') {
+    // Tips card
+    const explanation = d.tipsTr || d.explanationTr;
+    if (explanation) lessonCards.push({ type: 'info', title: 'Ipuclari', text: explanation, tag: 'speaking' });
+    // Questions with model answers
+    const questions = d.questions || d.sampleQuestions || [];
     questions.forEach((q, i) => {
       const qText = typeof q === 'string' ? q : q.q;
-      html += `<div class="grammar-box" style="margin-bottom:12px;border-left-color:#2dd4bf;"><p style="font-weight:600;">${qText}</p>`;
-      if (l.data.sampleAnswersTr && l.data.sampleAnswersTr[i]) { html += `<div style="margin-top:8px;font-size:13px;color:var(--text-4);"><strong>Örnek:</strong> ${l.data.sampleAnswersTr[i]}</div>`; }
-      html += `<button class="btn btn-secondary" style="margin-top:8px;" onclick="speakWord('${qText.replace(/'/g, "\\'")}')">Soruyu Dinle</button></div>`;
+      const sampleAns = (d.sampleAnswersTr && d.sampleAnswersTr[i]) ? d.sampleAnswersTr[i] : '';
+      lessonCards.push({ type: 'speaking-q', question: qText, sampleAnswer: sampleAns });
     });
-    html += `</div>`;
-  }
-  if (l.data.modelAnswers && l.data.modelAnswers.length > 0) {
-    html += `<div class="lesson-section"><h3>Örnek Cevaplar</h3>`;
-        l.data.modelAnswers.forEach(ma => {
-      const maQ = ma.q || '';
-      const maAns = ma.answer || ma.text || '';
-      const maBand = ma.band || '';
-      html += `<div class="grammar-box" style="margin-bottom:12px;border-left-color:#2dd4bf;">`;
-      if (maQ) { html += `<p style="font-weight:600;margin-bottom:8px;">${maQ}</p>`; }
-      if (maBand) { html += `<div style="font-size:11px;color:#2dd4bf;margin-bottom:6px;font-family:var(--font-mono);">Band: ${maBand}</div>`; }
-      html += `<div style="font-size:14px;color:var(--text-2);line-height:1.8;">${maAns}</div>`;
-      if (ma.answerTr) { html += `<div style="font-size:12px;color:var(--text-4);margin-top:8px;font-style:italic;">${ma.answerTr}</div>`; }
-      if (ma.tips) { html += `<div style="margin-top:8px;padding:8px;background:rgba(45,212,191,0.1);border-radius:8px;font-size:12px;color:#2dd4bf;">${ma.tips}</div>`; }
-      html += `</div>`;
+    // Model answers
+    if (d.modelAnswers) d.modelAnswers.forEach(ma => {
+      lessonCards.push({ type: 'info', title: ma.q || 'Ornek Cevap', text: (ma.answer || ma.text || '') + (ma.answerTr ? '\n\n' + ma.answerTr : ''), tag: 'speaking' });
     });
-    html += `</div>`;
-  }
-  if (l.data.usefulPhrases && l.data.usefulPhrases.length > 0) {
-    html += `<div class="lesson-section"><h3>Faydalı İfadeler</h3><div class="vocab-grid">`;
-    l.data.usefulPhrases.forEach(p => {
-      html += `<div class="vocab-card" onclick="speakWord('${(p.en||'').replace(/'/g,"\\'")}')"><div class="en">${p.en}</div><div class="tr">${p.tr}</div>${p.usage ? `<div style="font-size:11px;color:var(--text-4);margin-top:6px;border-top:1px solid var(--border-1);padding-top:6px;">${p.usage}</div>` : ''}</div>`;
+    // Useful phrases as vocab
+    if (d.usefulPhrases) d.usefulPhrases.forEach(p => {
+      lessonCards.push({ type: 'vocab', word: { e: p.en, t: p.tr, p: '', ex: p.usage || '' } });
     });
-    html += `</div></div>`;
-  }
-  return html;
-}
-
-function renderStrategyLesson(l) {
-  let html = `<div class="lesson-section"><h3>Strateji</h3><div class="grammar-box" style="border-left-color:#f472b6;"><p>${l.data.explanationTr}</p></div></div>`;
-  if (l.data.tips && l.data.tips.length > 0) {
-    html += `<div class="lesson-section"><h3>İpuçları</h3>`;
-    l.data.tips.forEach(tip => {
-      html += `<div class="grammar-box" style="margin-bottom:12px;border-left-color:#f472b6;"><p><strong style="color:var(--amber-light);">${tip.title}</strong></p><p style="margin-top:8px;font-size:14px;color:var(--text-2);">${tip.detail}</p></div>`;
+    addExerciseCards(d);
+  } else if (l.type === 'strategy') {
+    // Main explanation
+    if (d.explanationTr) lessonCards.push({ type: 'info', title: 'Strateji', text: d.explanationTr, tag: 'strategy' });
+    // Tips
+    if (d.tips) d.tips.forEach(tip => {
+      lessonCards.push({ type: 'info', title: tip.title, text: tip.detail, tag: 'strategy' });
     });
-    html += `</div>`;
-  }
-  if (l.data.dosDonts) {
-    html += `<div class="lesson-section"><h3>Yap\u0131lmas\u0131 Gerekenler</h3><div class="grammar-box" style="border-left-color:var(--emerald);">`;
-    (l.data.dosDonts.dos || []).forEach(d => { html += `<div style="display:flex;gap:8px;margin-bottom:8px;"><span style="color:var(--emerald);">\u2713</span><span style="font-size:14px;color:var(--text-2);">${d}</span></div>`; });
-    html += `</div></div>`;
-    html += `<div class="lesson-section"><h3>Yap\u0131lmamas\u0131 Gerekenler</h3><div class="grammar-box" style="border-left-color:var(--rose);">`;
-    (l.data.dosDonts.donts || []).forEach(d => { html += `<div style="display:flex;gap:8px;margin-bottom:8px;"><span style="color:var(--rose);">\u2717</span><span style="font-size:14px;color:var(--text-2);">${d}</span></div>`; });
-    html += `</div></div>`;
-  }
-  if (l.data.timingAdvice) {
-    html += `<div class="lesson-section"><h3>Zaman Y\u00f6netimi</h3><div class="grammar-box" style="border-left-color:#f472b6;"><p style="font-family:var(--font-mono);font-size:14px;">${l.data.timingAdvice}</p></div></div>`;
-  }
-  if (l.data.bandTips) {
-    html += `<div class="lesson-section"><h3>Band Hedefine G\u00f6re \u0130pu\u00e7lar\u0131</h3>`;
-    for (const [band, tip] of Object.entries(l.data.bandTips)) {
-      html += `<div class="grammar-box" style="margin-bottom:8px;border-left-color:#f472b6;"><p><strong style="color:var(--amber);">Band ${band}:</strong> ${tip}</p></div>`;
+    // Dos and Donts
+    if (d.dosDonts) {
+      lessonCards.push({ type: 'dos-donts', dos: d.dosDonts.dos || [], donts: d.dosDonts.donts || [] });
     }
-    html += `</div>`;
+    // Timing advice
+    if (d.timingAdvice) lessonCards.push({ type: 'info', title: 'Zaman Yonetimi', text: d.timingAdvice, tag: 'strategy' });
+    // Band tips
+    if (d.bandTips) {
+      let bandText = '';
+      for (const [band, tip] of Object.entries(d.bandTips)) {
+        bandText += `Band ${band}: ${tip}\n\n`;
+      }
+      lessonCards.push({ type: 'info', title: 'Band Hedefine Gore Ipuclari', text: bandText.trim(), tag: 'strategy' });
+    }
+    addExerciseCards(d);
   }
-  return html;
+
+  // If no cards were generated, add a fallback
+  if (lessonCards.length === 0) {
+    lessonCards.push({ type: 'info', title: l.title, text: 'Bu ders icin icerik hazirlaniyor.', tag: l.type });
+  }
 }
 
-function renderExercises(exercises, lessonId) {
-  let html = `<div class="lesson-section"><h3>Al\u0131\u015ft\u0131rmalar</h3>`;
-  exercises.forEach((ex, ei) => {
-    if (ex.type === 'quiz') {
-      ex.items.forEach((q, qi) => {
-        html += `<div class="grammar-box" style="margin-bottom:12px;"><p style="font-weight:600;margin-bottom:8px;">${q.q}</p><div class="quiz-options">`;
-        q.opts.forEach((o, oi) => { html += `<button class="quiz-option" onclick="answerExQ(this,${oi},${q.correct})">${o}</button>`; });
-        html += `</div></div>`;
-      });
-    } else if (ex.type === 'fillBlank') {
-      ex.items.forEach((fb, fbi) => {
-        const uid = `fb_${ei}_${fbi}`;
-        const parts = fb.sentence.split('___');
-        html += `<div class="grammar-box fill-blank-item" style="margin-bottom:12px;">`;
-        html += `<p class="fill-blank-sentence">${parts[0]}<span class="blank-slot" id="slot_${uid}">___</span>${parts[1] || ''}</p>`;
-        html += `<div class="fill-blank-opts">`;
-        fb.opts.forEach(opt => {
-          html += `<button onclick="answerFillBlank(this,'${opt.replace(/'/g,"\\'")}','${fb.answer.replace(/'/g,"\\'")}','slot_${uid}')">${opt}</button>`;
-        });
-        html += `</div></div>`;
-      });
-    } else if (ex.type === 'match') {
-      const mid = `match_${ei}`;
-      const shuffled = [...ex.pairs.map(p => p[1])].sort(() => Math.random() - 0.5);
-      html += `<div class="grammar-box" style="margin-bottom:12px;" id="${mid}_box"><p style="font-weight:600;margin-bottom:12px;">${ex.q || 'E\u015fle\u015ftir'}</p>`;
-      html += `<div class="match-container"><div class="match-column">`;
-      ex.pairs.forEach((p, pi) => {
-        html += `<div class="match-item" id="${mid}_l${pi}" onclick="selectMatchItem(this,'${mid}','left',${pi})" data-pair="${pi}">${p[0]}</div>`;
-      });
-      html += `</div><div class="match-column">`;
-      shuffled.forEach((r, ri) => {
-        const origIdx = ex.pairs.findIndex(p => p[1] === r);
-        html += `<div class="match-item" id="${mid}_r${ri}" onclick="selectMatchItem(this,'${mid}','right',${ri})" data-pair="${origIdx}">${r}</div>`;
-      });
-      html += `</div></div>`;
-      html += `<div class="match-score" id="${mid}_score" style="display:none;"></div>`;
-      html += `</div>`;
+function addExerciseCards(d) {
+  if (!d.exercises) return;
+  d.exercises.forEach(ex => {
+    if (ex.type === 'quiz' && ex.items) {
+      ex.items.forEach(q => lessonCards.push({ type: 'quiz', q: q.q, opts: q.opts, correct: q.correct }));
+    } else if (ex.type === 'fillBlank' && ex.items) {
+      ex.items.forEach(fb => lessonCards.push({ type: 'fill', sentence: fb.sentence, opts: fb.opts, answer: fb.answer }));
+    } else if (ex.type === 'match' && ex.pairs) {
+      lessonCards.push({ type: 'match', q: ex.q || 'Eslestir', pairs: ex.pairs });
     }
   });
-  html += `<div id="lessonScoreBox"></div>`;
-  html += `</div>`;
-  return html;
 }
 
-function answerReadingQ(btn, selected, correct) {
-  const parent = btn.parentElement;
-  const buttons = parent.querySelectorAll('.quiz-option');
-  buttons.forEach((b, i) => { b.disabled = true; if (i === correct) b.classList.add('correct'); if (i === selected && selected !== correct) b.classList.add('wrong'); });
-  const isCorrect = selected === correct;
-  const wrapper = parent.closest('.grammar-box');
-  const qText = wrapper ? (wrapper.querySelector('p')?.textContent || '') : '';
-  if (wrapper) {
-    const fb = wrapper.querySelector('.quiz-feedback');
-    if (fb && fb.dataset.explanation) {
-      fb.textContent = (isCorrect ? 'Dogru! ' : 'Yanlis. ') + fb.dataset.explanation;
-      fb.className = 'quiz-feedback show ' + (isCorrect ? 'correct-fb' : 'wrong-fb');
-    }
+function renderCurrentCard() {
+  if (currentCardIndex >= lessonCards.length) {
+    renderLessonComplete();
+    return;
   }
-  if (isCorrect) { awardXP(10, 'correct_answer'); } else { recordMistake({ word: qText, correct_answer: buttons[correct]?.textContent, user_answer: buttons[selected]?.textContent, lesson_id: currentLessonId, module_id: currentModuleId, question_type: 'reading' }).catch(()=>{}); }
-  recordTopicStat(currentModuleId, currentUnitId, isCorrect, Date.now() - questionStartTime).catch(()=>{});
-  questionStartTime = Date.now();
-  updateLessonProgress();
+  const card = lessonCards[currentCardIndex];
+  const body = document.getElementById('lfsBody');
+  const action = document.getElementById('lfsAction');
+  cardAnswered = false;
+
+  // Update progress
+  const pct = Math.round((currentCardIndex / lessonCards.length) * 100);
+  document.getElementById('lfsProgressFill').style.width = pct + '%';
+  document.getElementById('lfsCounter').textContent = `${currentCardIndex + 1}/${lessonCards.length}`;
+
+  let html = '';
+  let actionHtml = '';
+  const isInteractive = ['quiz', 'fill', 'match'].includes(card.type);
+
+  if (card.type === 'vocab') {
+    const w = card.word;
+    html = `<div class="lesson-card">
+      <div class="lc-tag vocab">Kelime</div>
+      <div class="lc-word">${w.e}</div>
+      <div class="lc-translation">${w.t}</div>
+      ${w.p ? `<div class="lc-phonetic">/${w.p}/</div>` : '<div style="height:16px;"></div>'}
+      ${w.ex ? `<div class="lc-example">${w.ex}${w.ext ? `<span class="tr">${w.ext}</span>` : ''}</div>` : ''}
+      <button class="lc-speak-btn" onclick="speakWord('${(w.e || '').replace(/'/g, "\\'")}')">&#9834; Dinle</button>
+    </div>`;
+    actionHtml = `<button class="btn btn-primary" onclick="nextCard()">Devam &rarr;</button>`;
+  } else if (card.type === 'grammar') {
+    let examplesHtml = '';
+    if (card.examples && card.examples.length > 0) {
+      examplesHtml = card.examples.map(ex =>
+        `<div class="lc-grammar-example"><div>${(ex.en || '').replace(/<hl>/g,'<span class="highlight">').replace(/<\/hl>/g,'</span>')}</div><span class="tr">${ex.tr || ''}</span></div>`
+      ).join('');
+    }
+    html = `<div class="lesson-card">
+      <div class="lc-tag grammar">Gramer</div>
+      <div class="lc-rule-title">${card.rule}</div>
+      ${card.explanation ? `<div class="lc-explanation">${card.explanation}</div>` : ''}
+      ${examplesHtml}
+    </div>`;
+    actionHtml = `<button class="btn btn-primary" onclick="nextCard()">Devam &rarr;</button>`;
+  } else if (card.type === 'quiz') {
+    lessonScore.total++;
+    html = `<div class="lesson-card">
+      <div class="lc-tag quiz">Soru</div>
+      <div class="lc-question">${card.q}</div>
+      <div class="lc-options" id="lcOptions">
+        ${card.opts.map((o, i) => `<button class="lc-option" onclick="answerLCQuiz(${i}, ${card.correct})">${o}</button>`).join('')}
+      </div>
+      <div id="lcFeedback"></div>
+    </div>`;
+    actionHtml = `<button class="btn btn-primary" id="lcNextBtn" style="opacity:0.4;pointer-events:none;" onclick="nextCard()">Devam &rarr;</button>`;
+  } else if (card.type === 'fill') {
+    lessonScore.total++;
+    const parts = card.sentence.split('___');
+    html = `<div class="lesson-card">
+      <div class="lc-tag fill">Bosluk Doldur</div>
+      <div class="lc-fill-sentence">${parts[0]}<span class="lc-fill-blank" id="lcFillBlank">___</span>${parts[1] || ''}</div>
+      <div class="lc-fill-opts" id="lcFillOpts">
+        ${card.opts.map(o => `<button class="lc-fill-opt" onclick="answerLCFill(this, '${o.replace(/'/g,"\\'")}', '${card.answer.replace(/'/g,"\\'")}')"><span>${o}</span></button>`).join('')}
+      </div>
+      <div id="lcFeedback"></div>
+    </div>`;
+    actionHtml = `<button class="btn btn-primary" id="lcNextBtn" style="opacity:0.4;pointer-events:none;" onclick="nextCard()">Devam &rarr;</button>`;
+  } else if (card.type === 'match') {
+    lessonScore.total++;
+    const shuffled = [...card.pairs.map(p => p[1])].sort(() => Math.random() - 0.5);
+    cardMatchState = { left: null, right: null, matched: 0, total: card.pairs.length, pairs: card.pairs, shuffledRight: shuffled };
+    let leftHtml = '', rightHtml = '';
+    card.pairs.forEach((p, pi) => {
+      leftHtml += `<div class="lc-match-item" id="lcm_l${pi}" onclick="lcMatchSelect('left', ${pi})" data-pair="${pi}">${p[0]}</div>`;
+    });
+    shuffled.forEach((r, ri) => {
+      const origIdx = card.pairs.findIndex(p => p[1] === r);
+      rightHtml += `<div class="lc-match-item" id="lcm_r${ri}" onclick="lcMatchSelect('right', ${ri})" data-pair="${origIdx}">${r}</div>`;
+    });
+    html = `<div class="lesson-card">
+      <div class="lc-tag match">Eslestir</div>
+      <div class="lc-question">${card.q}</div>
+      <div class="lc-match-grid">
+        <div><div class="lc-match-col-label">English</div>${leftHtml}</div>
+        <div><div class="lc-match-col-label">Turkce</div>${rightHtml}</div>
+      </div>
+      <div id="lcFeedback"></div>
+    </div>`;
+    actionHtml = `<button class="btn btn-primary" id="lcNextBtn" style="opacity:0.4;pointer-events:none;" onclick="nextCard()">Devam &rarr;</button>`;
+  } else if (card.type === 'dialogue') {
+    const avatarClass = card.isB ? 'speaker-b' : 'speaker-a';
+    const bubbleClass = card.isB ? ' right' : '';
+    html = `<div class="lesson-card">
+      <div class="lc-tag dialogue">Diyalog</div>
+      <div class="lc-dialogue-bubble${bubbleClass}">
+        <div class="lc-dialogue-avatar ${avatarClass}">${card.speaker}</div>
+        <div class="lc-dialogue-content">
+          <div class="lc-dialogue-en">${card.en}</div>
+          <div class="lc-dialogue-tr">${card.tr}</div>
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:20px;">
+        <button class="lc-speak-btn" onclick="speakWord('${(card.en || '').replace(/'/g, "\\'")}')">&#9834; Dinle</button>
+      </div>
+    </div>`;
+    actionHtml = `<button class="btn btn-primary" onclick="nextCard()">Devam &rarr;</button>`;
+  } else if (card.type === 'reading') {
+    let glossaryHtml = '';
+    if (card.glossary && card.glossary.length > 0) {
+      glossaryHtml = `<div style="margin-top:16px;border-top:1px solid var(--border-1);padding-top:14px;">
+        <div style="font-size:12px;font-weight:600;color:var(--text-4);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Kelime Sozlugu</div>
+        ${card.glossary.map(w => `<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:13px;"><span style="color:var(--amber-light);font-weight:500;">${w.en}</span><span style="color:var(--text-4);">${w.tr}</span></div>`).join('')}
+      </div>`;
+    }
+    html = `<div class="lesson-card">
+      <div class="lc-tag reading">Okuma</div>
+      <div class="lc-passage">${card.passage}</div>
+      ${glossaryHtml}
+    </div>`;
+    actionHtml = `<button class="btn btn-primary" onclick="nextCard()">Devam &rarr;</button>`;
+  } else if (card.type === 'speaking-q') {
+    html = `<div class="lesson-card">
+      <div class="lc-tag speaking">Konusma</div>
+      <div class="lc-question">${card.question}</div>
+      <div style="text-align:center;margin-bottom:16px;">
+        <button class="lc-speak-btn" onclick="speakWord('${(card.question || '').replace(/'/g, "\\'")}')">&#9834; Soruyu Dinle</button>
+      </div>
+      ${card.sampleAnswer ? `<div class="lc-example"><strong style="color:var(--text-4);font-size:12px;">Ornek Cevap:</strong><br>${card.sampleAnswer}</div>` : ''}
+    </div>`;
+    actionHtml = `<button class="btn btn-primary" onclick="nextCard()">Devam &rarr;</button>`;
+  } else if (card.type === 'dos-donts') {
+    let dosHtml = card.dos.map(d => `<div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:10px;"><span style="color:var(--emerald);font-size:18px;flex-shrink:0;">&#10003;</span><span style="font-size:14px;color:var(--text-2);">${d}</span></div>`).join('');
+    let dontsHtml = card.donts.map(d => `<div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:10px;"><span style="color:var(--rose);font-size:18px;flex-shrink:0;">&#10007;</span><span style="font-size:14px;color:var(--text-2);">${d}</span></div>`).join('');
+    html = `<div class="lesson-card">
+      <div class="lc-tag strategy">Strateji</div>
+      ${card.dos.length > 0 ? `<div style="margin-bottom:20px;"><div style="font-size:13px;font-weight:600;color:var(--emerald);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;">Yapilmasi Gerekenler</div>${dosHtml}</div>` : ''}
+      ${card.donts.length > 0 ? `<div><div style="font-size:13px;font-weight:600;color:var(--rose);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;">Yapilmamasi Gerekenler</div>${dontsHtml}</div>` : ''}
+    </div>`;
+    actionHtml = `<button class="btn btn-primary" onclick="nextCard()">Devam &rarr;</button>`;
+  } else if (card.type === 'info') {
+    const tagClass = card.tag || 'grammar';
+    const tagLabels = { writing: 'Yazma', speaking: 'Konusma', strategy: 'Strateji', dialogue: 'Diyalog', reading: 'Okuma', grammar: 'Gramer', vocab: 'Kelime' };
+    html = `<div class="lesson-card">
+      <div class="lc-tag ${tagClass}">${tagLabels[tagClass] || tagClass}</div>
+      <div class="lc-rule-title">${card.title}</div>
+      <div class="lc-explanation" style="white-space:pre-line;">${card.text}</div>
+    </div>`;
+    actionHtml = `<button class="btn btn-primary" onclick="nextCard()">Devam &rarr;</button>`;
+  }
+
+  body.innerHTML = html;
+  action.innerHTML = actionHtml;
 }
 
-function answerTFQ(btn, selected, correct) {
-  const parent = btn.parentElement;
-  const buttons = parent.querySelectorAll('.quiz-option');
+function nextCard() {
+  currentCardIndex++;
+  questionStartTime = Date.now();
+  renderCurrentCard();
+}
+
+// ==================== CARD ANSWER HANDLERS ====================
+function answerLCQuiz(selected, correct) {
+  if (cardAnswered) return;
+  cardAnswered = true;
+  const opts = document.querySelectorAll('#lcOptions .lc-option');
   const isCorrect = selected === correct;
-  buttons.forEach(b => { b.disabled = true; const val = b.textContent === 'True'; if (val === correct) b.classList.add('correct'); if (val === selected && selected !== correct) b.classList.add('wrong'); });
-  const wrapper = parent.closest('.grammar-box');
-  const qText = wrapper ? (wrapper.querySelector('p')?.textContent || '') : '';
-  if (isCorrect) { awardXP(10, 'correct_answer'); } else { recordMistake({ word: qText, correct_answer: String(correct), user_answer: String(selected), lesson_id: currentLessonId, module_id: currentModuleId, question_type: 'true_false' }).catch(()=>{}); }
-  recordTopicStat(currentModuleId, currentUnitId, isCorrect, Date.now() - questionStartTime).catch(()=>{});
-  questionStartTime = Date.now();
-  updateLessonProgress();
-}
-
-function answerExQ(btn, selected, correct) {
-  const parent = btn.parentElement;
-  const buttons = parent.querySelectorAll('.quiz-option');
-  const isCorrect = selected === correct;
-  buttons.forEach((b, i) => { b.disabled = true; if (i === correct) b.classList.add('correct'); if (i === selected && selected !== correct) b.classList.add('wrong'); });
-  const wrapper = parent.closest('.grammar-box');
-  const qText = wrapper ? (wrapper.querySelector('p')?.textContent || '') : '';
-  if (isCorrect) { awardXP(10, 'correct_answer'); } else { recordMistake({ word: qText, correct_answer: buttons[correct]?.textContent, user_answer: buttons[selected]?.textContent, lesson_id: currentLessonId, module_id: currentModuleId, question_type: 'quiz' }).catch(()=>{}); }
-  recordTopicStat(currentModuleId, currentUnitId, isCorrect, Date.now() - questionStartTime).catch(()=>{});
-  questionStartTime = Date.now();
-  updateLessonProgress();
-}
-
-// FIX 1: Fill-in-the-blank handler
-function answerFillBlank(btn, chosen, answer, slotId) {
-  const slot = document.getElementById(slotId);
-  const opts = btn.parentElement;
-  const buttons = opts.querySelectorAll('button');
-  buttons.forEach(b => b.disabled = true);
-  slot.textContent = chosen;
-  const isCorrect = chosen === answer;
+  opts.forEach((o, i) => {
+    o.disabled = true;
+    if (i === correct) o.classList.add('correct');
+    if (i === selected && selected !== correct) o.classList.add('wrong');
+  });
+  const fb = document.getElementById('lcFeedback');
+  const card = lessonCards[currentCardIndex];
   if (isCorrect) {
-    slot.classList.add('correct');
-    btn.classList.add('correct');
+    lessonScore.correct++;
+    fb.innerHTML = '<div class="lc-feedback correct-fb">Dogru!</div>';
     awardXP(10, 'correct_answer');
   } else {
-    slot.classList.add('wrong');
-    btn.classList.add('wrong');
-    buttons.forEach(b => { if (b.textContent === answer) b.classList.add('correct'); });
-    const wrapper = opts.closest('.grammar-box') || opts.closest('.fill-blank-item');
-    const sentence = wrapper ? (wrapper.querySelector('.fill-blank-sentence')?.textContent || '') : '';
-    recordMistake({ word: sentence, correct_answer: answer, user_answer: chosen, lesson_id: currentLessonId, module_id: currentModuleId, question_type: 'fillBlank' }).catch(()=>{});
+    const explanation = card.explanation || '';
+    fb.innerHTML = `<div class="lc-feedback wrong-fb">Yanlis! Dogru cevap: ${card.opts[correct]}${explanation ? '<br>' + explanation : ''}</div>`;
+    lessonScore.mistakes.push({ ...card, userAnswer: selected });
+    recordMistake({ word: card.q, correct_answer: card.opts[correct], user_answer: card.opts[selected], lesson_id: currentLessonId, module_id: currentModuleId, question_type: 'quiz' }).catch(()=>{});
   }
   recordTopicStat(currentModuleId, currentUnitId, isCorrect, Date.now() - questionStartTime).catch(()=>{});
   questionStartTime = Date.now();
-  updateLessonProgress();
+  enableLCNext();
 }
 
-// FIX 3: Interactive match state
-let matchState = {};
-function selectMatchItem(el, mid, side, idx) {
-  if (el.classList.contains('matched') || el.classList.contains('disabled')) return;
-  if (!matchState[mid]) matchState[mid] = { left: null, right: null, matched: 0, total: 0 };
-  const ms = matchState[mid];
-  if (ms.total === 0) {
-    ms.total = document.querySelectorAll(`[id^="${mid}_l"]`).length;
+function answerLCFill(btn, chosen, answer) {
+  if (cardAnswered) return;
+  cardAnswered = true;
+  const blank = document.getElementById('lcFillBlank');
+  const opts = document.querySelectorAll('#lcFillOpts .lc-fill-opt');
+  opts.forEach(o => o.disabled = true);
+  blank.textContent = chosen;
+  const isCorrect = chosen === answer;
+  const fb = document.getElementById('lcFeedback');
+  if (isCorrect) {
+    lessonScore.correct++;
+    blank.classList.add('correct');
+    btn.classList.add('correct');
+    fb.innerHTML = '<div class="lc-feedback correct-fb">Dogru!</div>';
+    awardXP(10, 'correct_answer');
+  } else {
+    blank.classList.add('wrong');
+    btn.classList.add('wrong');
+    opts.forEach(o => { if (o.textContent.trim() === answer) o.classList.add('correct'); });
+    fb.innerHTML = `<div class="lc-feedback wrong-fb">Yanlis! Dogru cevap: ${answer}</div>`;
+    const card = lessonCards[currentCardIndex];
+    lessonScore.mistakes.push({ ...card, userAnswer: chosen });
+    recordMistake({ word: card.sentence, correct_answer: answer, user_answer: chosen, lesson_id: currentLessonId, module_id: currentModuleId, question_type: 'fillBlank' }).catch(()=>{});
   }
+  recordTopicStat(currentModuleId, currentUnitId, isCorrect, Date.now() - questionStartTime).catch(()=>{});
+  questionStartTime = Date.now();
+  enableLCNext();
+}
+
+function lcMatchSelect(side, idx) {
+  const ms = cardMatchState;
+  const el = document.getElementById(`lcm_${side[0]}${idx}`);
+  if (!el || el.classList.contains('matched')) return;
   // Clear previous selection on same side
   if (ms[side] !== null) {
-    const prev = document.getElementById(`${mid}_${side[0]}${ms[side]}`);
+    const prev = document.getElementById(`lcm_${side[0]}${ms[side]}`);
     if (prev) prev.classList.remove('selected');
   }
   ms[side] = idx;
   el.classList.add('selected');
   // Check if both sides selected
   if (ms.left !== null && ms.right !== null) {
-    const leftEl = document.getElementById(`${mid}_l${ms.left}`);
-    const rightEl = document.getElementById(`${mid}_r${ms.right}`);
+    const leftEl = document.getElementById(`lcm_l${ms.left}`);
+    const rightEl = document.getElementById(`lcm_r${ms.right}`);
     const leftPair = parseInt(leftEl.dataset.pair);
     const rightPair = parseInt(rightEl.dataset.pair);
     if (leftPair === rightPair) {
@@ -2337,10 +2853,11 @@ function selectMatchItem(el, mid, side, idx) {
       recordTopicStat(currentModuleId, currentUnitId, true, Date.now() - questionStartTime).catch(()=>{});
       questionStartTime = Date.now();
       if (ms.matched === ms.total) {
-        const scoreEl = document.getElementById(`${mid}_score`);
-        if (scoreEl) { scoreEl.textContent = 'Tamamlandi!'; scoreEl.style.display = 'block'; }
+        lessonScore.correct++;
+        const fb = document.getElementById('lcFeedback');
+        fb.innerHTML = '<div class="lc-feedback correct-fb">Tum eslesmeler tamamlandi!</div>';
+        enableLCNext();
       }
-      updateLessonProgress();
     } else {
       leftEl.classList.add('wrong-flash');
       rightEl.classList.add('wrong-flash');
@@ -2357,102 +2874,102 @@ function selectMatchItem(el, mid, side, idx) {
   }
 }
 
-// FIX 4 + FIX 9: Lesson progress tracking and score display
-function countLessonQuestions() {
-  let total = 0;
-  // quiz options (each quiz-options div = 1 question)
-  document.querySelectorAll('#lessonDetailView .quiz-options').forEach(() => total++);
-  // fill blank items
-  document.querySelectorAll('#lessonDetailView .fill-blank-item').forEach(() => total++);
-  // match containers (each match box = 1 exercise)
-  document.querySelectorAll('#lessonDetailView .match-container').forEach(() => total++);
-  return total;
-}
-
-function countAnsweredQuestions() {
-  let answered = 0;
-  // Quiz: check if any button is disabled in quiz-options
-  document.querySelectorAll('#lessonDetailView .quiz-options').forEach(qo => {
-    const btns = qo.querySelectorAll('.quiz-option');
-    if (btns.length > 0 && btns[0].disabled) answered++;
-  });
-  // Fill blank: check if slot has correct/wrong class
-  document.querySelectorAll('#lessonDetailView .fill-blank-item').forEach(fb => {
-    const slot = fb.querySelector('.blank-slot');
-    if (slot && (slot.classList.contains('correct') || slot.classList.contains('wrong'))) answered++;
-  });
-  // Match: check if all items matched
-  document.querySelectorAll('#lessonDetailView .match-container').forEach(mc => {
-    const box = mc.closest('.grammar-box');
-    const items = mc.querySelectorAll('.match-item');
-    const matched = mc.querySelectorAll('.match-item.matched');
-    if (items.length > 0 && matched.length === items.length) answered++;
-  });
-  return answered;
-}
-
-function countCorrectAnswers() {
-  let correct = 0;
-  document.querySelectorAll('#lessonDetailView .quiz-options').forEach(qo => {
-    const btns = qo.querySelectorAll('.quiz-option');
-    if (btns.length > 0 && btns[0].disabled) {
-      // Check if any button has both correct class and was actually selected (not just showing answer)
-      const wrongBtn = qo.querySelector('.quiz-option.wrong');
-      if (!wrongBtn) correct++;
-    }
-  });
-  document.querySelectorAll('#lessonDetailView .fill-blank-item').forEach(fb => {
-    const slot = fb.querySelector('.blank-slot');
-    if (slot && slot.classList.contains('correct')) correct++;
-  });
-  document.querySelectorAll('#lessonDetailView .match-container').forEach(mc => {
-    const items = mc.querySelectorAll('.match-item');
-    const matched = mc.querySelectorAll('.match-item.matched');
-    if (items.length > 0 && matched.length === items.length) correct++;
-  });
-  return correct;
-}
-
-function updateLessonProgress() {
-  const total = countLessonQuestions();
-  const answered = countAnsweredQuestions();
-  const correctCount = countCorrectAnswers();
-  // Update progress bar
-  const progressBar = document.getElementById('lessonProgressBar');
-  if (progressBar) {
-    const pct = total > 0 ? Math.round((answered / total) * 100) : 0;
-    progressBar.innerHTML = `<span>${answered}/${total} soru cevaplandi</span><div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>`;
-  }
-  // Enable/disable completion button
-  const completeBtn = document.getElementById('lessonCompleteBtn');
-  if (completeBtn) {
-    const threshold = Math.ceil(total * 0.7);
-    completeBtn.disabled = total > 0 && answered < threshold;
-    if (completeBtn.disabled) {
-      completeBtn.style.opacity = '0.5';
-      completeBtn.style.cursor = 'not-allowed';
-    } else {
-      completeBtn.style.opacity = '1';
-      completeBtn.style.cursor = 'pointer';
-    }
-  }
-  // FIX 9: Update score display
-  if (answered === total && total > 0) {
-    const scoreBox = document.getElementById('lessonScoreBox');
-    if (scoreBox) {
-      const pct = Math.round((correctCount / total) * 100);
-      const cls = pct >= 80 ? 'good' : pct >= 50 ? 'mid' : 'low';
-      scoreBox.innerHTML = `<div class="lesson-score-box"><div class="score-value ${cls}">Skor: ${correctCount}/${total} (${pct}%)</div><div class="score-label">${pct >= 80 ? 'Harika!' : pct >= 50 ? 'Iyi gidiyorsun!' : 'Biraz daha calis!'}</div></div>`;
-    }
+function enableLCNext() {
+  const btn = document.getElementById('lcNextBtn');
+  if (btn) {
+    btn.style.opacity = '1';
+    btn.style.pointerEvents = 'auto';
   }
 }
 
-function speakDialogueLines(id) {
-  const l = getLesson(id);
-  if (!l || !l.data.lines || !('speechSynthesis' in window)) return;
-  let d = 0;
-  l.data.lines.forEach(x => { const enText = x.en || x.text; setTimeout(() => { const u = new SpeechSynthesisUtterance(enText); u.lang = 'en-US'; u.rate = 0.8; speechSynthesis.speak(u); }, d); d += 3000; });
+// ==================== LESSON COMPLETE ====================
+function renderLessonComplete() {
+  const pct = lessonScore.total > 0 ? Math.round((lessonScore.correct / lessonScore.total) * 100) : 100;
+  const cls = pct >= 80 ? 'good' : pct >= 50 ? 'mid' : 'low';
+  const stars = pct >= 90 ? 3 : pct >= 60 ? 2 : pct >= 30 ? 1 : 0;
+  const starHtml = Array.from({length: 3}, (_, i) =>
+    `<span class="lc-star" style="animation-delay:${0.2 + i*0.2}s">${i < stars ? '&#11088;' : '&#9734;'}</span>`
+  ).join('');
+  const msg = pct >= 90 ? 'Muhteseml!' : pct >= 70 ? 'Harika is cikarddin!' : pct >= 50 ? 'Iyi gidiyorsun!' : 'Biraz daha calis!';
+  const hasMistakes = lessonScore.mistakes.length > 0;
+
+  // Calculate XP
+  const isPerfect = lessonScore.total > 0 && lessonScore.correct === lessonScore.total;
+  const xpEarned = isPerfect ? 150 : 50;
+
+  // Update progress
+  document.getElementById('lfsProgressFill').style.width = '100%';
+  document.getElementById('lfsCounter').textContent = `${lessonCards.length}/${lessonCards.length}`;
+
+  const body = document.getElementById('lfsBody');
+  body.innerHTML = `<div class="lesson-card lc-complete">
+    <div class="lc-tag complete">Ders Tamamlandi</div>
+    <div class="lc-stars">${starHtml}</div>
+    <div class="lc-score-big ${cls}">${lessonScore.total > 0 ? pct + '%' : '&#10003;'}</div>
+    <div class="lc-complete-msg">${msg}</div>
+    ${lessonScore.total > 0 ? `<div style="font-size:14px;color:var(--text-4);margin-bottom:12px;">${lessonScore.correct}/${lessonScore.total} dogru</div>` : ''}
+    <div class="lc-xp-earned">+${xpEarned} XP</div>
+    <div class="lc-complete-actions">
+      ${hasMistakes ? `<button class="btn btn-secondary" onclick="retryMistakes()" style="width:100%;">Yanlislarini Tekrar Et</button>` : ''}
+      <button class="btn btn-primary" onclick="finishLesson()" style="width:100%;">Devam</button>
+    </div>
+  </div>`;
+  document.getElementById('lfsAction').innerHTML = '';
+
+  // Complete the lesson
+  completeCurriculumLesson(currentLessonId);
 }
+
+function retryMistakes() {
+  if (lessonScore.mistakes.length === 0) return;
+  // Re-insert mistake cards at the end
+  const retryCards = lessonScore.mistakes.map(m => {
+    if (m.type === 'quiz') return { type: 'quiz', q: m.q, opts: m.opts, correct: m.correct, explanation: m.explanation || '' };
+    if (m.type === 'fill') return { type: 'fill', sentence: m.sentence, opts: m.opts, answer: m.answer };
+    return m;
+  });
+  lessonCards = retryCards;
+  currentCardIndex = 0;
+  lessonScore = { correct: 0, total: 0, mistakes: [] };
+  renderCurrentCard();
+}
+
+function finishLesson() {
+  if (lessonFSElement) {
+    lessonFSElement.remove();
+    lessonFSElement = null;
+  }
+}
+
+function confirmExitLesson() {
+  const overlay = document.createElement('div');
+  overlay.className = 'lesson-exit-confirm';
+  overlay.id = 'lessonExitConfirm';
+  overlay.innerHTML = `<div class="lesson-exit-confirm-box">
+    <h3>Dersten cikmak istediginize emin misiniz?</h3>
+    <p>Ilerlemeniz kaybolacak.</p>
+    <div class="exit-actions">
+      <button class="btn btn-secondary" onclick="document.getElementById('lessonExitConfirm').remove()">Devam Et</button>
+      <button class="btn btn-primary" style="background:var(--rose);" onclick="forceExitLesson()">Cik</button>
+    </div>
+  </div>`;
+  document.body.appendChild(overlay);
+}
+
+function forceExitLesson() {
+  const confirm = document.getElementById('lessonExitConfirm');
+  if (confirm) confirm.remove();
+  if (lessonFSElement) {
+    lessonFSElement.remove();
+    lessonFSElement = null;
+  }
+}
+
+// Legacy compatibility functions for quiz page and other systems
+function countLessonQuestions() { return lessonScore.total; }
+function countCorrectAnswers() { return lessonScore.correct; }
+function countAnsweredQuestions() { return lessonScore.total; }
+function updateLessonProgress() {}
 
 function completeCurriculumLesson(id) {
   if (!state.lessonsCompleted) state.lessonsCompleted = [];
@@ -2460,16 +2977,12 @@ function completeCurriculumLesson(id) {
     state.lessonsCompleted.push(id);
     const l = getLesson(id);
     if (l && l.type === 'vocabulary' && l.data.words) { state.wordsLearned = (state.wordsLearned || 0) + l.data.words.length; }
-    addActivity(`"${l?.title || id}" tamamland\u0131`);
+    addActivity(`"${l?.title || id}" tamamlandi`);
     apiFetch('/progress', { method: 'POST', body: JSON.stringify({ type: 'lesson', data: { lessonId: id, section: 'complete' } }) }).catch(() => {});
-    // XP award: 50 base + 100 bonus for perfect score
-    const totalQ = countLessonQuestions();
-    const correctQ = countCorrectAnswers();
-    const isPerfect = totalQ > 0 && correctQ === totalQ;
+    const isPerfect = lessonScore.total > 0 && lessonScore.correct === lessonScore.total;
     awardXP(isPerfect ? 150 : 50, 'lesson_complete', id);
   }
-  if (currentUnitId) showUnitLessons(currentModuleId, currentUnitId);
-  else showModules();
+  saveState();
 }
 
 // ==================== SPEECH ====================
