@@ -785,6 +785,42 @@ body::before {
 .module-card .module-progress-bar { height: 3px; background: var(--bg-elevated); border-radius: 3px; margin-top: 6px; overflow: hidden; }
 .module-card .module-progress-fill { height: 100%; background: var(--emerald); border-radius: 3px; transition: width 0.3s; }
 
+.recommended-badge {
+  position: absolute; top: 12px; right: 12px;
+  background: var(--amber); color: var(--bg-deep);
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 1px; padding: 3px 8px; border-radius: 4px;
+}
+.plan-card {
+  background: linear-gradient(135deg, rgba(245,158,11,0.08), rgba(245,158,11,0.02));
+  border: 1px solid var(--border-amber);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 20px;
+}
+.plan-stat {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 0;
+  font-size: 13px; color: var(--text-3);
+}
+.plan-stat .label { color: var(--text-4); min-width: 100px; }
+.plan-stat .value { color: var(--amber-light); font-weight: 600; }
+.next-lesson-card {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-1);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 8px;
+}
+.next-lesson-card:hover {
+  border-color: var(--border-amber);
+  background: var(--bg-card-hover);
+  transform: translateX(4px);
+}
+
 .unit-item {
   display: flex; align-items: center; gap: 16px;
   padding: 16px 20px;
@@ -1249,6 +1285,21 @@ body::before {
         </div>
       </div>
 
+      <div class="card" id="personalPlanCard" style="display:none;">
+        <div class="card-header">
+          <div class="card-title">Kişisel Planın</div>
+          <div class="card-badge" id="planLevelDash"></div>
+        </div>
+        <div class="plan-card">
+          <div class="plan-stat"><span class="label">Hedef Band:</span><span class="value" id="planTarget"></span></div>
+          <div class="plan-stat"><span class="label">Odak Alanlar:</span><span class="value" id="planFocus"></span></div>
+          <div class="plan-stat"><span class="label">Günlük Tempo:</span><span class="value" id="planDaily"></span></div>
+          <div class="plan-stat"><span class="label">Tahmini Süre:</span><span class="value" id="planDuration"></span></div>
+        </div>
+        <h4 style="font-size:14px;color:var(--amber-light);margin-bottom:8px;">Sıradaki Dersler</h4>
+        <div id="nextLessonsList"></div>
+      </div>
+
       <div class="card">
         <div class="card-header"><div class="card-title">Son Aktiviteler</div></div>
         <div id="activityLog" style="font-size:13px;color:var(--text-4);">
@@ -1517,6 +1568,39 @@ function updateDashboard() {
   document.getElementById('dailyTasks').innerHTML = `<div style="display:flex;align-items:center;gap:8px;"><span style="font-size:14px;">&#9654;</span><span style="font-size:13px;color:${hasMore?'var(--text-2)':'var(--emerald)'};">${hasMore?'M\u00fcfredattan bir ders se\u00e7':'T\u00fcm dersler tamamland\u0131!'}</span></div><div style="display:flex;align-items:center;gap:8px;"><span style="font-size:14px;">&#10022;</span><span style="font-size:13px;color:var(--text-3);">G\u00fcnl\u00fck quiz\'i \u00e7\u00f6z</span></div><div style="display:flex;align-items:center;gap:8px;"><span style="font-size:14px;">&#9998;</span><span style="font-size:13px;color:var(--text-3);">Konu\u015fma prati\u011fi yap</span></div>`;
   const logEl = document.getElementById('activityLog');
   if(state.activities.length>0) logEl.innerHTML = state.activities.map(a=>`<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border-1);"><span style="font-size:13px;">${a.text}</span><span style="color:var(--text-4);font-size:11px;font-family:var(--font-mono);">${a.time}</span></div>`).join('');
+  // Personalized plan card
+  const planCard = document.getElementById('personalPlanCard');
+  const user = typeof getCurrentUser === 'function' ? getCurrentUser() : (typeof currentUser !== 'undefined' ? currentUser : null);
+  if (planCard && user?.plan) {
+    planCard.style.display = 'block';
+    const plan = user.plan;
+    document.getElementById('planLevelDash').textContent = plan.levelLabel || '';
+    document.getElementById('planTarget').textContent = 'Band ' + (plan.targetBand || '—');
+    document.getElementById('planFocus').textContent = plan.focusAreas || 'Genel';
+    document.getElementById('planDaily').textContent = plan.dailyLabel || '—';
+    let nextLessons = [];
+    if (user.onboarding && typeof generateLearningPath === 'function') {
+      const lp = generateLearningPath(user.onboarding);
+      const daysLeft = lp.totalEstimatedDays - Math.floor((state.lessonsCompleted?.length || 0) / lp.dailyAllocation);
+      document.getElementById('planDuration').textContent = (daysLeft > 0 ? daysLeft : 0) + ' gün kaldı';
+      nextLessons = lp.lessons
+        .filter(id => !(state.lessonsCompleted || []).includes(id))
+        .slice(0, 3)
+        .map(id => typeof getLesson === 'function' ? getLesson(id) : null)
+        .filter(Boolean);
+    } else {
+      document.getElementById('planDuration').textContent = plan.durationLabel || '—';
+    }
+    const nlList = document.getElementById('nextLessonsList');
+    if (nextLessons.length > 0) {
+      const typeLabels = { vocabulary:'Kelime', grammar:'Gramer', dialogue:'Diyalog', reading:'Okuma', writing:'Yazma', speaking:'Konuşma', strategy:'Strateji' };
+      nlList.innerHTML = nextLessons.map(l => `<div class="next-lesson-card" onclick="openCurriculumLesson('${l.id}')"><div style="width:36px;height:36px;border-radius:8px;background:var(--amber-glow);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;">▶</div><div><div style="font-size:13px;font-weight:600;color:var(--text-1);">${l.title}</div><div style="font-size:11px;color:var(--text-4);margin-top:2px;">${typeLabels[l.type] || l.type} · ${l.minutes || 15} dk · ${l.level || ''}</div></div></div>`).join('');
+    } else {
+      nlList.innerHTML = '<div style="font-size:13px;color:var(--text-4);padding:8px 0;">Tüm önerilen dersler tamamlandı!</div>';
+    }
+  } else if (planCard) {
+    planCard.style.display = 'none';
+  }
 }
 
 // ==================== CURRICULUM NAVIGATION ====================
@@ -1531,6 +1615,12 @@ function showModules() {
   document.getElementById('lessonDetailView').classList.remove('active');
   document.getElementById('totalLessonsBadge').textContent = countTotalLessons() + ' ders';
   const grid = document.getElementById('moduleGrid');
+  // Determine which modules are recommended based on weak areas
+  const _user = typeof getCurrentUser === 'function' ? getCurrentUser() : (typeof currentUser !== 'undefined' ? currentUser : null);
+  const _weakAreas = _user?.plan?.weakAreas || [];
+  const weakToModules = { listening:['ielts-listening'], reading:['ielts-reading'], writing:['ielts-writing'], speaking:['ielts-speaking'], vocabulary:['foundations','daily-life','social'], grammar:['foundations','daily-life'] };
+  const recommendedModuleIds = new Set();
+  _weakAreas.forEach(wa => { (weakToModules[wa]||[]).forEach(mid => recommendedModuleIds.add(mid)); });
   grid.innerHTML = MODULES.map(mod => {
     const units = UNITS[mod.id] || [];
     let totalLessons = 0, completedLessons = 0;
@@ -1540,7 +1630,8 @@ function showModules() {
       lessons.forEach(lid => { if (state?.lessonsCompleted?.includes(lid)) completedLessons++; });
     });
     const pct = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
-    return `<div class="module-card" onclick="showUnits('${mod.id}')"><div class="module-icon">${mod.icon}</div><div class="module-title">${mod.title}</div><div class="module-cefr">${mod.cefr.join(' \u2192 ')}</div><div class="module-desc">${mod.desc}</div><div class="module-progress">${completedLessons}/${totalLessons} ders tamamland\u0131<div class="module-progress-bar"><div class="module-progress-fill" style="width:${pct}%"></div></div></div></div>`;
+    const badge = recommendedModuleIds.has(mod.id) ? '<div class="recommended-badge">\u2605 \u00d6nerilen</div>' : '';
+    return `<div class="module-card" onclick="showUnits('${mod.id}')">${badge}<div class="module-icon">${mod.icon}</div><div class="module-title">${mod.title}</div><div class="module-cefr">${mod.cefr.join(' \u2192 ')}</div><div class="module-desc">${mod.desc}</div><div class="module-progress">${completedLessons}/${totalLessons} ders tamamland\u0131<div class="module-progress-bar"><div class="module-progress-fill" style="width:${pct}%"></div></div></div></div>`;
   }).join('');
 }
 
@@ -1631,10 +1722,14 @@ function renderGrammarLesson(l) {
 
 function renderDialogueLesson(l) {
   let html = '';
-  if (l.data.scenarioTr) { html += `<div class="lesson-section"><h3>Senaryo</h3><div class="grammar-box"><p>${l.data.scenarioTr}</p></div></div>`; }
+  const situation = l.data.scenarioTr || l.data.situation;
+  if (situation) { html += `<div class="lesson-section"><h3>Senaryo</h3><div class="grammar-box"><p>${situation}</p></div></div>`; }
   html += `<div class="lesson-section"><h3>Diyalog</h3><div class="dialogue-box">`;
+  const speakers = l.data.speakers || ['A','B'];
   (l.data.lines || []).forEach(x => {
-    html += `<div class="dialogue-line"><div class="dialogue-speaker ${x.speaker === 'B' ? 'b' : ''}">${x.speaker}:</div><div class="dialogue-text">${x.en}<span class="translation">${x.tr}</span></div></div>`;
+    const spk = x.speaker || speakers[x.s] || 'A';
+    const isB = x.speaker === 'B' || x.s === 1;
+    html += `<div class="dialogue-line"><div class="dialogue-speaker ${isB ? 'b' : ''}">${spk}:</div><div class="dialogue-text">${x.en}<span class="translation">${x.tr}</span></div></div>`;
   });
   html += `</div><button class="btn btn-secondary" style="margin-top:12px;width:100%;" onclick="speakDialogueLines('${l.id}')">Diyalo\u011fu Dinle</button></div>`;
   if (l.data.keyPhrases && l.data.keyPhrases.length > 0) {
@@ -1650,9 +1745,10 @@ function renderDialogueLesson(l) {
 function renderReadingLesson(l) {
   let html = `<div class="lesson-section"><h3>Okuma Pasaj\u0131</h3>`;
   html += `<div class="grammar-box" style="border-left-color:var(--sky);"><p style="font-size:14px;line-height:2;white-space:pre-line;">${l.data.passage}</p></div>`;
-  if (l.data.wordGlossary && l.data.wordGlossary.length > 0) {
-    html += `<div style="margin-top:16px;"><strong style="color:var(--amber-light);font-size:13px;">Kelime S\u00f6zl\u00fc\u011f\u00fc</strong><div class="vocab-grid" style="margin-top:8px;">`;
-    l.data.wordGlossary.forEach(w => { html += `<div class="vocab-card"><div class="en">${w.en}</div><div class="tr">${w.tr}</div></div>`; });
+  const glossary = l.data.wordGlossary || l.data.vocabulary;
+  if (glossary && glossary.length > 0) {
+    html += `<div style="margin-top:16px;"><strong style="color:var(--amber-light);font-size:13px;">Kelime Sözlüğü</strong><div class="vocab-grid" style="margin-top:8px;">`;
+    glossary.forEach(w => { html += `<div class="vocab-card"><div class="en">${w.en}</div><div class="tr">${w.tr}</div></div>`; });
     html += `</div></div>`;
   }
   html += `</div>`;
@@ -1660,14 +1756,14 @@ function renderReadingLesson(l) {
     html += `<div class="lesson-section"><h3>Sorular</h3>`;
     l.data.questions.forEach((q, qi) => {
       html += `<div class="grammar-box" style="margin-bottom:12px;border-left-color:var(--sky);"><p style="font-weight:600;margin-bottom:8px;">${qi + 1}. ${q.q}</p>`;
-      if (q.type === 'multiple_choice') {
+      if (q.opts) {
         html += `<div class="quiz-options" style="margin-top:8px;">`;
         q.opts.forEach((o, oi) => { html += `<button class="quiz-option" onclick="answerReadingQ(this,${oi},${q.correct})">${o}</button>`; });
         html += `</div>`;
       } else if (q.type === 'true_false') {
         html += `<div class="quiz-options" style="margin-top:8px;"><button class="quiz-option" onclick="answerTFQ(this,true,${q.answer})">True</button><button class="quiz-option" onclick="answerTFQ(this,false,${q.answer})">False</button></div>`;
       }
-      if (q.explanationTr) { html += `<div class="quiz-feedback" id="readingFb${qi}" style="margin-top:8px;"></div>`; }
+      if (q.explanation || q.explanationTr) { html += `<div class="quiz-feedback" id="readingFb${qi}" style="margin-top:8px;"></div>`; }
       html += `</div>`;
     });
     html += `</div>`;
@@ -1676,8 +1772,10 @@ function renderReadingLesson(l) {
 }
 
 function renderWritingLesson(l) {
-  let html = `<div class="lesson-section"><h3>Yazma G\u00f6revi</h3>`;
-  if (l.data.taskTr) { html += `<div class="grammar-box" style="border-left-color:#fb923c;"><p>${l.data.taskTr}</p></div>`; }
+  let html = `<div class="lesson-section"><h3>Yazma Görevi</h3>`;
+  const taskDesc = l.data.taskTr || l.data.explanationTr;
+  if (taskDesc) { html += `<div class="grammar-box" style="border-left-color:#fb923c;"><p>${taskDesc}</p></div>`; }
+  if (l.data.samplePrompt) { html += `<div style="margin-top:16px;"><strong style="color:var(--amber-light);font-size:13px;">IELTS Sorusu</strong><div class="grammar-box" style="margin-top:8px;border-left-color:#fb923c;"><p style="font-style:italic;">${l.data.samplePrompt}</p></div></div>`; }
   if (l.data.structure) {
     html += `<div style="margin-top:16px;"><strong style="color:var(--amber-light);font-size:13px;">Essay Yap\u0131s\u0131</strong>`;
     html += `<div class="grammar-box" style="margin-top:8px;border-left-color:#fb923c;"><p>${typeof l.data.structure === 'string' ? l.data.structure : JSON.stringify(l.data.structure)}</p></div></div>`;
@@ -1697,19 +1795,49 @@ function renderWritingLesson(l) {
 
 function renderSpeakingLesson(l) {
   let html = '';
-  if (l.data.tipsTr) { html += `<div class="lesson-section"><h3>\u0130pu\u00e7lar\u0131</h3><div class="grammar-box" style="border-left-color:#2dd4bf;"><p>${l.data.tipsTr}</p></div></div>`; }
-  if (l.data.questions && l.data.questions.length > 0) {
-    html += `<div class="lesson-section"><h3>Konu\u015fma Sorular\u0131</h3>`;
-    l.data.questions.forEach((q, i) => {
-      html += `<div class="grammar-box" style="margin-bottom:12px;border-left-color:#2dd4bf;"><p style="font-weight:600;">${q}</p>${l.data.sampleAnswersTr && l.data.sampleAnswersTr[i] ? `<div style="margin-top:8px;font-size:13px;color:var(--text-4);"><strong>\u00d6rnek:</strong> ${l.data.sampleAnswersTr[i]}</div>` : ''}<button class="btn btn-secondary" style="margin-top:8px;" onclick="speakWord('${q.replace(/'/g, "\\'")}')">Soruyu Dinle</button></div>`;
+  const explanation = l.data.tipsTr || l.data.explanationTr;
+  if (explanation) { html += `<div class="lesson-section"><h3>İpuçları</h3><div class="grammar-box" style="border-left-color:#2dd4bf;"><p>${explanation}</p></div></div>`; }
+  const questions = l.data.questions || l.data.sampleQuestions || [];
+  if (questions.length > 0) {
+    html += `<div class="lesson-section"><h3>Konuşma Soruları</h3>`;
+    questions.forEach((q, i) => {
+      const qText = typeof q === 'string' ? q : q.q;
+      html += `<div class="grammar-box" style="margin-bottom:12px;border-left-color:#2dd4bf;"><p style="font-weight:600;">${qText}</p>`;
+      if (l.data.sampleAnswersTr && l.data.sampleAnswersTr[i]) { html += `<div style="margin-top:8px;font-size:13px;color:var(--text-4);"><strong>Örnek:</strong> ${l.data.sampleAnswersTr[i]}</div>`; }
+      html += `<button class="btn btn-secondary" style="margin-top:8px;" onclick="speakWord('${qText.replace(/'/g, "\\'")}')">Soruyu Dinle</button></div>`;
     });
     html += `</div>`;
+  }
+  if (l.data.modelAnswers && l.data.modelAnswers.length > 0) {
+    html += `<div class="lesson-section"><h3>Örnek Cevaplar</h3>`;
+    l.data.modelAnswers.forEach(ma => {
+      html += `<div class="grammar-box" style="margin-bottom:12px;border-left-color:#2dd4bf;"><p style="font-weight:600;margin-bottom:8px;">${ma.q}</p>`;
+      html += `<div style="font-size:14px;color:var(--text-2);line-height:1.8;">${ma.answer}</div>`;
+      if (ma.answerTr) { html += `<div style="font-size:12px;color:var(--text-4);margin-top:8px;font-style:italic;">${ma.answerTr}</div>`; }
+      if (ma.tips) { html += `<div style="margin-top:8px;padding:8px;background:rgba(45,212,191,0.1);border-radius:8px;font-size:12px;color:#2dd4bf;">💡 ${ma.tips}</div>`; }
+      html += `</div>`;
+    });
+    html += `</div>`;
+  }
+  if (l.data.usefulPhrases && l.data.usefulPhrases.length > 0) {
+    html += `<div class="lesson-section"><h3>Faydalı İfadeler</h3><div class="vocab-grid">`;
+    l.data.usefulPhrases.forEach(p => {
+      html += `<div class="vocab-card" onclick="speakWord('${(p.en||'').replace(/'/g,"\\'")}')"><div class="en">${p.en}</div><div class="tr">${p.tr}</div>${p.usage ? `<div style="font-size:11px;color:var(--text-4);margin-top:6px;border-top:1px solid var(--border-1);padding-top:6px;">${p.usage}</div>` : ''}</div>`;
+    });
+    html += `</div></div>`;
   }
   return html;
 }
 
 function renderStrategyLesson(l) {
   let html = `<div class="lesson-section"><h3>Strateji</h3><div class="grammar-box" style="border-left-color:#f472b6;"><p>${l.data.explanationTr}</p></div></div>`;
+  if (l.data.tips && l.data.tips.length > 0) {
+    html += `<div class="lesson-section"><h3>İpuçları</h3>`;
+    l.data.tips.forEach(tip => {
+      html += `<div class="grammar-box" style="margin-bottom:12px;border-left-color:#f472b6;"><p><strong style="color:var(--amber-light);">${tip.title}</strong></p><p style="margin-top:8px;font-size:14px;color:var(--text-2);">${tip.detail}</p></div>`;
+    });
+    html += `</div>`;
+  }
   if (l.data.dosDonts) {
     html += `<div class="lesson-section"><h3>Yap\u0131lmas\u0131 Gerekenler</h3><div class="grammar-box" style="border-left-color:var(--emerald);">`;
     (l.data.dosDonts.dos || []).forEach(d => { html += `<div style="display:flex;gap:8px;margin-bottom:8px;"><span style="color:var(--emerald);">\u2713</span><span style="font-size:14px;color:var(--text-2);">${d}</span></div>`; });
