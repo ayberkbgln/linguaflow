@@ -772,6 +772,40 @@ body::before {
 }
 .back-btn:hover { color: var(--amber); }
 
+/* ===== USER MENU DROPDOWN ===== */
+.user-pill { position: relative; cursor: pointer; }
+.user-menu-dropdown {
+  display: none; position: absolute; top: calc(100% + 8px); right: 0; z-index: 100;
+  background: var(--bg-card); border: 1px solid var(--border-2); border-radius: 10px;
+  padding: 6px 0; min-width: 180px; box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+.user-menu-dropdown.show { display: block; }
+.user-menu-dropdown button {
+  display: flex; align-items: center; gap: 8px; width: 100%; padding: 10px 16px;
+  background: none; border: none; color: var(--text-2); font-family: var(--font-body);
+  font-size: 13px; cursor: pointer; transition: background 0.15s;
+}
+.user-menu-dropdown button:hover { background: var(--bg-elevated); color: var(--text-1); }
+.user-menu-dropdown button.danger { color: var(--rose); }
+.user-menu-dropdown button.danger:hover { background: var(--rose-glow); }
+
+/* ===== SETTINGS PAGE ===== */
+.settings-card {
+  background: var(--bg-card); border: 1px solid var(--border-1); border-radius: 12px;
+  padding: 24px; margin-bottom: 16px;
+}
+.settings-card h3 { font-size: 16px; font-weight: 600; margin-bottom: 16px; color: var(--amber-light); }
+.settings-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+}
+.settings-item {
+  background: var(--bg-primary); border: 1px solid var(--border-1); border-radius: 10px; padding: 14px;
+}
+.settings-item .label { font-size: 11px; color: var(--text-4); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+.settings-item .value { font-size: 15px; font-weight: 600; color: var(--text-1); }
+.settings-actions { display: flex; gap: 12px; margin-top: 20px; }
+@media (max-width: 600px) { .settings-grid { grid-template-columns: 1fr; } }
+
 /* ===== MODULES ===== */
 .module-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
 .module-card {
@@ -799,6 +833,17 @@ body::before {
   font-size: 10px; font-weight: 700; text-transform: uppercase;
   letter-spacing: 1px; padding: 3px 8px; border-radius: 4px;
 }
+.module-card.locked-module {
+  opacity: 0.4; cursor: not-allowed; position: relative;
+}
+.module-card.locked-module:hover { transform: none; border-color: var(--border-1); background: var(--bg-card); }
+.module-lock-overlay {
+  position: absolute; inset: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; border-radius: 12px;
+  background: rgba(12,10,9,0.6); z-index: 2; gap: 4px;
+}
+.module-lock-overlay span { font-size: 24px; }
+.module-lock-overlay small { font-size: 11px; color: var(--text-4); font-weight: 500; }
 .plan-card {
   background: linear-gradient(135deg, rgba(245,158,11,0.08), rgba(245,158,11,0.02));
   border: 1px solid var(--border-amber);
@@ -1295,11 +1340,15 @@ body::before {
         </div>
         <div id="streakTodayHint" style="display:none;position:absolute;top:100%;right:0;margin-top:4px;background:var(--bg-card);border:1px solid var(--border-2);border-radius:8px;padding:6px 12px;font-size:11px;white-space:nowrap;z-index:10;"></div>
         <div class="streak-pill" id="xpPill"><span>⭐</span> <span id="xpDisplay">0</span> XP</div>
-        <div class="user-pill">
+        <div class="user-pill" onclick="toggleUserMenu(event)">
           <div class="user-av" id="userAvatar"></div>
           <span id="userName"></span>
+          <div class="user-menu-dropdown" id="userMenuDropdown">
+            <button onclick="openSettings(event)">&#9881; Ayarlar</button>
+            <button onclick="restartOnboarding(event)">&#128260; Ayarları Değiştir</button>
+            <button class="danger" onclick="handleLogout()">&#9211; Çıkış Yap</button>
+          </div>
         </div>
-        <button class="btn-logout" onclick="handleLogout()">Çıkış</button>
       </div>
     </div>
 
@@ -1467,6 +1516,19 @@ body::before {
     <div class="page" id="page-band">
       <div id="bandArea"></div>
     </div>
+
+    <!-- Settings -->
+    <div class="page" id="page-settings">
+      <button class="back-btn" onclick="closeSettings()">&#8592; Geri</button>
+      <div class="settings-card">
+        <h3>Profil Ayarları</h3>
+        <div class="settings-grid" id="settingsGrid"></div>
+        <div class="settings-actions">
+          <button class="btn btn-primary" onclick="restartOnboarding(event)">&#128260; Ayarları Değiştir</button>
+          <button class="btn btn-ghost danger" style="color:var(--rose);border-color:rgba(251,113,133,0.3);" onclick="handleLogout()">&#9211; Çıkış Yap</button>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -1553,12 +1615,27 @@ async function handleLogin() {
     const data = await apiFetch('/auth/login', { method: 'POST', body: JSON.stringify({ email, password: pw }) });
     setToken(data.token);
     currentUser = { id: data.user.id, name: data.user.name, email: data.user.email };
-    // Profil verilerini çek
+    // Profil verilerini çek — localStorage fallback
     try {
       const profile = await apiFetch('/profile');
       currentUser.onboarding = profile.onboarding;
       currentUser.plan = profile.plan;
-    } catch(e) { console.warn('Profil yüklenemedi:', e); }
+      if (profile.onboarding) {
+        localStorage.setItem('lf_onboarding', JSON.stringify(profile.onboarding));
+      }
+      if (profile.plan) {
+        localStorage.setItem('lf_plan', JSON.stringify(profile.plan));
+      }
+    } catch(e) {
+      console.warn('Profil yüklenemedi, localStorage kontrol ediliyor:', e);
+      // Fallback to localStorage cache
+      try {
+        const cachedOb = localStorage.getItem('lf_onboarding');
+        const cachedPlan = localStorage.getItem('lf_plan');
+        if (cachedOb) currentUser.onboarding = JSON.parse(cachedOb);
+        if (cachedPlan) currentUser.plan = JSON.parse(cachedPlan);
+      } catch(e2) { console.warn('localStorage fallback hatası:', e2); }
+    }
     loadState();
     currentUser.onboarding ? enterApp() : startOnboarding();
   } catch (e) {
@@ -1616,7 +1693,7 @@ async function resendVerification() {
 }
 async function handleLogout() {
   try { await apiFetch('/auth/logout', { method: 'POST' }); } catch(e) {}
-  clearToken(); currentUser = null; state = null; showScreen('screen-login');
+  clearToken(); localStorage.removeItem('lf_onboarding'); localStorage.removeItem('lf_plan'); currentUser = null; state = null; showScreen('screen-login');
 }
 
 // ==================== ONBOARDING ====================
@@ -1646,6 +1723,9 @@ function genPlan(d) {
 async function completeOb() {
   const plan = genPlan(obData);
   if (currentUser) { currentUser.onboarding = obData; currentUser.plan = plan; currentUser.progress = { streak:0, lastActiveDate:null, lessonsCompleted:[], wordsLearned:0, quizScores:[], chatCount:0, activities:[] }; }
+  // Cache in localStorage immediately so onboarding survives API failures
+  localStorage.setItem('lf_onboarding', JSON.stringify(obData));
+  localStorage.setItem('lf_plan', JSON.stringify(plan));
   try { await apiFetch('/profile', { method: 'POST', body: JSON.stringify({ onboarding: obData, plan }) }); } catch(e) { console.warn('Profil kaydedilemedi:', e); }
   loadState(); enterApp();
 }
@@ -1657,6 +1737,55 @@ function enterApp() {
   document.getElementById('userAvatar').textContent = u.name.charAt(0).toUpperCase();
   document.getElementById('chatMessages').innerHTML = `<div class="msg ai">Merhaba ${u.name}! Ben senin İngilizce konuşma partnerin. Benimle İngilizce pratik yapabilirsin. Yanlış yaparsan düzeltirim, anlamadığın yerleri Türkçe açıklarım.<span class="turkish-help">Bir senaryo seçebilir veya doğrudan İngilizce yazmaya başlayabilirsin!</span></div>`;
   showScreen('screen-app'); loadXP(); updateDashboard(); showModules(); saveState();
+}
+
+// ==================== USER MENU & SETTINGS ====================
+function toggleUserMenu(e) {
+  e.stopPropagation();
+  const dd = document.getElementById('userMenuDropdown');
+  dd.classList.toggle('show');
+}
+document.addEventListener('click', () => {
+  const dd = document.getElementById('userMenuDropdown');
+  if (dd) dd.classList.remove('show');
+});
+function openSettings(e) {
+  if (e) e.stopPropagation();
+  document.getElementById('userMenuDropdown').classList.remove('show');
+  // Deactivate all nav tabs and pages
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-settings').classList.add('active');
+  // Render settings content
+  const u = getCurrentUser();
+  const ob = u?.onboarding || {};
+  const plan = u?.plan || {};
+  const levelMap = {zero:'Sıfır (A0)',beginner:'Başlangıç (A1)',elementary:'Temel (A2)',intermediate:'Orta (B1)',upper:'İleri Orta (B2)'};
+  const dailyMap = {'15min':'15 dk/gün','30min':'30 dk/gün','1hour':'1 saat/gün','2hours':'2+ saat/gün'};
+  const examMap = {'3months':'3 Ay İçinde','6months':'6 Ay İçinde','1year':'1 Yıl İçinde','nodate':'Tarih Yok'};
+  const areaMap = {listening:'Dinleme',reading:'Okuma',writing:'Yazma',speaking:'Konuşma',vocabulary:'Kelime',grammar:'Gramer'};
+  const weakAreas = (ob.weakAreas || []).map(a => areaMap[a] || a).join(', ') || 'Belirtilmedi';
+  document.getElementById('settingsGrid').innerHTML = `
+    <div class="settings-item"><div class="label">Seviye</div><div class="value">${levelMap[ob.level] || ob.level || 'Belirtilmedi'}</div></div>
+    <div class="settings-item"><div class="label">IELTS Hedef</div><div class="value">Band ${ob.targetBand || '—'}</div></div>
+    <div class="settings-item"><div class="label">Sınav Tarihi</div><div class="value">${examMap[ob.examDate] || ob.examDate || 'Belirtilmedi'}</div></div>
+    <div class="settings-item"><div class="label">Günlük Süre</div><div class="value">${dailyMap[ob.dailyTime] || ob.dailyTime || 'Belirtilmedi'}</div></div>
+    <div class="settings-item" style="grid-column:1/-1;"><div class="label">Zayıf Alanlar</div><div class="value">${weakAreas}</div></div>
+  `;
+}
+function closeSettings() {
+  document.getElementById('page-settings').classList.remove('active');
+  // Go back to dashboard
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const dashTab = document.querySelector('.nav-tab[data-page="dashboard"]');
+  if (dashTab) dashTab.classList.add('active');
+  document.getElementById('page-dashboard').classList.add('active');
+}
+function restartOnboarding(e) {
+  if (e) e.stopPropagation();
+  document.getElementById('userMenuDropdown').classList.remove('show');
+  startOnboarding();
 }
 
 // ==================== NAV ====================
@@ -1749,13 +1878,41 @@ function showModules() {
   document.getElementById('lessonDetailView').classList.remove('active');
   document.getElementById('totalLessonsBadge').textContent = countTotalLessons() + ' ders';
   const grid = document.getElementById('moduleGrid');
-  // Determine which modules are recommended based on weak areas
+  // Determine user level and recommended modules based on weak areas
   const _user = typeof getCurrentUser === 'function' ? getCurrentUser() : (typeof currentUser !== 'undefined' ? currentUser : null);
-  const _weakAreas = _user?.plan?.weakAreas || [];
+  const _weakAreas = _user?.plan?.weakAreas || _user?.onboarding?.weakAreas || [];
+  const _level = _user?.onboarding?.level || _user?.plan?.level || '';
   const weakToModules = { listening:['ielts-listening'], reading:['ielts-reading'], writing:['ielts-writing'], speaking:['ielts-speaking'], vocabulary:['foundations','daily-life','social'], grammar:['foundations','daily-life'] };
   const recommendedModuleIds = new Set();
   _weakAreas.forEach(wa => { (weakToModules[wa]||[]).forEach(mid => recommendedModuleIds.add(mid)); });
-  grid.innerHTML = MODULES.map(mod => {
+
+  // Determine which modules are locked based on user level
+  const isBeginnerLevel = ['zero','beginner'].includes(_level);
+  const isIntermediateUp = ['intermediate','upper'].includes(_level);
+  const ieltsModuleIds = ['ielts-reading','ielts-writing','ielts-listening','ielts-speaking'];
+  const foundationModuleIds = ['foundations'];
+
+  // Sort modules: recommended first, then by level appropriateness
+  let sortedModules = [...MODULES];
+  sortedModules.sort((a, b) => {
+    const aRec = recommendedModuleIds.has(a.id) ? -2 : 0;
+    const bRec = recommendedModuleIds.has(b.id) ? -2 : 0;
+    // For beginners: foundations first, IELTS last
+    if (isBeginnerLevel) {
+      const aFoundation = foundationModuleIds.includes(a.id) ? -1 : (ieltsModuleIds.includes(a.id) ? 1 : 0);
+      const bFoundation = foundationModuleIds.includes(b.id) ? -1 : (ieltsModuleIds.includes(b.id) ? 1 : 0);
+      return (aRec + aFoundation) - (bRec + bFoundation);
+    }
+    // For intermediate+: IELTS first, foundations as optional
+    if (isIntermediateUp) {
+      const aIelts = ieltsModuleIds.includes(a.id) ? -1 : (foundationModuleIds.includes(a.id) ? 1 : 0);
+      const bIelts = ieltsModuleIds.includes(b.id) ? -1 : (foundationModuleIds.includes(b.id) ? 1 : 0);
+      return (aRec + aIelts) - (bRec + bIelts);
+    }
+    return aRec - bRec;
+  });
+
+  grid.innerHTML = sortedModules.map(mod => {
     const units = UNITS[mod.id] || [];
     let totalLessons = 0, completedLessons = 0;
     units.forEach(u => {
@@ -1765,7 +1922,14 @@ function showModules() {
     });
     const pct = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
     const badge = recommendedModuleIds.has(mod.id) ? '<div class="recommended-badge">\u2605 \u00d6nerilen</div>' : '';
-    return `<div class="module-card" onclick="showUnits('${mod.id}')">${badge}<div class="module-icon">${mod.icon}</div><div class="module-title">${mod.title}</div><div class="module-cefr">${mod.cefr.join(' \u2192 ')}</div><div class="module-desc">${mod.desc}</div><div class="module-progress">${completedLessons}/${totalLessons} ders tamamland\u0131<div class="module-progress-bar"><div class="module-progress-fill" style="width:${pct}%"></div></div></div></div>`;
+
+    // Lock IELTS modules for zero/beginner level users
+    const isLocked = isBeginnerLevel && ieltsModuleIds.includes(mod.id);
+    const lockOverlay = isLocked ? '<div class="module-lock-overlay"><span>&#128274;</span><small>Önce temel dersleri tamamla</small></div>' : '';
+    const lockedClass = isLocked ? ' locked-module' : '';
+    const clickHandler = isLocked ? '' : `onclick="showUnits('${mod.id}')"`;
+
+    return `<div class="module-card${lockedClass}" ${clickHandler}>${lockOverlay}${badge}<div class="module-icon">${mod.icon}</div><div class="module-title">${mod.title}</div><div class="module-cefr">${mod.cefr.join(' \u2192 ')}</div><div class="module-desc">${mod.desc}</div><div class="module-progress">${completedLessons}/${totalLessons} ders tamamland\u0131<div class="module-progress-bar"><div class="module-progress-fill" style="width:${pct}%"></div></div></div></div>`;
   }).join('');
 }
 
@@ -2904,7 +3068,21 @@ document.getElementById('regPassword').addEventListener('keydown',(e)=>{if(e.key
           const profile = await apiFetch('/profile');
           currentUser.onboarding = profile.onboarding;
           currentUser.plan = profile.plan;
-        } catch(e) {}
+          if (profile.onboarding) {
+            localStorage.setItem('lf_onboarding', JSON.stringify(profile.onboarding));
+          }
+          if (profile.plan) {
+            localStorage.setItem('lf_plan', JSON.stringify(profile.plan));
+          }
+        } catch(e) {
+          console.warn('Profil yüklenemedi, localStorage kontrol ediliyor:', e);
+          try {
+            const cachedOb = localStorage.getItem('lf_onboarding');
+            const cachedPlan = localStorage.getItem('lf_plan');
+            if (cachedOb) currentUser.onboarding = JSON.parse(cachedOb);
+            if (cachedPlan) currentUser.plan = JSON.parse(cachedPlan);
+          } catch(e2) {}
+        }
         loadState();
         currentUser.onboarding ? enterApp() : startOnboarding();
         return;

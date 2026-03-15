@@ -18,13 +18,25 @@ module.exports = async function handler(req, res) {
 
     const profile = profiles.length > 0 ? profiles[0] : null;
 
+    // Parse weak_areas from JSON string back to array
+    let weakAreas = [];
+    if (profile && profile.weak_areas) {
+      try {
+        weakAreas = typeof profile.weak_areas === 'string'
+          ? JSON.parse(profile.weak_areas)
+          : profile.weak_areas;
+      } catch (e) {
+        weakAreas = Array.isArray(profile.weak_areas) ? profile.weak_areas : [];
+      }
+    }
+
     return res.status(200).json({
       onboarding: profile ? {
         level: profile.english_level,
         targetBand: profile.ielts_target,
         examDate: profile.exam_date,
         dailyTime: profile.daily_time,
-        weakAreas: profile.weak_areas
+        weakAreas: weakAreas
       } : null,
       plan: plans.length > 0 ? plans[0].plan_data : null,
       progress: {
@@ -38,15 +50,17 @@ module.exports = async function handler(req, res) {
     const { onboarding, plan } = req.body;
 
     if (onboarding) {
+      // Convert weakAreas array to JSON string for TEXT column storage
+      const weakAreasJson = JSON.stringify(onboarding.weakAreas || []);
       await sql`
         INSERT INTO user_profiles (user_id, english_level, ielts_target, exam_date, daily_time, weak_areas, onboarding_completed)
-        VALUES (${uid}, ${onboarding.level}, ${onboarding.targetBand}, ${onboarding.examDate}, ${onboarding.dailyTime}, ${onboarding.weakAreas}, true)
+        VALUES (${uid}, ${onboarding.level}, ${onboarding.targetBand}, ${onboarding.examDate}, ${onboarding.dailyTime}, ${weakAreasJson}, true)
         ON CONFLICT (user_id) DO UPDATE SET
           english_level = ${onboarding.level},
           ielts_target = ${onboarding.targetBand},
           exam_date = ${onboarding.examDate},
           daily_time = ${onboarding.dailyTime},
-          weak_areas = ${onboarding.weakAreas},
+          weak_areas = ${weakAreasJson},
           onboarding_completed = true,
           updated_at = NOW()
       `;

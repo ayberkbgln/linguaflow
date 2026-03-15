@@ -101,11 +101,12 @@ const LESSON_DATA = {
       {e:"M",t:"Em",p:"/ɛm/",ex:"M is for Mother",ext:"M Mother (Anne) içindir"}
     ],
     exercises:[
-      {type:"match",q:"Harfi sesle eşleştir",pairs:[["A","Ey"],["B","Bi"],["C","Si"],["F","Ef"],["H","Eyç"]]},
+      {type:"match",q:"Kelimeyi anlamıyla eşleştir",pairs:[["Apple","Elma"],["Book","Kitap"],["Cat","Kedi"],["Dog","Köpek"],["House","Ev"]]},
       {type:"quiz",items:[
-        {q:"\"Good morning\" ne demek?",opts:["İyi akşamlar","Günaydın","İyi geceler","Hoşça kal"],correct:1},
-        {q:"\"H\" harfi İngilizcede nasıl okunur?",opts:["Ha","Eyç","He","Aş"],correct:1},
-        {q:"\"I\" harfi İngilizcede nasıl okunur?",opts:["İ","Ay","Ayn","İy"],correct:1}
+        {q:"\"Good morning\" ne zaman kullanılır?",opts:["Gece yatarken","Sabah karşılaşınca","Öğleden sonra","Vedalaşırken"],correct:1},
+        {q:"\"Apple\" kelimesinin çoğulu nedir?",opts:["Apples","Appls","Applees","Apple's"],correct:0},
+        {q:"Hangisi bir selamlama ifadesidir?",opts:["Thank you","Goodbye","Hello","Sorry"],correct:2},
+        {q:"\"B-O-O-K\" hangi kelimeyi oluşturur?",opts:["Back","Book","Look","Cook"],correct:1}
       ]}
     ]
   }
@@ -131,10 +132,11 @@ const LESSON_DATA = {
     ],
     exercises:[
       {type:"quiz",items:[
-        {q:"\"W\" harfinin İngilizce okunuşu nedir?",opts:["Ve","Dablyu","Vu","Vi"],correct:1},
-        {q:"İngiliz alfabesinde kaç harf vardır?",opts:["24","26","28","29"],correct:1},
-        {q:"\"Ph\" harfleri bir arada hangi sesi verir?",opts:["/p/","/f/","/h/","/b/"],correct:1},
-        {q:"\"Th\" harfleri hangi Türkçede olmayan sesi verir?",opts:["/t/","/d/","/θ/ (dil dişlerin arasında)","/s/"],correct:2}
+        {q:"\"Thank you\" ne demek?",opts:["Özür dilerim","Lütfen","Teşekkür ederim","Merhaba"],correct:2},
+        {q:"\"S-U-N\" hangi kelimeyi oluşturur?",opts:["Son","Sun","Sin","San"],correct:1},
+        {q:"\"Red\" ne anlama gelir?",opts:["Yeşil","Mavi","Kırmızı","Sarı"],correct:2},
+        {q:"\"Phone\" kelimesinde hangi ses vardır?",opts:["/p/ sesi","/f/ sesi","/h/ sesi","/b/ sesi"],correct:1},
+        {q:"\"Water\" ne demek?",opts:["Ateş","Hava","Toprak","Su"],correct:3}
       ]}
     ]
   }
@@ -150,10 +152,11 @@ const LESSON_DATA = {
     ],
     exercises:[
       {type:"quiz",items:[
-        {q:"Hangisi sesli harftir (vowel)?",opts:["B","D","E","G"],correct:2},
-        {q:"İngiliz alfabesinde kaç sesli harf var?",opts:["3","5","7","8"],correct:1},
-        {q:"Hangisi sesli harf DEĞİLDİR?",opts:["A","O","T","U"],correct:2},
-        {q:"\"Apple\" kelimesindeki sesli harf hangisi?",opts:["P","L","A","E — ikisi de"],correct:3}
+        {q:"\"Cat\" ve \"Cut\" arasındaki fark nedir?",opts:["Aynı anlama gelir","Farklı sesli harflerle farklı anlamlar","Biri fiil, biri isim değil","Hiçbir fark yok"],correct:1},
+        {q:"Her İngilizce kelimede en az ne bulunur?",opts:["Bir sessiz harf","İki harf","Bir sesli harf","Üç harf"],correct:2},
+        {q:"\"Egg\" kelimesinde kaç sesli harf sesi var?",opts:["0","1","2","3"],correct:1},
+        {q:"Hangisi doğrudur?",opts:["İngilizcede 5 sesli harf var: A, E, I, O, U","İngilizcede 3 sesli harf var","Sesli harfler sadece kelimenin başında olur","İngilizcede sesli harf yoktur"],correct:0},
+        {q:"\"Ice\" kelimesinde \"I\" nasıl okunur?",opts:["/i/ (kısa i)","/ aɪ/ (ay)","/ ɪ/ (ı)","Okunmaz"],correct:1}
       ]}
     ]
   }
