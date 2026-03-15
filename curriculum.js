@@ -104,8 +104,8 @@ const LESSON_DATA = {
       {type:"match",q:"Kelimeyi anlamıyla eşleştir",pairs:[["Apple","Elma"],["Book","Kitap"],["Cat","Kedi"],["Dog","Köpek"],["House","Ev"]]},
       {type:"quiz",items:[
         {q:"\"Good morning\" ne zaman kullanılır?",opts:["Gece yatarken","Sabah karşılaşınca","Öğleden sonra","Vedalaşırken"],correct:1},
-        {q:"\"Apple\" kelimesinin çoğulu nedir?",opts:["Apples","Appls","Applees","Apple's"],correct:0},
-        {q:"Hangisi bir selamlama ifadesidir?",opts:["Thank you","Goodbye","Hello","Sorry"],correct:2},
+        {q:"\"I have ___ apple.\" Boşluğa ne gelir?",opts:["a","an","the","—"],correct:1,hint:"Sesli harfle başlayan kelimelerden önce 'an' kullanılır."},
+        {q:"Hangisi doğrudur?",opts:["She is a cat.","It is a cat.","He is a cat.","They is a cat."],correct:1,hint:"Hayvanlar ve nesneler için 'it' kullanılır."},
         {q:"\"House\" ne demek?",opts:["Araba","Okul","Ev","İş"],correct:2}
       ]}
     ]
@@ -133,10 +133,10 @@ const LESSON_DATA = {
     exercises:[
       {type:"quiz",items:[
         {q:"\"Thank you\" ne demek?",opts:["Özür dilerim","Lütfen","Teşekkür ederim","Merhaba"],correct:2},
-        {q:"\"Goodbye\" ne zaman kullanılır?",opts:["Karşılaşınca","Teşekkür ederken","Vedalaşırken","Yemek yerken"],correct:2},
+        {q:"\"She is ___ teacher.\" Boşluğa ne gelir?",opts:["a","an","the","—"],correct:0,hint:"Türkçede artikel yoktur ama İngilizcede 'a/an' önemlidir."},
         {q:"\"Red\" ne anlama gelir?",opts:["Yeşil","Mavi","Kırmızı","Sarı"],correct:2},
         {q:"\"Please\" hangi durumda kullanılır?",opts:["Özür dilerken","Rica ederken/Lütfen","Vedalaşırken","Kızgınken"],correct:1},
-        {q:"\"Water\" ne demek?",opts:["Ateş","Hava","Toprak","Su"],correct:3}
+        {q:"Doğru cümle hangisidir?",opts:["I am drink water.","I drink water.","I water drink.","Drink I water."],correct:1,hint:"İngilizcede cümle sırası: Özne + Fiil + Nesne (SVO). Türkçedeki gibi fiil sonda olmaz."}
       ]}
     ]
   }
@@ -154,9 +154,9 @@ const LESSON_DATA = {
       {type:"quiz",items:[
         {q:"\"Cat\" ve \"Cut\" arasındaki fark nedir?",opts:["Aynı anlama gelir","Farklı sesli harflerle farklı anlamlar","Biri fiil, biri isim değil","Hiçbir fark yok"],correct:1},
         {q:"Her İngilizce kelimede en az ne bulunur?",opts:["Bir sessiz harf","İki harf","Bir sesli harf","Üç harf"],correct:2},
-        {q:"\"Egg\" kelimesinde kaç sesli harf sesi var?",opts:["0","1","2","3"],correct:1},
-        {q:"Hangisi doğrudur?",opts:["İngilizcede 5 sesli harf var: A, E, I, O, U","İngilizcede 3 sesli harf var","Sesli harfler sadece kelimenin başında olur","İngilizcede sesli harf yoktur"],correct:0},
-        {q:"\"Ice\" kelimesinde \"I\" nasıl okunur?",opts:["/i/ (kısa i)","/ aɪ/ (ay)","/ ɪ/ (ı)","Okunmaz"],correct:1}
+        {q:"\"___ egg\" boşluğa ne gelir?",opts:["a","an","the","—"],correct:1,hint:"'Egg' sesli harfle başlar, bu yüzden 'an' kullanılır."},
+        {q:"Hangisi doğru cümle sırasıdır?",opts:["Cat is the big.","The cat big is.","The cat is big.","Big is the cat."],correct:2,hint:"İngilizcede sıra: Özne + Fiil + Sıfat. Türkçedeki gibi 'Kedi büyük' değil."},
+        {q:"\"Ice\" kelimesinde \"I\" nasıl okunur?",opts:["/i/ (kısa i)","/aɪ/ (ay)","/ɪ/ (ı)","Okunmaz"],correct:1}
       ]}
     ]
   }
@@ -187,7 +187,8 @@ const LESSON_DATA = {
         {q:"Akşam vakti biriyle karşılaştığında ne dersin?",opts:["Good morning","Good night","Good evening","Goodbye"],correct:2},
         {q:"\"Rica ederim\" İngilizcede ne?",opts:["Thank you","Sorry","You're welcome","Please"],correct:2},
         {q:"Birinden bir şey rica ederken hangi kelimeyi kullanırsın?",opts:["Sorry","Please","Hello","Goodbye"],correct:1},
-        {q:"\"Excuse me\" ne zaman kullanılır?",opts:["Vedalaşırken","Dikkat çekmek için","Teşekkür ederken","Uyurken"],correct:1}
+        {q:"\"Excuse me\" ne zaman kullanılır?",opts:["Vedalaşırken","Dikkat çekmek için","Teşekkür ederken","Uyurken"],correct:1},
+        {q:"Ayşe is my friend. '___ is very nice.' Boşluğa ne gelir?",opts:["He","It","She","They"],correct:2,hint:"Ayşe kadın ismidir. Türkçede 'o' denir ama İngilizcede kadın için 'she' kullanılır."}
       ]}
     ]
   }
@@ -214,9 +215,9 @@ const LESSON_DATA = {
       ]},
       {type:"quiz",items:[
         {q:"\"I ___ from Turkey\" boşluğa ne gelir?",opts:["is","are","am","be"],correct:2},
-        {q:"\"She ___ my friend\" boşluğa ne gelir?",opts:["am","are","is","be"],correct:2},
+        {q:"Ahmet is a doctor. '___ is very kind.' Boşluğa ne gelir?",opts:["She","It","They","He"],correct:3,hint:"Türkçede 'o' hem erkek hem kadın için kullanılır ama İngilizcede erkek = he, kadın = she."},
         {q:"\"They ___ students\" boşluğa ne gelir?",opts:["am","is","are","be"],correct:2},
-        {q:"\"He isn't\" ne demek?",opts:["O değil","O var","O evet","O burada"],correct:0}
+        {q:"Hangisi doğrudur?",opts:["She is teacher.","She is a teacher.","She is the teacher.","She teacher is."],correct:1,hint:"İngilizcede mesleklerden önce 'a/an' article kullanılır."}
       ]}
     ]
   }
@@ -297,10 +298,11 @@ const LESSON_DATA = {
     ],
     exercises:[
       {type:"quiz",items:[
-        {q:"\"Seven\" kaç demek?",opts:["6","7","8","9"],correct:1},
+        {q:"\"I have ___ sister.\" Boşluğa ne gelir?",opts:["a","an","one","—"],correct:2,hint:"Sayı belirtirken 'one' kullanılır, 'a' genel article'dır."},
         {q:"\"Twelve\" kaç demek?",opts:["2","20","12","22"],correct:2},
-        {q:"Bir haftada kaç gün vardır?",opts:["Five","Six","Seven","Eight"],correct:2},
-        {q:"\"Twenty\" kaç demek?",opts:["12","2","22","20"],correct:3}
+        {q:"\"There are seven days ___ a week.\" Boşluğa ne gelir?",opts:["at","on","in","to"],correct:2,hint:"Türkçede 'haftada' derken ek kullanırız ama İngilizcede 'in' edatı gerekir."},
+        {q:"\"Twenty\" kaç demek?",opts:["12","2","22","20"],correct:3},
+        {q:"Hangisi doğrudur?",opts:["I have three book.","I have three books.","I have three a books.","Three books I have."],correct:1,hint:"Sayıdan sonra isim çoğul olur ve İngilizcede fiil sonda olmaz."}
       ]}
     ]
   }
@@ -325,10 +327,11 @@ const LESSON_DATA = {
     exercises:[
       {type:"match",q:"Renkleri eşleştir",pairs:[["Red","Kırmızı"],["Blue","Mavi"],["Green","Yeşil"],["Yellow","Sarı"],["Black","Siyah"]]},
       {type:"quiz",items:[
-        {q:"Gökyüzünün rengi İngilizcede ne?",opts:["Green","Red","Blue","Yellow"],correct:2},
+        {q:"\"The sky is blue.\" Bu cümlede 'the' neden kullanıldı?",opts:["Çünkü bilinen/tek bir şeydir","Çünkü mavi","Gerek yok, 'a' da olur","Rastgele"],correct:0,hint:"'The' bilinen veya tek olan şeyler için kullanılır. Gökyüzü tektir."},
         {q:"\"Purple\" ne renk?",opts:["Pembe","Mor","Mavi","Turuncu"],correct:1},
         {q:"\"Kahverengi\" İngilizcede ne?",opts:["Black","Grey","Brown","Orange"],correct:2},
-        {q:"Hangisi bir renk DEĞİLDİR?",opts:["Pink","Ten","White","Grey"],correct:1}
+        {q:"\"I want ___ red apple.\" Boşluğa ne gelir?",opts:["a","an","the","—"],correct:0,hint:"'Red' sessiz harfle başlar, bu yüzden 'a' kullanılır. 'An' değil!"},
+        {q:"Hangisi doğru cümle sırasıdır?",opts:["Red is the car.","The car red is.","The car is red.","Is red the car."],correct:2,hint:"İngilizce sıra: Özne + Fiil + Sıfat."}
       ]}
     ]
   }
@@ -355,7 +358,9 @@ const LESSON_DATA = {
       {type:"quiz",items:[
         {q:"\"bus\" kelimesinin çoğulu nedir?",opts:["buss","buse","buses","bus"],correct:2},
         {q:"\"city\" kelimesinin çoğulu nedir?",opts:["citys","cities","cityes","city"],correct:1},
-        {q:"\"tooth\" kelimesinin çoğulu nedir?",opts:["tooths","toothes","teeth","teeths"],correct:2}
+        {q:"\"tooth\" kelimesinin çoğulu nedir?",opts:["tooths","toothes","teeth","teeths"],correct:2},
+        {q:"\"I see ___ children in the park.\" Boşluğa ne gelir?",opts:["a","an","the","—"],correct:2,hint:"Bahsedilen çocuklar belirli ise 'the' kullanılır. Türkçede 'parkta çocukları görüyorum' derken bu ayrım yapılmaz."},
+        {q:"Hangisi doğrudur?",opts:["There is three cats.","There are three cats.","Three cats there are.","Cats three are there."],correct:1,hint:"Çoğul isimlerle 'are' kullanılır ve İngilizcede cümle sırası farklıdır."}
       ]}
     ]
   }
@@ -393,8 +398,8 @@ const LESSON_DATA = {
       {type:"quiz",items:[
         {q:"\"Düşünmek\" İngilizcede ne?",opts:["Think","Thank","Thing","Thick"],correct:0},
         {q:"\"I ___ help\" (Yardıma ihtiyacım var)",opts:["want","need","like","have"],correct:1},
-        {q:"\"Find\" ne demek?",opts:["Bulmak","Kaybetmek","Aramak","Vermek"],correct:0},
-        {q:"\"Tell me\" ne demek?",opts:["Bana sor","Bana anlat","Bana ver","Bana göster"],correct:1}
+        {q:"Mehmet wants coffee. '___ likes coffee.' Boşluğa ne gelir?",opts:["She","It","They","He"],correct:3,hint:"Mehmet erkek ismidir → 'He'. Türkçede 'o' denir ama İngilizcede cinsiyet ayrımı yapılır."},
+        {q:"Hangisi doğru cümle sırasıdır?",opts:["I English speak.","Speak I English.","I speak English.","English I speak."],correct:2,hint:"Türkçede 'Ben İngilizce konuşurum' (SOV) ama İngilizcede 'I speak English' (SVO) — fiil ortada olur."}
       ]}
     ]
   }
@@ -422,7 +427,9 @@ const LESSON_DATA = {
       {type:"quiz",items:[
         {q:"\"She ___ coffee every morning\" doğru olan hangisi?",opts:["drink","drinks","drinking","drinkes"],correct:1},
         {q:"\"They ___ here\" olumsuz hali nedir?",opts:["doesn't live","don't live","not live","isn't live"],correct:1},
-        {q:"\"He go\" doğru mu?",opts:["Evet doğru","Hayır, 'He goes' olmalı","Hayır, 'He going' olmalı","Hayır, 'He gos' olmalı"],correct:1}
+        {q:"\"He go\" doğru mu?",opts:["Evet doğru","Hayır, 'He goes' olmalı","Hayır, 'He going' olmalı","Hayır, 'He gos' olmalı"],correct:1},
+        {q:"Fatma ___ to school every day. Boşluğa ne gelir?",opts:["go","goes","going","gone"],correct:1,hint:"Fatma kadın ismidir → she goes. He/she/it ile fiile -s/-es eklenir."},
+        {q:"\"I live ___ Istanbul.\" Boşluğa ne gelir?",opts:["at","on","in","to"],correct:2,hint:"Şehirlerle 'in' kullanılır. Türkçede 'İstanbul'da' derken ek kullanılır, İngilizcede edat gerekir."}
       ]}
     ]
   }
@@ -453,7 +460,8 @@ const LESSON_DATA = {
       {type:"quiz",items:[
         {q:"\"Nerelisin?\" İngilizcede nasıl sorulur?",opts:["What are you from?","Where are you from?","Who are you from?","When are you from?"],correct:1},
         {q:"\"How much\" ne soruyor?",opts:["Nasıl","Ne kadar","Kaç tane","Neden"],correct:1},
-        {q:"Birinin mesleğini sormak için ne dersin?",opts:["Who do you do?","Where do you do?","What do you do?","When do you do?"],correct:2}
+        {q:"Birinin mesleğini sormak için ne dersin?",opts:["Who do you do?","Where do you do?","What do you do?","When do you do?"],correct:2},
+        {q:"Hangisi doğru soru sırasıdır?",opts:["You where live?","Where you live?","Where do you live?","Live where you do?"],correct:2,hint:"İngilizcede soru sırası: Soru kelimesi + do/does + özne + fiil. Türkçedeki sıra farklıdır."}
       ]}
     ]
   }
@@ -486,7 +494,9 @@ const LESSON_DATA = {
       {type:"quiz",items:[
         {q:"Babanın annesine İngilizcede ne denir?",opts:["Mother","Aunt","Grandmother","Sister"],correct:2},
         {q:"\"Cousin\" ne demek?",opts:["Kardeş","Kuzen","Amca","Yeğen"],correct:1},
-        {q:"\"Kız çocuk\" İngilizcede ne?",opts:["Son","Sister","Daughter","Wife"],correct:2}
+        {q:"\"Kız çocuk\" İngilizcede ne?",opts:["Son","Sister","Daughter","Wife"],correct:2},
+        {q:"Ali's mother is a nurse. '___ works at a hospital.' Boşluğa ne gelir?",opts:["He","It","She","They"],correct:2,hint:"Ali'nin annesi kadındır → 'She'. Türkçede 'o' denir ama İngilizcede kadın = she, erkek = he."},
+        {q:"\"My father is ___ engineer.\" Boşluğa ne gelir?",opts:["a","an","the","—"],correct:1,hint:"'Engineer' sesli harfle başlar → 'an'. Mesleklerden önce article kullanılır."}
       ]}
     ]
   }
@@ -510,7 +520,9 @@ const LESSON_DATA = {
       ]},
       {type:"quiz",items:[
         {q:"\"Onun (erkek) arabası\" İngilizcede ne?",opts:["Her car","His car","Their car","Our car"],correct:1},
-        {q:"\"Elif's book\" ne demek?",opts:["Elif kitap","Elif kitaba","Elif'in kitabı","Kitap Elif"],correct:2}
+        {q:"\"Elif's book\" ne demek?",opts:["Elif kitap","Elif kitaba","Elif'in kitabı","Kitap Elif"],correct:2},
+        {q:"Ahmet has a sister. '___ sister is tall.' Boşluğa ne gelir?",opts:["Her","His","Their","Our"],correct:1,hint:"Ahmet erkek → 'His'. Türkçede 'onun' hem erkek hem kadın için kullanılır ama İngilizcede erkek = his, kadın = her."},
+        {q:"\"___ cat is on the table.\" (benim kedim)",opts:["I","Me","My","Mine"],correct:2,hint:"İyelik sıfatı 'my' isimden önce gelir."}
       ]}
     ]
   }
@@ -537,10 +549,12 @@ const LESSON_DATA = {
     ],
     exercises:[
       {type:"quiz",items:[
-        {q:"Sabah ilk ne yaparsın?",opts:["Go to work","Wake up","Have lunch","Cook dinner"],correct:1},
+        {q:"\"I wake up ___ 7 AM.\" Boşluğa ne gelir?",opts:["in","on","at","to"],correct:2,hint:"Saat için 'at' kullanılır. Türkçede '7'de' derken ek kullanılır, İngilizcede edat gerekir."},
         {q:"\"Take a shower\" ne demek?",opts:["Duş almak","Yüzmek","Yıkamak","Temizlemek"],correct:0},
         {q:"\"Go to bed\" ne demek?",opts:["Yatağa gitmek","Uyumak","Kalkmak","Eve gitmek"],correct:0},
-        {q:"Öğle yemeğini anlatmak için hangi ifade kullanılır?",opts:["Have breakfast","Have dinner","Have lunch","Have food"],correct:2}
+        {q:"Öğle yemeğini anlatmak için hangi ifade kullanılır?",opts:["Have breakfast","Have dinner","Have lunch","Have food"],correct:2},
+        {q:"Hangisi doğrudur?",opts:["I to work go by bus.","I go to work by bus.","By bus I go to work.","Go I to work by bus."],correct:1,hint:"İngilizcede cümle sırası: Özne + Fiil + Yer + Araç. Türkçedeki sıra farklıdır."},
+        {q:"\"She ___ breakfast ___ 8 o'clock.\" Boşluklara ne gelir?",opts:["have / in","has / at","have / at","has / on"],correct:1,hint:"She → has (3. tekil -s). Saat için 'at' kullanılır."}
       ]}
     ]
   }
@@ -601,6 +615,7 @@ const LESSON_DATA = {
       {type:"quiz",items:[
         {q:"\"Sebze\" İngilizcede ne?",opts:["Fruit","Vegetable","Salad","Rice"],correct:1},
         {q:"\"Fish\" ne demek?",opts:["Tavuk","Et","Balık","Yumurta"],correct:2},
+        {q:"\"I eat ___ egg for breakfast.\" Boşluğa ne gelir?",opts:["a","an","the","—"],correct:1,hint:"'Egg' sesli harfle başlar → 'an'. Türkçede 'bir yumurta' derken ayrım yoktur."},
         {q:"\"Mercimek çorbası\" için hangi kelime gerekir?",opts:["Salad","Pasta","Soup","Rice"],correct:2}
       ]}
     ]
@@ -623,9 +638,10 @@ const LESSON_DATA = {
     exercises:[
       {type:"quiz",items:[
         {q:"Restoranda kibar bir şekilde su istemek için ne dersin?",opts:["Give me water!","Water now!","I would like some water, please.","Water!"],correct:2},
-        {q:"\"Can I have the menu?\" ne demek?",opts:["Menüyü verir misiniz?","Menü nerede?","Menüyü alabilir miyim?","Bu menü mü?"],correct:2},
+        {q:"\"Can I have ___ cup of tea?\" Boşluğa ne gelir?",opts:["a","an","the","—"],correct:0,hint:"'Cup' sessiz harfle başlar → 'a'. Sayılabilen şeylerden önce article kullanılır."},
         {q:"\"Juice\" ne demek?",opts:["Su","Çay","Meyve suyu","Süt"],correct:2},
-        {q:"Hesabı istemek için ne dersin?",opts:["Money please","The bill, please","Pay now","How much all?"],correct:1}
+        {q:"Hesabı istemek için ne dersin?",opts:["Money please","The bill, please","Pay now","How much all?"],correct:1},
+        {q:"\"He drinks coffee ___ the morning.\" Boşluğa ne gelir?",opts:["at","on","in","to"],correct:2,hint:"Günün bölümleri için 'in' kullanılır: in the morning, in the afternoon, in the evening."}
       ]}
     ]
   }
@@ -645,7 +661,8 @@ const LESSON_DATA = {
         {q:"\"Water\" sayılabilen mi sayılamayan mı?",opts:["Sayılabilen (Countable)","Sayılamayan (Uncountable)"],correct:1},
         {q:"\"How ___ apples do you want?\" boşluğa ne gelir?",opts:["much","many","some","any"],correct:1},
         {q:"\"I don't have ___ milk\" boşluğa ne gelir?",opts:["some","many","any","a"],correct:2},
-        {q:"Hangisi sayılamayan (uncountable) bir isimdir?",opts:["Egg","Apple","Rice","Orange"],correct:2}
+        {q:"Hangisi sayılamayan (uncountable) bir isimdir?",opts:["Egg","Apple","Rice","Orange"],correct:2},
+        {q:"Hangisi doğrudur?",opts:["I want bread.","I want a bread.","I want an bread.","I want the bread."],correct:0,hint:"'Bread' sayılamayan isimdir, önüne 'a/an' gelmez. Türkçede bu ayrım yoktur."}
       ]}
     ]
   }
@@ -675,7 +692,8 @@ const LESSON_DATA = {
       {type:"quiz",items:[
         {q:"\"Can I try this on?\" ne demek?",opts:["Bunu alabilir miyim?","Bunu deneyebilir miyim?","Bu kaç para?","Bunu iade edebilir miyim?"],correct:1},
         {q:"\"Receipt\" ne demek?",opts:["Fiyat","İndirim","Fiş","Kart"],correct:2},
-        {q:"Bir şeyin pahalı olmadığını söylemek için hangi kelimeyi kullanırsın?",opts:["Expensive","Discount","Price","Cheap"],correct:3}
+        {q:"Bir şeyin pahalı olmadığını söylemek için hangi kelimeyi kullanırsın?",opts:["Expensive","Discount","Price","Cheap"],correct:3},
+        {q:"\"I bought it ___ the shop ___ the corner.\" Boşluklara ne gelir?",opts:["at / in","in / at","at / on","from / on"],correct:2,hint:"Dükkan için 'at', köşe için 'on' kullanılır. Türkçede 'dükkanda', 'köşedeki' derken ek kullanılır."}
       ]}
     ]
   }
@@ -1480,10 +1498,11 @@ const LESSON_DATA = {
     exercises:[
       {type:"match",q:"Eşleştir",pairs:[["Bus","Otobüs"],["Train","Tren"],["Taxi","Taksi"],["Ferry","Vapur"],["Ticket","Bilet"]]},
       {type:"quiz",items:[
-        {q:"\"Metro\" İngilizcede ne?",opts:["Bus","Subway","Tram","Train"],correct:1},
+        {q:"\"I go to work ___ bus.\" Boşluğa ne gelir?",opts:["with","in","on","by"],correct:3,hint:"Ulaşım araçlarıyla 'by' kullanılır: by bus, by train, by car. Türkçede 'otobüsle' derken ek kullanılır."},
         {q:"\"Platform\" ne demek?",opts:["Durak","Bilet","Peron","İstasyon"],correct:2},
         {q:"\"I ride my bicycle\" ne demek?",opts:["Bisikletimi satarım","Bisiklet sürerim","Bisikletim var","Bisiklet isterim"],correct:1},
-        {q:"Hangisi bir su taşıtıdır?",opts:["Tram","Bus","Ferry","Car"],correct:2}
+        {q:"Hangisi bir su taşıtıdır?",opts:["Tram","Bus","Ferry","Car"],correct:2},
+        {q:"\"The train leaves ___ platform 3.\" Boşluğa ne gelir?",opts:["in","at","on","from"],correct:3,hint:"Platform'dan kalkmak için 'from' kullanılır."}
       ]}
     ]
   }
@@ -1511,8 +1530,8 @@ const LESSON_DATA = {
       {type:"quiz",items:[
         {q:"\"Go straight\" ne demek?",opts:["Sağa dön","Düz git","Sola dön","Dur"],correct:1},
         {q:"\"Next to\" ne demek?",opts:["Karşısında","Arasında","Yanında","Arkasında"],correct:2},
-        {q:"\"Crossroads\" ne demek?",opts:["Köprü","Kavşak","Köşe","Durak"],correct:1},
-        {q:"\"Roundabout\" ne demek?",opts:["Otobüs durağı","Dönel kavşak","Trafik ışığı","Köprü"],correct:1}
+        {q:"\"The bank is ___ the park.\" (karşısında) Boşluğa ne gelir?",opts:["next to","between","opposite","behind"],correct:2,hint:"Yer edatları Türkçede ek ile, İngilizcede ayrı kelimelerle ifade edilir."},
+        {q:"\"The café is ___ the bank and the school.\" Boşluğa ne gelir?",opts:["next to","opposite","between","in front of"],correct:2,hint:"İki şeyin arasında olmak için 'between' kullanılır."}
       ]}
     ]
   }
@@ -1530,7 +1549,7 @@ const LESSON_DATA = {
     exercises:[
       {type:"quiz",items:[
         {q:"\"Düz git\" İngilizcede nasıl söylenir?",opts:["You go straight","Go straight","Going straight","Goes straight"],correct:1},
-        {q:"\"Burada durma\" İngilizcede ne?",opts:["Not stop here","Don't stop here","No stop here","Stopping not here"],correct:1},
+        {q:"\"Burada durma\" İngilizcede ne?",opts:["Not stop here","Don't stop here","No stop here","Stopping not here"],correct:1,hint:"İngilizcede olumsuz emir: Don't + fiil. Türkçedeki '-ma/-me' eki yerine 'Don't' kullanılır."},
         {q:"Hangisi bir emir cümlesidir?",opts:["He turns left","Turning left","Turn left","He is turning left"],correct:2},
         {q:"\"Take the second left\" ne demek?",opts:["İkinci soldan dön","İki kere sola dön","Solu al","Sol tarafı tut"],correct:0}
       ]}
@@ -1590,9 +1609,9 @@ const LESSON_DATA = {
       {type:"match",q:"Eşleştir",pairs:[["Kitchen","Mutfak"],["Bedroom","Yatak odası"],["Sofa","Kanepe"],["Fridge","Buzdolabı"],["Garden","Bahçe"]]},
       {type:"quiz",items:[
         {q:"\"Living room\" ne demek?",opts:["Yatak odası","Mutfak","Oturma odası","Banyo"],correct:2},
-        {q:"Süt nerede saklanır?",opts:["Wardrobe","Table","Fridge","Bed"],correct:2},
-        {q:"\"Wardrobe\" ne demek?",opts:["Masa","Sandalye","Gardırop","Lamba"],correct:2},
-        {q:"\"Bathroom\" ne demek?",opts:["Yatak odası","Banyo","Mutfak","Bahçe"],correct:1}
+        {q:"\"The milk is ___ the fridge.\" Boşluğa ne gelir?",opts:["at","on","in","to"],correct:2,hint:"Kapalı alanların içi için 'in' kullanılır. Türkçede 'buzdolabında' derken ek kullanılır."},
+        {q:"\"The book is ___ the table.\" Boşluğa ne gelir?",opts:["in","at","on","to"],correct:2,hint:"Yüzey üstünde olmak için 'on' kullanılır: on the table, on the wall."},
+        {q:"\"There is ___ lamp next to the bed.\" Boşluğa ne gelir?",opts:["a","an","the","—"],correct:0,hint:"İlk kez bahsedilen tekil nesneler için 'a/an' kullanılır. 'Lamp' sessiz harfle başlar → 'a'."}
       ]}
     ]
   }
@@ -1612,7 +1631,8 @@ const LESSON_DATA = {
         {q:"\"___ a sofa in the living room.\" boşluğa ne gelir?",opts:["There are","There is","There have","There has"],correct:1},
         {q:"\"___ three cats in the garden.\" boşluğa ne gelir?",opts:["There is","There has","There are","There was"],correct:2},
         {q:"\"Bahçe yok\" İngilizcede ne?",opts:["There aren't a garden","There isn't a garden","There no garden","There don't garden"],correct:1},
-        {q:"\"There aren't any chairs\" ne demek?",opts:["Sandalyeler var","Hiç sandalye yok","Sandalye kırık","Sandalye güzel"],correct:1}
+        {q:"\"There aren't any chairs\" ne demek?",opts:["Sandalyeler var","Hiç sandalye yok","Sandalye kırık","Sandalye güzel"],correct:1},
+        {q:"\"The picture is ___ the wall.\" Boşluğa ne gelir?",opts:["in","at","on","to"],correct:2,hint:"Duvar gibi yüzeyler için 'on' kullanılır. Türkçede 'duvarda' derken ek kullanılır."}
       ]}
     ]
   }
@@ -1673,7 +1693,8 @@ const LESSON_DATA = {
         {q:"\"Photography\" ne demek?",opts:["Fotoğraf çekme","Film izleme","Resim yapma","Müzik dinleme"],correct:0},
         {q:"\"Gardening\" ne demek?",opts:["Bahçecilik","Yürüyüş","Balıkçılık","Yüzme"],correct:0},
         {q:"\"I enjoy reading\" ne demek?",opts:["Okurum","Okumaktan hoşlanırım","Okumam gerekiyor","Okuyabilirim"],correct:1},
-        {q:"Hangisi bir spor değildir?",opts:["Swimming","Football","Cooking","Hiking"],correct:2}
+        {q:"Hangisi bir spor değildir?",opts:["Swimming","Football","Cooking","Hiking"],correct:2},
+        {q:"Zeynep likes dancing. '___ dances every weekend.' Boşluğa ne gelir?",opts:["He","It","They","She"],correct:3,hint:"Zeynep kadın ismidir → 'She'. Türkçede 'o' denir ama İngilizcede kadın = she."}
       ]}
     ]
   }
@@ -1693,7 +1714,8 @@ const LESSON_DATA = {
         {q:"\"I enjoy ___\" boşluğa ne gelir?",opts:["to swim","swim","swimming","swims"],correct:2},
         {q:"\"She likes ___ music.\" boşluğa ne gelir?",opts:["listen","listening to","to listening","listened"],correct:1},
         {q:"Hangisi YANLIŞTIR?",opts:["I like reading","I enjoy reading","I enjoy to read","I like to read"],correct:2},
-        {q:"\"What do you like doing?\" ne soruyor?",opts:["Ne yapıyorsun?","Ne yapmayı seversin?","Ne yaptın?","Ne yapacaksın?"],correct:1}
+        {q:"\"What do you like doing?\" ne soruyor?",opts:["Ne yapıyorsun?","Ne yapmayı seversin?","Ne yaptın?","Ne yapacaksın?"],correct:1},
+        {q:"Hangisi doğru cümle sırasıdır?",opts:["I music listening enjoy.","Enjoy I listening music.","I enjoy listening to music.","Music I enjoy listening."],correct:2,hint:"İngilizce sıra: Özne + Fiil + Nesne. Türkçedeki 'Ben müzik dinlemeyi severim' sırasından farklıdır."}
       ]}
     ]
   }
@@ -1751,9 +1773,9 @@ const LESSON_DATA = {
       {type:"match",q:"Eşleştir",pairs:[["Airport","Havalimanı"],["Passport","Pasaport"],["Luggage","Bagaj"],["Beach","Plaj"],["Souvenir","Hediyelik eşya"]]},
       {type:"quiz",items:[
         {q:"\"Boarding pass\" ne demek?",opts:["Pasaport","Biniş kartı","Bilet","Vize"],correct:1},
-        {q:"\"Sightseeing\" ne demek?",opts:["Alışveriş","Gezi/Tur","Yüzme","Yemek"],correct:1},
+        {q:"\"We arrived ___ the airport.\" Boşluğa ne gelir?",opts:["in","on","at","to"],correct:2,hint:"Belirli yerler (havalimanı, istasyon, okul) için 'at' kullanılır."},
         {q:"\"The flight is delayed\" ne demek?",opts:["Uçuş iptal","Uçuş erken","Uçuş gecikti","Uçuş tam zamanında"],correct:2},
-        {q:"\"Reservation\" ne demek?",opts:["İptal","Rezervasyon","Bilet","Pasaport"],correct:1}
+        {q:"\"We are going ___ holiday ___ July.\" Boşluklara ne gelir?",opts:["to / at","on / in","in / on","at / in"],correct:1,hint:"'On holiday' ve aylarla 'in' kullanılır: in July, in March."}
       ]}
     ]
   }
@@ -1772,8 +1794,8 @@ const LESSON_DATA = {
       {type:"quiz",items:[
         {q:"Planlı bir tatil için hangisi doğru?",opts:["I will go to Antalya","I am going to go to Antalya","I go Antalya","I going Antalya"],correct:1},
         {q:"Anlık karar: \"Tamam, sana yardım ederim\" →",opts:["I'm going to help you","I help you","I'll help you","I helped you"],correct:2},
-        {q:"\"She won't come\" ne demek?",opts:["O gelecek","O gelmeyecek","O geldi","O geliyor"],correct:1},
-        {q:"\"We are going to visit the museum\" ne demek?",opts:["Müzeyi ziyaret ettik","Müzeyi ziyaret edeceğiz","Müzeyi ziyaret edebiliriz","Müzeyi ziyaret ederiz"],correct:1}
+        {q:"\"She won't come\" ne demek?",opts:["O gelecek","O gelmeyecek","O geldi","O geliyor"],correct:1,hint:"Türkçede 'o gelmeyecek' derken cinsiyet belirtilmez ama İngilizcede 'she' kadın, 'he' erkek demektir."},
+        {q:"\"We are going to visit ___ museum.\" Boşluğa ne gelir?",opts:["a","an","the","—"],correct:2,hint:"Belirli/bilinen bir müzeden bahsedildiğinde 'the' kullanılır."}
       ]}
     ]
   }
@@ -1832,8 +1854,8 @@ const LESSON_DATA = {
       {type:"quiz",items:[
         {q:"\"I have a sore throat\" ne demek?",opts:["Başım ağrıyor","Boğazım ağrıyor","Midem ağrıyor","Sırtım ağrıyor"],correct:1},
         {q:"\"Prescription\" ne demek?",opts:["Randevu","İlaç","Reçete","Hastane"],correct:2},
-        {q:"\"I've caught a cold\" ne demek?",opts:["Üşüdüm","Soğuk algınlığına yakalandım","Grip oldum","Ateşim var"],correct:1},
-        {q:"\"Pain\" ne demek?",opts:["İlaç","Hastalık","Ağrı","Doktor"],correct:2}
+        {q:"Elif has a headache. '___ should take some medicine.' Boşluğa ne gelir?",opts:["He","It","They","She"],correct:3,hint:"Elif kadın ismidir → 'She'. Türkçede 'o ilaç almalı' derken cinsiyet belirtilmez."},
+        {q:"\"I need to see ___ doctor.\" Boşluğa ne gelir?",opts:["a","an","the","—"],correct:0,hint:"Genel olarak bir doktordan bahsederken 'a' kullanılır."}
       ]}
     ]
   }
@@ -1853,7 +1875,8 @@ const LESSON_DATA = {
         {q:"\"You should rest\" ne demek?",opts:["Dinlenmelisin","Dinlenme","Dinlendin","Dinleniyorsun"],correct:0},
         {q:"\"He shouldn't smoke\" ne demek?",opts:["Sigara içebilir","Sigara içmemeli","Sigara içiyor","Sigara içti"],correct:1},
         {q:"Başı ağrıyan birine ne dersin?",opts:["You should run","You should take a painkiller","You shouldn't rest","You should eat more"],correct:1},
-        {q:"\"Should I see a doctor?\" ne soruyor?",opts:["Doktor musunuz?","Doktora gitmeli miyim?","Doktoru gördünüz mü?","Doktor nerede?"],correct:1}
+        {q:"\"Should I see a doctor?\" ne soruyor?",opts:["Doktor musunuz?","Doktora gitmeli miyim?","Doktoru gördünüz mü?","Doktor nerede?"],correct:1},
+        {q:"\"You should stay ___ home and rest.\" Boşluğa ne gelir?",opts:["in","on","at","to"],correct:2,hint:"'At home' kalıp ifadedir. Türkçede 'evde' derken ek kullanılır, İngilizcede 'at' edatı gerekir."}
       ]}
     ]
   }
@@ -1912,7 +1935,8 @@ const LESSON_DATA = {
         {q:"\"In my opinion\" ne demek?",opts:["Bence","Kesinlikle","Tabii ki","Aslında"],correct:0},
         {q:"\"Advantage\" ne demek?",opts:["Dezavantaj","Sorun","Avantaj","Fikir"],correct:2},
         {q:"\"On the other hand\" ne demek?",opts:["Bir yandan","Öte yandan","El ele","Başka bir el"],correct:1},
-        {q:"\"I disagree\" ne demek?",opts:["Katılıyorum","Katılmıyorum","İnanıyorum","Bilmiyorum"],correct:1}
+        {q:"\"I disagree\" ne demek?",opts:["Katılıyorum","Katılmıyorum","İnanıyorum","Bilmiyorum"],correct:1},
+        {q:"Hangisi doğru cümle sırasıdır?",opts:["Important is education I think.","I think education is important.","Education important is I think.","Think I education important is."],correct:1,hint:"İngilizce sıra: 'I think' + Özne + Fiil + Sıfat. Türkçede fiil sondadır ama İngilizcede değil."}
       ]}
     ]
   }
@@ -1991,7 +2015,8 @@ const LESSON_DATA = {
         {q:"\"Nervous\" ne demek?",opts:["Mutlu","Gergin","Kızgın","Cömert"],correct:1},
         {q:"\"Confident\" ne demek?",opts:["Utangaç","Sabırlı","Özgüvenli","Tembel"],correct:2},
         {q:"\"I'm bored\" ne demek?",opts:["Sıkıldım","Yoruldum","Kızdım","Heyecanlandım"],correct:0},
-        {q:"Hangisi olumlu bir kişilik özelliğidir?",opts:["Lazy","Angry","Generous","Bored"],correct:2}
+        {q:"Hangisi olumlu bir kişilik özelliğidir?",opts:["Lazy","Angry","Generous","Bored"],correct:2},
+        {q:"Murat is excited about the trip. '___ is very happy.' Boşluğa ne gelir?",opts:["She","It","They","He"],correct:3,hint:"Murat erkek ismidir → 'He'. Türkçede 'o çok mutlu' derken cinsiyet belirtilmez."}
       ]}
     ]
   }
@@ -2011,7 +2036,8 @@ const LESSON_DATA = {
         {q:"\"She is ___ than her sister.\" (tall)",opts:["taller","more tall","tallest","most tall"],correct:0},
         {q:"\"He is the ___ person I know.\" (generous)",opts:["more generous","most generous","generouser","generousest"],correct:1},
         {q:"\"Good\" sıfatının comparative hali nedir?",opts:["Gooder","More good","Better","Best"],correct:2},
-        {q:"\"Bad\" sıfatının superlative hali nedir?",opts:["Baddest","Most bad","Worse","Worst"],correct:3}
+        {q:"\"Bad\" sıfatının superlative hali nedir?",opts:["Baddest","Most bad","Worse","Worst"],correct:3},
+        {q:"Hangisi doğrudur?",opts:["Istanbul is the most big city.","Istanbul is the biggest city.","Istanbul is the bigger city.","Istanbul is most big city."],correct:1,hint:"Kısa sıfatlarda superlative: the + sıfat + -est. 'The' article her zaman kullanılır."}
       ]}
     ]
   }
@@ -2069,8 +2095,8 @@ const LESSON_DATA = {
       {type:"quiz",items:[
         {q:"\"Upload\" ne demek?",opts:["İndirmek","Yüklemek","Silmek","Açmak"],correct:1},
         {q:"\"Don't share your password\" ne demek?",opts:["Şifreni paylaşma","Şifreni değiştir","Şifreni hatırla","Şifreni yaz"],correct:0},
-        {q:"\"Online\" ne demek?",opts:["Çevrimdışı","Bağlantısız","Çevrimiçi","Kapalı"],correct:2},
-        {q:"\"I downloaded a new app\" ne demek?",opts:["Yeni bir uygulama yükledim","Yeni bir uygulama indirdim","Yeni bir uygulama sildim","Yeni bir uygulama yaptım"],correct:1}
+        {q:"\"I spend too much time ___ the internet.\" Boşluğa ne gelir?",opts:["in","at","on","to"],correct:2,hint:"İnternetle 'on' kullanılır: on the internet, on social media. Türkçede 'internette' eki kullanılır."},
+        {q:"\"I downloaded ___ new app.\" Boşluğa ne gelir?",opts:["a","an","the","—"],correct:0,hint:"İlk kez bahsedilen tekil isimlerden önce 'a/an' kullanılır. 'New' sessiz harfle başlar → 'a'."}
       ]}
     ]
   }
@@ -2090,7 +2116,8 @@ const LESSON_DATA = {
         {q:"\"The website is updated weekly\" ne demek?",opts:["Web sitesini güncelliyorum","Web sitesi haftalık güncellenir","Web sitesi güncellenmedi","Web sitesini güncelle"],correct:1},
         {q:"\"Was invented\" ne demek?",opts:["İcat etti","İcat edildi","İcat edecek","İcat eder"],correct:1},
         {q:"Active → Passive: \"They sell phones online\" →",opts:["Phones are sold online","Phones sold online","Phones selling online","Phones sell online"],correct:0},
-        {q:"\"by\" ne için kullanılır passive cümlede?",opts:["Zaman belirtmek","Yer belirtmek","Yapan kişiyi belirtmek","Nesneyi belirtmek"],correct:2}
+        {q:"\"by\" ne için kullanılır passive cümlede?",opts:["Zaman belirtmek","Yer belirtmek","Yapan kişiyi belirtmek","Nesneyi belirtmek"],correct:2},
+        {q:"Hangisi doğru passive cümle sırasıdır?",opts:["Made in China are smartphones.","Smartphones in China are made.","Smartphones are made in China.","In China smartphones made are."],correct:2,hint:"Passive cümle sırası: Nesne (özne olarak) + be + V3 + yer bilgisi."}
       ]}
     ]
   }
