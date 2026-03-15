@@ -2943,6 +2943,15 @@ function finishLesson() {
     lessonFSElement.remove();
     lessonFSElement = null;
   }
+  // Refresh the lesson list to show updated completion status
+  if (currentUnitId && currentModuleId) {
+    showUnitLessons(currentModuleId, currentUnitId);
+  } else if (currentModuleId) {
+    showUnits(currentModuleId);
+  } else {
+    showModules();
+  }
+  updateDashboard();
 }
 
 function confirmExitLesson() {
